@@ -22,6 +22,7 @@ describe("buildProgram", () => {
 
     expect(commandNames).toContain("init");
     expect(commandNames).toContain("spec");
+    expect(commandNames).toContain("spec-ready");
   });
 
   it("runs init against the current working directory", async () => {
