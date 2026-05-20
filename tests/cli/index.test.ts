@@ -16,7 +16,7 @@ import { buildProgram, isDirectExecution } from "../../src/cli/index.js";
 const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
 
 describe("buildProgram", () => {
-  it("registers the init command", () => {
+  it("registers expected commands", () => {
     const program = buildProgram();
     const commandNames = program.commands.map((command) => command.name());
 
