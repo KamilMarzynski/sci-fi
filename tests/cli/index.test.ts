@@ -129,6 +129,30 @@ describe("installed artifact cli", () => {
         throw new Error("Expected commander tarball for offline install");
       }
 
+      execFileSync(
+        "npm",
+        [
+          "pack",
+          "./node_modules/yaml",
+          "--pack-destination",
+          packDirectory,
+        ],
+        {
+          cwd: repositoryRoot,
+          encoding: "utf8",
+          env: npmEnvironment,
+        },
+      );
+
+      const [yamlArtifactName] = readdirSync(packDirectory).filter((entry) =>
+        entry.startsWith("yaml-") && entry.endsWith(".tgz"),
+      );
+      expect(yamlArtifactName).toBeDefined();
+
+      if (yamlArtifactName === undefined) {
+        throw new Error("Expected yaml tarball for offline install");
+      }
+
       writeFileSync(
         join(installDirectory, "package.json"),
         JSON.stringify({ name: "specflow-cli-test", private: true }),
@@ -143,6 +167,7 @@ describe("installed artifact cli", () => {
           "--no-fund",
           "--no-package-lock",
           join(packDirectory, commanderArtifactName),
+          join(packDirectory, yamlArtifactName),
           join(packDirectory, artifactName),
         ],
         {
