@@ -24,7 +24,15 @@ export async function createFeature(
   const featureDirectoryPath = buildFeatureDirectoryPath(projectRoot, slug);
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);
 
-  const existingFeatureDirectory = await stat(featureDirectoryPath).catch(() => null);
+  const existingFeatureDirectory = await stat(featureDirectoryPath).catch(
+    (error: unknown): null => {
+      if (isMissingPathError(error)) {
+        return null;
+      }
+
+      throw error;
+    },
+  );
 
   if (existingFeatureDirectory !== null) {
     throw new Error(
@@ -55,4 +63,8 @@ export async function createFeature(
     featureDirectoryPath,
     metadataPath,
   };
+}
+
+function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && "code" in error && error.code === "ENOENT";
 }

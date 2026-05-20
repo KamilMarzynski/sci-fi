@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, stat } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -9,9 +9,7 @@ const temporaryDirectories: string[] = [];
 afterEach(async () => {
   await Promise.all(
     temporaryDirectories.map(async (directory) => {
-      await import("node:fs/promises").then(({ rm }) =>
-        rm(directory, { recursive: true, force: true }),
-      );
+      await rm(directory, { recursive: true, force: true });
     }),
   );
   temporaryDirectories.length = 0;
@@ -65,5 +63,39 @@ describe("createFeature", () => {
     ).rejects.toThrow(
       `Cannot create feature user-auth: ${join(projectRoot, "docs", "specflow", "specs", "user-auth")} already exists.`,
     );
+  });
+
+  it("assigns sequential ids", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-create-"));
+    temporaryDirectories.push(projectRoot);
+
+    const first = await createFeature({
+      projectRoot,
+      slug: "first-feature",
+      now: "2026-05-20T06:29:55Z",
+    });
+
+    const second = await createFeature({
+      projectRoot,
+      slug: "second-feature",
+      now: "2026-05-20T06:30:55Z",
+    });
+
+    expect(first.id).toBe("FEAT-0001");
+    expect(second.id).toBe("FEAT-0002");
+  });
+
+  it("omits title when not provided", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-create-"));
+    temporaryDirectories.push(projectRoot);
+
+    const result = await createFeature({
+      projectRoot,
+      slug: "no-title",
+      now: "2026-05-20T06:29:55Z",
+    });
+
+    const metadata = JSON.parse(await readFile(result.metadataPath, "utf8"));
+    expect(metadata).not.toHaveProperty("title");
   });
 });
