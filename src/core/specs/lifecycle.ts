@@ -14,13 +14,20 @@ export interface FeatureLifecycle {
   artifacts: FeatureArtifacts;
 }
 
-async function pathIsRegularFile(filePath: string): Promise<boolean> {
-  const entry = await stat(filePath).catch(() => null);
-  return entry?.isFile() ?? false;
-}
-
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && "code" in error && error.code === "ENOENT";
+}
+
+async function pathIsRegularFile(filePath: string): Promise<boolean> {
+  try {
+    const entry = await stat(filePath);
+    return entry.isFile();
+  } catch (error) {
+    if (isMissingPathError(error)) {
+      return false;
+    }
+    throw error;
+  }
 }
 
 function isValidFeatureMetadata(value: unknown): value is FeatureMetadata {
