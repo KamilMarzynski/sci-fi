@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { registerInitCommand } from "./commands/init.js";
 import { registerSpecCommand } from "./commands/spec.js";
+import { registerPlanReadyCommand } from "./commands/plan-ready.js";
 import { registerSpecReadyCommand } from "./commands/spec-ready.js";
 
 const require = createRequire(import.meta.url);
@@ -35,6 +36,7 @@ export function buildProgram(): Command {
   registerInitCommand(program);
   registerSpecCommand(program);
   registerSpecReadyCommand(program);
+  registerPlanReadyCommand(program);
 
   return program;
 }
