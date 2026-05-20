@@ -177,3 +177,67 @@ describe("validateStatusTransition", () => {
     await expect(validateStatusTransition(artifacts, "done")).resolves.toBeUndefined();
   });
 });
+
+describe("validateStatusTransition with context", () => {
+  it("rejects in-progress when current status is not plan-ready", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        "in-progress",
+        { currentStatus: "spec-ready" },
+      ),
+    ).rejects.toThrow(
+      "Cannot start feature: feature must be plan-ready before starting implementation.",
+    );
+  });
+
+  it("accepts in-progress when current status is plan-ready", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        "in-progress",
+        { currentStatus: "plan-ready" },
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it("rejects done when allTasksDone is false", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        "done",
+        { allTasksDone: false },
+      ),
+    ).rejects.toThrow(
+      "Cannot mark feature as done: not all tasks are complete.",
+    );
+  });
+
+  it("accepts done when allTasksDone is true", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        "done",
+        { allTasksDone: true },
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it("does not apply in-progress rule when context is absent", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: false, architectureExists: false, taskFileCount: 0 },
+        "in-progress",
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it("does not apply done rule when context is absent", async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: false, architectureExists: false, taskFileCount: 0 },
+        "done",
+      ),
+    ).resolves.toBeUndefined();
+  });
+});

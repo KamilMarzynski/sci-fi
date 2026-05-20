@@ -93,9 +93,15 @@ export async function inspectFeatureLifecycle(
   };
 }
 
+interface ValidationContext {
+  currentStatus?: FeatureStatus;
+  allTasksDone?: boolean;
+}
+
 export async function validateStatusTransition(
   artifacts: FeatureArtifacts,
   targetStatus: FeatureStatus,
+  context?: ValidationContext,
 ): Promise<void> {
   if (targetStatus === "spec-ready" && !artifacts.specExists) {
     throw new Error("Cannot mark feature as spec-ready: spec.md is missing.");
@@ -105,9 +111,24 @@ export async function validateStatusTransition(
     if (!artifacts.architectureExists) {
       throw new Error("Cannot mark feature as plan-ready: architecture.md is missing.");
     }
-
     if (artifacts.taskFileCount < 1) {
       throw new Error("Cannot mark feature as plan-ready: no task files were found.");
     }
+  }
+
+  if (
+    targetStatus === "in-progress" &&
+    context?.currentStatus !== undefined &&
+    context.currentStatus !== "plan-ready"
+  ) {
+    throw new Error(
+      "Cannot start feature: feature must be plan-ready before starting implementation.",
+    );
+  }
+
+  if (targetStatus === "done" && context?.allTasksDone === false) {
+    throw new Error(
+      "Cannot mark feature as done: not all tasks are complete.",
+    );
   }
 }
