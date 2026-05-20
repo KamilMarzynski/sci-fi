@@ -1,144 +1,19 @@
-import { execFileSync, spawnSync } from "node:child_process";
 import {
   existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
   readFileSync,
-  rmSync,
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-
-const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
-const verificationRoot = join(repositoryRoot, ".testing");
-const sandboxesRoot = join(verificationRoot, "sandboxes");
-const artifactsRoot = join(verificationRoot, "artifacts");
-
-type InstalledDependencyNode = {
-  path?: string;
-  dependencies?: Record<string, InstalledDependencyNode>;
-};
-
-type InstalledDependencyTree = InstalledDependencyNode & {
-  _dependencies?: Record<string, string>;
-};
-
-function isInstalledDependencyNode(value: unknown): value is InstalledDependencyNode {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const dependencies = Reflect.get(value, "dependencies");
-  const path = Reflect.get(value, "path");
-
-  return (
-    (path === undefined || typeof path === "string") &&
-    (
-      dependencies === undefined ||
-      (typeof dependencies === "object" &&
-        dependencies !== null &&
-        !Array.isArray(dependencies))
-    )
-  );
-}
-
-function isInstalledDependencyTree(value: unknown): value is InstalledDependencyTree {
-  if (!isInstalledDependencyNode(value)) {
-    return false;
-  }
-
-  const declaredDependencies = Reflect.get(value, "_dependencies");
-
-  return (
-    declaredDependencies === undefined ||
-    (typeof declaredDependencies === "object" &&
-      declaredDependencies !== null &&
-      !Array.isArray(declaredDependencies))
-  );
-}
-
-function readInstalledProductionDependencyTree(): InstalledDependencyTree {
-  const dependencyTreeContents = execFileSync(
-    "npm",
-    ["ls", "--omit=dev", "--all", "--json", "--long"],
-    {
-      cwd: repositoryRoot,
-      encoding: "utf8",
-    },
-  );
-  const dependencyTree = JSON.parse(dependencyTreeContents);
-
-  if (!isInstalledDependencyTree(dependencyTree)) {
-    throw new Error("Expected npm ls to return an installed dependency tree");
-  }
-
-  return dependencyTree;
-}
-
-function collectInstalledDependencyPaths(
-  dependencyTree: InstalledDependencyTree,
-): string[] {
-  const stagedPaths = new Set<string>();
-  const pendingNodes = Object.keys(dependencyTree._dependencies ?? {}).map(
-    (dependencyName) => dependencyTree.dependencies?.[dependencyName],
-  );
-
-  while (pendingNodes.length > 0) {
-    const dependencyNode = pendingNodes.pop();
-
-    if (dependencyNode === undefined) {
-      continue;
-    }
-
-    if (dependencyNode.path === undefined) {
-      throw new Error("Expected installed dependency node to include a package path");
-    }
-
-    if (stagedPaths.has(dependencyNode.path)) {
-      continue;
-    }
-
-    stagedPaths.add(dependencyNode.path);
-    pendingNodes.push(...Object.values(dependencyNode.dependencies ?? {}));
-  }
-
-  return [...stagedPaths];
-}
-
-function packPackage(
-  packageSpecifier: string,
-  packDirectory: string,
-  npmEnvironment: NodeJS.ProcessEnv,
-): string {
-  const existingArtifacts = new Set(readdirSync(packDirectory));
-
-  execFileSync("npm", ["pack", packageSpecifier, "--pack-destination", packDirectory], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-    env: npmEnvironment,
-  });
-
-  const newArtifacts = readdirSync(packDirectory).filter(
-    (entry) => entry.endsWith(".tgz") && !existingArtifacts.has(entry),
-  );
-
-  expect(newArtifacts).toHaveLength(1);
-
-  const [artifactName] = newArtifacts;
-
-  if (artifactName === undefined) {
-    throw new Error(`Expected npm pack to produce one tarball for ${packageSpecifier}`);
-  }
-
-  return join(packDirectory, artifactName);
-}
+import {
+  cleanupInstalledPackageTestEnvironment,
+  createInstalledPackageTestEnvironment,
+  runInstalledInit,
+} from "./installed-test-helpers.js";
 
 describe("installed build init verification", () => {
   it("initializes the project structure from an installed package in the dedicated workspace", () => {
-    const installation = createInstalledPackageTestEnvironment();
+    const installation = createInstalledPackageTestEnvironment("installed-init-");
 
     try {
       const result = runInstalledInit(installation.installDirectory);
@@ -163,7 +38,7 @@ describe("installed build init verification", () => {
   });
 
   it("allows a safe installed-build rerun without overwriting existing bootstrap docs or generated files", () => {
-    const installation = createInstalledPackageTestEnvironment();
+    const installation = createInstalledPackageTestEnvironment("installed-init-");
 
     try {
       const initialRun = runInstalledInit(installation.installDirectory);
@@ -204,7 +79,7 @@ describe("installed build init verification", () => {
   });
 
   it("returns a stable non-zero exit and concise stderr on an init conflict", () => {
-    const installation = createInstalledPackageTestEnvironment();
+    const installation = createInstalledPackageTestEnvironment("installed-init-");
 
     try {
       writeFileSync(join(installation.installDirectory, "bugs"), "conflict", "utf8");
@@ -230,86 +105,13 @@ describe("installed build init verification", () => {
   });
 });
 
-type InstalledPackageTestEnvironment = {
-  artifactRoot: string;
-  installDirectory: string;
-  sandboxRoot: string;
-};
-
-function createInstalledPackageTestEnvironment(): InstalledPackageTestEnvironment {
-  const sandboxRoot = mkdtempSync(join(sandboxesRoot, "installed-init-"));
-  const artifactRoot = mkdtempSync(join(artifactsRoot, "installed-init-"));
-  const packDirectory = join(artifactRoot, "pack");
-  const installDirectory = join(sandboxRoot, "workspace");
-  const cacheDirectory = join(sandboxRoot, ".npm-cache");
-  const npmEnvironment = {
-    ...process.env,
-    npm_config_cache: cacheDirectory,
-  };
-
-  mkdirSync(packDirectory, { recursive: true });
-  mkdirSync(installDirectory, { recursive: true });
-  mkdirSync(cacheDirectory, { recursive: true });
-
-  const installedDependencyTree = readInstalledProductionDependencyTree();
-  const packageArtifactPath = packPackage(".", packDirectory, npmEnvironment);
-  const runtimeDependencyArtifactPaths = collectInstalledDependencyPaths(
-    installedDependencyTree,
-  ).map((dependencyPath) => packPackage(dependencyPath, packDirectory, npmEnvironment));
-
-  writeFileSync(
-    join(installDirectory, "package.json"),
-    JSON.stringify({ name: "specflow-installed-init-test", private: true }),
-  );
-
-  execFileSync(
-    "npm",
-    [
-      "install",
-      "--offline",
-      "--no-audit",
-      "--no-fund",
-      "--no-package-lock",
-      ...runtimeDependencyArtifactPaths,
-      packageArtifactPath,
-    ],
-    {
-      cwd: installDirectory,
-      encoding: "utf8",
-      env: npmEnvironment,
-    },
-  );
-
-  return {
-    artifactRoot,
-    installDirectory,
-    sandboxRoot,
-  };
-}
-
-function cleanupInstalledPackageTestEnvironment(
-  environment: InstalledPackageTestEnvironment,
-): void {
-  rmSync(environment.sandboxRoot, { force: true, recursive: true });
-  rmSync(environment.artifactRoot, { force: true, recursive: true });
-}
-
-function runInstalledInit(installDirectory: string) {
-  const installedBinPath = join(installDirectory, "node_modules/.bin/specflow");
-
-  return spawnSync(installedBinPath, ["init"], {
-    cwd: installDirectory,
-    encoding: "utf8",
-  });
-}
-
 const expectedAgentsDocument = `# AGENTS.md
 
 This repository uses \`specflow\` to keep implementation work aligned with written specs.
 
 ## Workflow Expectations
 
-- Capture new feature work in \`specs/\` before implementing.
+- Capture specflow-managed feature work in \`docs/specflow/specs/\` before implementing.
 - Track production bugs in \`bugs/\` with reproduction details and fix status.
 - Keep command wiring thin and move reusable logic into core modules.
 

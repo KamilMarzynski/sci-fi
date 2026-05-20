@@ -33,11 +33,13 @@ node dist/cli/index.js init
 
 ## Current Command Surface
 
-The bootstrap milestone currently exposes one command:
-
 ```bash
 specflow init
+specflow spec <slug> [--title "..."]
 ```
+
+`specflow spec` creates a feature container under `docs/specflow/specs/<slug>/`
+and writes `.specflow.json` with the CLI-managed feature identifier and status.
 
 Running `specflow init` in a repository creates:
 

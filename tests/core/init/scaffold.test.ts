@@ -137,7 +137,7 @@ This repository uses \`specflow\` to keep implementation work aligned with writt
 
 ## Workflow Expectations
 
-- Capture new feature work in \`specs/\` before implementing.
+- Capture specflow-managed feature work in \`docs/specflow/specs/\` before implementing.
 - Track production bugs in \`bugs/\` with reproduction details and fix status.
 - Keep command wiring thin and move reusable logic into core modules.
 

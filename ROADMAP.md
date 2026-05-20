@@ -6,7 +6,8 @@
    Production-ready TypeScript CLI scaffold, package shape, config, base folders, and `specflow init` foundation.
 
 2. Spec Lifecycle
-   `specflow spec`, feature folder generation, IDs, and spec/plan/tasks templates.
+   `specflow spec`, namespaced feature folders, CLI-managed feature metadata,
+   slug-based feature identity, and lifecycle validation helpers.
 
 3. Bug Lifecycle
    `specflow bug`, standalone vs spec-linked bugs, fuzzy lookup, and bug templates.
