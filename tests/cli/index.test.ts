@@ -21,6 +21,7 @@ describe("buildProgram", () => {
     const commandNames = program.commands.map((command) => command.name());
 
     expect(commandNames).toContain("init");
+    expect(commandNames).toContain("spec");
   });
 
   it("runs init against the current working directory", async () => {

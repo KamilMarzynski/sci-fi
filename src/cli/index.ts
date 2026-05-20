@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { registerInitCommand } from "./commands/init.js";
+import { registerSpecCommand } from "./commands/spec.js";
 
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
@@ -31,6 +32,7 @@ export function buildProgram(): Command {
     .version(readPackageVersion(packageJson));
 
   registerInitCommand(program);
+  registerSpecCommand(program);
 
   return program;
 }
