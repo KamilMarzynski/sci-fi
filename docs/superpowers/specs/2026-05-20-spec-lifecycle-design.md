@@ -1,302 +1,165 @@
-# Spec Lifecycle Design
+# Spec Lifecycle — Design
 
 **Date:** 2026-05-20
-**Status:** Draft for review
-**Scope:** Second sub-project of `specflow`
+**Roadmap item:** 2 — Spec Lifecycle (MVP)
+**Scope:** CLI commands and core modules for the full feature lifecycle: created → spec-ready → plan-ready → in-progress → done. Skills and slash commands are out of scope (separate job).
 
-## Goal
+---
 
-Define the first durable feature lifecycle contract for `specflow`.
+## Overview
 
-This sub-project should not try to encode the full authoring workflow into the CLI. Instead, it should establish the repository shape, CLI-owned metadata, and status transitions that agent slash commands can rely on when driving feature work.
+The spec lifecycle tracks a feature from initial creation through specification, planning, and implementation. The CLI provides deterministic commands that agents call at lifecycle boundaries. Agents write the markdown artifacts; the CLI validates their presence and records state transitions.
 
-## Why This Next
+---
 
-The bootstrap layer is already in place. The next missing piece is a stable way to represent a feature inside the repository so later slash commands, skills, and validation logic can coordinate around the same source of truth.
+## File layout
 
-Without this layer, feature work remains informal: there is no canonical feature container, no CLI-owned state, and no deterministic way for an agent to resume work based on repository contents.
+Each feature lives under `docs/specflow/specs/<slug>/`:
 
-## Decisions
-
-### Feature Path
-
-`specflow`-managed features live under:
-
-```text
+```
 docs/specflow/specs/<slug>/
+├── .specflow.json        ← feature metadata (status, id, slug, title, timestamps)
+├── spec.md               ← written by spec-session agent
+├── architecture.md       ← written by plan agent
+└── tasks/
+    ├── <task-slug>.md
+    └── ...
 ```
 
-This path is intentionally namespaced under `docs/specflow/` so `specflow` does not compete with other frameworks or repository-local conventions that may also create specification artifacts.
+Task files have YAML frontmatter written by the planning agent. The CLI reads and updates `status` only; `parallel` and `depends-on` are agent-owned and never modified by the CLI.
 
-### Folder Naming
-
-- Feature folders are slug-based.
-- The slug is user- or agent-provided.
-- The folder name is not derived from the CLI-generated feature ID.
-
-Example:
-
-```text
-docs/specflow/specs/user-auth/
+```yaml
+---
+id: TASK-001
+slug: setup-database
+status: pending        # pending | in-progress | done
+parallel: false        # orchestrator uses this for dispatch decisions
+depends-on: []         # task slugs that must complete first
+---
 ```
 
-This keeps the filesystem readable and user-owned. It also avoids binding repository paths to an internal ID strategy that may change later.
+---
 
-### CLI Identity vs Filesystem Identity
+## Status lifecycle
 
-- `specflow` generates an internal feature ID.
-- The generated ID is stored in metadata.
-- The generated ID is not used in the folder name.
-
-The ID exists for CLI-layer management and future lookup behavior, but the visible repository identity of a feature remains the slug.
-
-### Initial Command Shape
-
-The entry command for this sub-project is:
-
-```bash
-specflow spec <slug> [--title "..."]
+```
+created → spec-ready → plan-ready → in-progress → done
 ```
 
-Behavior:
+Future-aware: `change-requested` will slot in between any existing status without restructuring. `validateStatusTransition` already handles unknown statuses gracefully (passes through with no rules).
 
-- create `docs/specflow/specs/<slug>/`
-- create `docs/specflow/specs/<slug>/.specflow.json`
-- do not create `spec.md`
-- do not create `architecture.md`
-- do not create `tasks/`
+---
 
-This command is intentionally minimal. In the expected workflow it will usually be invoked by an agent-facing slash command such as `/specflow:start ...`, not typed directly by a user.
+## CLI commands
 
-### Authoring Responsibility
+### Feature lifecycle
 
-The CLI owns durable storage and lifecycle state.
+| Command | Validates | Transitions to |
+|---|---|---|
+| `specflow spec <slug> [--title]` | slug not already taken | `created` |
+| `specflow spec-ready <slug>` | `spec.md` exists | `spec-ready` |
+| `specflow plan-ready <slug>` | `architecture.md` exists + ≥1 task `.md` in `tasks/` | `plan-ready` |
+| `specflow start <slug>` | current status is `plan-ready` | `in-progress` |
+| `specflow finish <slug>` | all tasks have status `done` | `done` |
+| `specflow list [--status <status>]` | — | read-only |
+| `specflow status <slug>` | — | read-only |
 
-Skills and slash commands own authoring behavior.
+### Task commands
 
-That means:
+| Command | Validates | Mutates |
+|---|---|---|
+| `specflow task list <slug>` | — | read-only |
+| `specflow task start <slug> <task>` | task file exists | task status → `in-progress` |
+| `specflow task done <slug> <task>` | task file exists + status is `in-progress` | task status → `done` |
 
-- the CLI should not freeze document templates too early
-- the CLI should not try to encode research prompts or writing guidance
-- `spec.md`, `architecture.md`, and task files remain agent-authored artifacts
+All mutation commands exit non-zero on validation failure (CI-friendly).
 
-This separation keeps the CLI stable while allowing authoring workflows to evolve faster.
+---
 
-### Technical Design Artifact
+## Agent call flow
 
-The technical design artifact for a feature is:
+```
+/specflow:create <slug> [description]
+  → specflow spec <slug>           # create container
+  → agent: brainstorm, grill user, write spec.md
+  → specflow spec-ready <slug>     # validate + set status
 
-```text
-architecture.md
+/specflow:plan [slug]
+  → agent: plan session, validate plan vs spec (subagent), write architecture.md + tasks/*.md
+  → specflow plan-ready <slug>     # validate + set status
+
+/specflow:implement <slug>
+  → specflow start <slug>          # set in-progress
+  → orchestrator reads tasks (parallel/depends-on), dispatches agents
+  → per task: specflow task start <slug> <task>
+  → task agent: work → eval subagent → repeat until pass
+  → per task: specflow task done <slug> <task>   # after code review passes
+  → specflow finish <slug>         # all tasks done → done
 ```
 
-This file captures technical decisions, architectural boundaries, and implementation-shaping constraints for a feature.
+If `/specflow:implement` is called on a feature with status `done`, the agent informs the user and suggests filing a bug (future phase) or using `/specflow:change` (future phase).
 
-It is not the full implementation plan by itself. The executable implementation plan is the combination of:
+---
 
-- `architecture.md`
-- `tasks/*.md`
+## Core module layout
 
-### Task Model
+### New: `src/core/specs/transition.ts`
 
-Implementation planning is task-based.
-
-- task files live under `docs/specflow/specs/<slug>/tasks/`
-- each task is a separate `.md` file
-- task filenames are human-readable and agent-named
-- task filenames are not CLI-generated IDs
-
-Readable task filenames are important because an orchestrator agent may later dispatch subagents by task, and the filename itself should hint at the work to be done.
-
-## Proposed Structure
-
-### At Creation Time
-
-```text
-docs/
-└── specflow/
-    └── specs/
-        └── user-auth/
-            └── .specflow.json
+```ts
+updateFeatureStatus(projectRoot: string, slug: string, targetStatus: FeatureStatus): Promise<void>
 ```
 
-### After Spec Drafting
+Reads `.specflow.json`, runs `validateStatusTransition` (extended for `start` and `finish` rules), writes updated status and `updatedAt`.
 
-```text
-docs/
-└── specflow/
-    └── specs/
-        └── user-auth/
-            ├── .specflow.json
-            └── spec.md
+### New: `src/core/tasks/`
+
+| File | Exports |
+|---|---|
+| `types.ts` | `TaskStatus`, `TaskMetadata`, `TaskFrontmatter` |
+| `paths.ts` | `buildTasksDirectoryPath`, `buildTaskFilePath` |
+| `frontmatter.ts` | `readTaskFrontmatter`, `writeTaskFrontmatter` (uses `gray-matter`) |
+| `list.ts` | `listTasks(projectRoot, slug): Promise<TaskMetadata[]>` |
+| `transition.ts` | `updateTaskStatus(projectRoot, slug, taskSlug, status): Promise<void>` |
+
+### Extended: `src/core/specs/lifecycle.ts`
+
+`validateStatusTransition` gains rules for:
+- `in-progress`: requires current status `plan-ready`
+- `done`: requires all tasks have status `done` (delegates to `listTasks`)
+
+### New CLI command files
+
+```
+src/cli/commands/spec-ready.ts
+src/cli/commands/plan-ready.ts
+src/cli/commands/start.ts
+src/cli/commands/finish.ts
+src/cli/commands/list.ts
+src/cli/commands/status.ts
+src/cli/commands/task.ts   ← subcommand group: list | start | done
 ```
 
-### After Planning
+---
 
-```text
-docs/
-└── specflow/
-    └── specs/
-        └── user-auth/
-            ├── .specflow.json
-            ├── spec.md
-            ├── architecture.md
-            └── tasks/
-                ├── define-session-boundary.md
-                └── add-auth-storage-contract.md
-```
+## Dependencies
 
-## Metadata Contract
+`gray-matter` — YAML frontmatter parsing/serialization for task files. Already the standard Node.js library for this pattern.
 
-Each feature folder contains a CLI-owned metadata file:
+---
 
-```text
-docs/specflow/specs/<slug>/.specflow.json
-```
+## Future-aware notes
 
-Initial recommended shape:
+- `FeatureStatus` is an `as const` array. Adding `change-requested` is a single-line addition to `types.ts`.
+- `validateStatusTransition` passes through statuses with no rules — new statuses don't break existing validation.
+- `specflow start` gate (`plan-ready` required) will extend to also accept `change-requested` with a one-line change.
+- No other future-proofing. Bug lifecycle, agent install targets, and `specflow:change` are separate roadmap items.
 
-```json
-{
-  "version": 1,
-  "id": "FEAT-0001",
-  "slug": "user-auth",
-  "title": "User Auth",
-  "status": "created",
-  "createdAt": "2026-05-20T06:29:55Z",
-  "updatedAt": "2026-05-20T06:29:55Z"
-}
-```
+---
 
-Field intent:
+## Out of scope
 
-- `version`: schema version for future migrations
-- `id`: internal CLI-managed identifier
-- `slug`: canonical folder slug
-- `title`: optional display title for agent and CLI output
-- `status`: lifecycle state
-- `createdAt`: feature creation time
-- `updatedAt`: last CLI-managed state update
-
-The metadata file is the CLI-owned coordination layer. User-authored markdown files remain separate so commands can make deterministic decisions without over-trusting mutable document contents.
-
-## Lifecycle Model
-
-### States
-
-- `created`
-- `spec-ready`
-- `plan-ready`
-- `in-progress`
-- `done`
-
-### State Meanings
-
-`created`
-
-- The feature container exists.
-- Research may still be needed.
-- A draft spec may or may not exist yet.
-- The feature has not been accepted into planning.
-
-`spec-ready`
-
-- `spec.md` exists.
-- The spec has been accepted.
-- The feature is ready to enter planning.
-
-`plan-ready`
-
-- `architecture.md` exists.
-- `tasks/` exists.
-- `tasks/` contains at least one task file.
-- The implementation plan has been accepted and there is executable work to do.
-
-`in-progress`
-
-- Implementation is underway, or active bug/repair work has moved the feature into execution state.
-
-`done`
-
-- The feature lifecycle is considered complete.
-
-## Resume Behavior
-
-This state model is designed to support a later `/specflow:continue <slug>` flow that can infer the next step from repository state.
-
-Expected behavior:
-
-- `created` + no `spec.md`: continue with research and spec drafting
-- `created` + `spec.md`: continue with spec review or acceptance
-- `spec-ready`: continue with planning
-- `plan-ready`: continue with execution
-- `in-progress`: continue implementation or bugfix work
-
-This avoids the need for extra resume flags and keeps the workflow inspectable from files on disk.
-
-## Transition Rules
-
-The CLI should be strict about lifecycle transitions.
-
-- commands should validate required artifacts before updating status
-- commands should fail with precise reasons when the target state is not structurally valid
-- commands should not silently create missing planning artifacts during a state transition
-
-Examples:
-
-- a command that marks `spec-ready` must fail if `spec.md` is missing
-- a command that marks `plan-ready` must fail if `architecture.md` is missing
-- a command that marks `plan-ready` must fail if `tasks/` is missing or contains no task files
-
-This keeps the CLI honest and prevents hidden state drift between metadata and repository contents.
-
-## Recommended Command Scope
-
-This sub-project should focus on lifecycle primitives, not the entire downstream workflow.
-
-Recommended minimum scope:
-
-- `specflow spec <slug> [--title "..."]`
-- core logic for reading and writing `.specflow.json`
-- core logic for validating feature lifecycle state
-- thin CLI transitions for later slash-command integration
-
-The exact transition command names can still be decided later, but the lifecycle contract should be designed now so later commands do not have to reinterpret feature state.
-
-## Architecture
-
-This sub-project should preserve the repository rule that commands remain thin and business logic stays reusable.
-
-- `src/cli/commands/` should own argument parsing and output
-- `src/core/` should own feature creation, metadata updates, and transition validation
-- `src/templates/` should not own spec templates yet, because the CLI is intentionally not the source of authoring structure in this phase
-
-The CLI should act as a stateful repository primitive behind agent slash commands, not as a document-writing workflow engine.
-
-## Risks and Constraints
-
-- If folder names depend on generated IDs, future changes to ID strategy will cause needless path churn.
-- If the CLI creates too many authoring artifacts too early, later skills will be forced to inherit premature template decisions.
-- If metadata is stored only in markdown frontmatter, later commands will need to infer state from mutable user-authored files, which is fragile.
-- If `plan-ready` does not require task files, the status stops meaning there is actual executable work ready to start.
-
-## Success Criteria
-
-This sub-project is complete when:
-
-- `specflow spec <slug> [--title "..."]` creates a namespaced feature container under `docs/specflow/specs/`
-- each created feature contains a valid `.specflow.json`
-- the CLI can distinguish feature lifecycle states from metadata plus artifact presence
-- the lifecycle contract supports deterministic resume behavior for later slash commands
-- the implementation does not create `plan.md`
-- the implementation does not require ID-based folder names
-
-## Out of Scope
-
-The following are intentionally deferred:
-
-- exact slash-command names and installation targets
-- authoring templates for `spec.md`, `architecture.md`, or task files
-- bug lifecycle details beyond acknowledging later transitions to `in-progress`
-- global feature registries such as `.specflow/specs.json`
-- multi-framework interoperability beyond isolating `specflow` artifacts under `docs/specflow/`
+- Skills and slash commands (`/specflow:create`, `/specflow:plan`, `/specflow:implement`) — separate job
+- Bug lifecycle (`specflow bug`, roadmap item 3)
+- `specflow change` and `change-requested` status (future phase)
+- Agent install targets (roadmap item 4)
+- `specflow validate` and `specflow update` (roadmap item 5)
