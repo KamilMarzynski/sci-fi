@@ -36,7 +36,7 @@ export async function createFeature(
 
   const existingEntries = await readdir(featuresRootPath, {
     withFileTypes: true,
-  }).catch(() => []);
+  });
   const nextId = formatFeatureId(existingEntries.filter((entry) => entry.isDirectory()).length + 1);
 
   await mkdir(featureDirectoryPath, { recursive: false });
