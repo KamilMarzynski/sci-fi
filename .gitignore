@@ -2,3 +2,5 @@ node_modules/
 dist/
 coverage/
 .testing/artifacts/
+data
+.worktrees/
