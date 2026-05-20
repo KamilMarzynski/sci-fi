@@ -1,0 +1,39 @@
+{
+  "name": "specflow",
+  "version": "0.1.0",
+  "description": "Specification-driven CLI scaffolding for agentic workflows",
+  "type": "module",
+  "bin": {
+    "specflow": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"const fs=require('node:fs'); const path='dist/cli/index.js'; const shebang='#!/usr/bin/env node\\n'; const contents=fs.readFileSync(path, 'utf8'); if (!contents.startsWith(shebang)) { fs.writeFileSync(path, shebang + contents); } fs.chmodSync(path, 0o755);\"",
+    "prepack": "npm run build && node -e \"require('node:fs').accessSync('dist/cli/index.js')\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "cli",
+    "scaffolding",
+    "specification",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vitest/coverage-v8": "^4.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}
