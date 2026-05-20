@@ -8,6 +8,11 @@ import { registerInitCommand } from "./commands/init.js";
 import { registerSpecCommand } from "./commands/spec.js";
 import { registerPlanReadyCommand } from "./commands/plan-ready.js";
 import { registerSpecReadyCommand } from "./commands/spec-ready.js";
+import { registerStartCommand } from "./commands/start.js";
+import { registerFinishCommand } from "./commands/finish.js";
+import { registerListCommand } from "./commands/list.js";
+import { registerStatusCommand } from "./commands/status.js";
+import { registerTaskCommand } from "./commands/task.js";
 
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
@@ -37,6 +42,11 @@ export function buildProgram(): Command {
   registerSpecCommand(program);
   registerSpecReadyCommand(program);
   registerPlanReadyCommand(program);
+  registerStartCommand(program);
+  registerFinishCommand(program);
+  registerListCommand(program);
+  registerStatusCommand(program);
+  registerTaskCommand(program);
 
   return program;
 }
