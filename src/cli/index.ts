@@ -13,6 +13,7 @@ import { registerFinishCommand } from "./commands/finish.js";
 import { registerListCommand } from "./commands/list.js";
 import { registerStatusCommand } from "./commands/status.js";
 import { registerTaskCommand } from "./commands/task.js";
+import { registerBugCommand } from "./commands/bug.js";
 
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
@@ -47,6 +48,7 @@ export function buildProgram(): Command {
   registerListCommand(program);
   registerStatusCommand(program);
   registerTaskCommand(program);
+  registerBugCommand(program);
 
   return program;
 }
