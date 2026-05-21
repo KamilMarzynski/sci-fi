@@ -9,6 +9,7 @@ const originalWorkingDirectory = process.cwd();
 
 afterEach(async () => {
   process.chdir(originalWorkingDirectory);
+  process.exitCode = 0;
   await Promise.all(
     temporaryDirectories.map((dir) => rm(dir, { recursive: true, force: true })),
   );
@@ -64,5 +65,75 @@ describe("finish command", () => {
     await expect(
       buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]),
     ).rejects.toThrow("not all tasks are complete");
+  });
+
+  it("fails when there are open fixes", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const tasksDir = await scaffoldInProgressFeature(projectRoot);
+    await writeFile(
+      join(tasksDir, "setup-db.md"),
+      "---\nid: TASK-001\nslug: setup-db\nstatus: done\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "utf8",
+    );
+
+    const fixesDir = join(
+      projectRoot,
+      "docs",
+      "specflow",
+      "specs",
+      "user-auth",
+      "fixes",
+    );
+    await mkdir(fixesDir, { recursive: true });
+    await writeFile(
+      join(fixesDir, "FIX-0001-token-expiry.md"),
+      "---\nid: FIX-0001\nslug: token-expiry\nstatus: open\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# token expiry\n",
+      "utf8",
+    );
+
+    await expect(
+      buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]),
+    ).rejects.toThrow(
+      /Cannot finish user-auth.*FIX-0001.*open.*Resolve or mark wont-fix before finishing/s,
+    );
+  });
+
+  it("succeeds when all fixes are resolved", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const tasksDir = await scaffoldInProgressFeature(projectRoot);
+    await writeFile(
+      join(tasksDir, "setup-db.md"),
+      "---\nid: TASK-001\nslug: setup-db\nstatus: done\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "utf8",
+    );
+
+    const fixesDir = join(
+      projectRoot,
+      "docs",
+      "specflow",
+      "specs",
+      "user-auth",
+      "fixes",
+    );
+    await mkdir(fixesDir, { recursive: true });
+    await writeFile(
+      join(fixesDir, "FIX-0001-token-expiry.md"),
+      "---\nid: FIX-0001\nslug: token-expiry\nstatus: resolved\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# token expiry\n",
+      "utf8",
+    );
+
+    await buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]);
+
+    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const metadata = JSON.parse(
+      await readFile(join(featureDir, ".specflow.json"), "utf8"),
+    ) as { status: string };
+    expect(metadata.status).toBe("done");
   });
 });
