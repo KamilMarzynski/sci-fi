@@ -4,3 +4,5 @@ coverage/
 .testing/artifacts/
 data
 .worktrees/
+.claude/worktrees
+.testing
