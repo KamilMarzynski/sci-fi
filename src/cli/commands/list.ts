@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { cwd } from "node:process";
+import { listOpenFixes } from "../../core/fixes/list.js";
 import { listFeatures } from "../../core/specs/list.js";
 import type { FeatureStatus } from "../../core/specs/types.js";
 import { FEATURE_STATUS_VALUES } from "../../core/specs/types.js";
@@ -24,7 +25,14 @@ export function registerListCommand(program: Command): void {
 
       for (const feature of features) {
         const title = feature.title ?? "";
-        process.stdout.write(`${feature.id}\t${feature.slug}\t${feature.status}\t${title}\n`);
+        const openFixes = await listOpenFixes(cwd(), feature.slug);
+        const fixesLabel =
+          openFixes.length > 0
+            ? `${openFixes.length} open fix${openFixes.length === 1 ? "" : "es"}`
+            : "-";
+        process.stdout.write(
+          `${feature.id}\t${feature.slug}\t${feature.status}\t${fixesLabel}\t${title}\n`,
+        );
       }
     });
 }
