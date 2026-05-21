@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { cwd } from "node:process";
+import { listFixes } from "../../core/fixes/list.js";
 import { inspectFeatureLifecycle } from "../../core/specs/lifecycle.js";
 import { listTasks } from "../../core/tasks/list.js";
 
@@ -12,6 +13,7 @@ export function registerStatusCommand(program: Command): void {
       const projectRoot = cwd();
       const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
       const tasks = await listTasks(projectRoot, slug);
+      const fixes = await listFixes(projectRoot, slug);
 
       const { metadata, artifacts } = lifecycle;
       const title = metadata.title !== undefined ? ` (${metadata.title})` : "";
@@ -20,14 +22,27 @@ export function registerStatusCommand(program: Command): void {
       process.stdout.write(`id:      ${metadata.id}\n`);
       process.stdout.write(`status:  ${metadata.status}\n`);
       process.stdout.write(`\n`);
-      process.stdout.write(`spec.md:          ${artifacts.specExists ? "present" : "missing"}\n`);
-      process.stdout.write(`architecture.md:  ${artifacts.architectureExists ? "present" : "missing"}\n`);
-      process.stdout.write(`tasks:            ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? "" : "s"}\n`);
+      process.stdout.write(
+        `spec.md:          ${artifacts.specExists ? "present" : "missing"}\n`,
+      );
+      process.stdout.write(
+        `architecture.md:  ${artifacts.architectureExists ? "present" : "missing"}\n`,
+      );
+      process.stdout.write(
+        `tasks:            ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? "" : "s"}\n`,
+      );
 
       if (tasks.length > 0) {
         process.stdout.write(`\n`);
         for (const task of tasks) {
           process.stdout.write(`  ${task.slug}\t${task.status}\n`);
+        }
+      }
+
+      if (fixes.length > 0) {
+        process.stdout.write(`\nfixes:\n`);
+        for (const fix of fixes) {
+          process.stdout.write(`  ${fix.id}  ${fix.status}  ${fix.slug}\n`);
         }
       }
     });
