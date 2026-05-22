@@ -4,6 +4,7 @@ import {
   BUG_SEVERITY_VALUES,
   BUG_STATUS_VALUES,
   type BugFrontmatter,
+  type BugSeverity,
 } from "./types.js";
 
 export interface BugFile {
@@ -22,11 +23,10 @@ function isValidBugStatus(value: unknown): value is BugFrontmatter["status"] {
 
 function isValidBugSeverity(
   value: unknown,
-): value is BugFrontmatter["severity"] {
+): value is BugSeverity {
   return (
-    value === undefined ||
-    (typeof value === "string" &&
-      (BUG_SEVERITY_VALUES as readonly string[]).includes(value))
+    typeof value === "string" &&
+    (BUG_SEVERITY_VALUES as readonly string[]).includes(value)
   );
 }
 
@@ -39,7 +39,7 @@ function isValidRawBugFrontmatter(
     typeof obj["id"] === "string" &&
     typeof obj["slug"] === "string" &&
     isValidBugStatus(obj["status"]) &&
-    isValidBugSeverity(obj["severity"]) &&
+    (obj["severity"] === undefined || isValidBugSeverity(obj["severity"])) &&
     (typeof obj["related-feature"] === "string" || obj["related-feature"] === undefined) &&
     typeof obj["created"] === "string"
   );
@@ -59,19 +59,22 @@ export async function readBugFile(filePath: string): Promise<BugFile> {
     throw new Error(`Bug file at ${filePath} has invalid frontmatter.`);
   }
 
+  const frontmatter: BugFrontmatter = {
+    id: raw["id"] as string,
+    slug: raw["slug"] as string,
+    status: raw["status"] as BugFrontmatter["status"],
+    created: raw["created"] as string,
+  };
+
+  if (raw["severity"] !== undefined) {
+    frontmatter.severity = raw["severity"] as BugSeverity;
+  }
+  if (raw["related-feature"] !== undefined) {
+    frontmatter["related-feature"] = raw["related-feature"] as string;
+  }
+
   return {
-    frontmatter: {
-      id: raw["id"] as string,
-      slug: raw["slug"] as string,
-      status: raw["status"] as BugFrontmatter["status"],
-      ...(raw["severity"] !== undefined && {
-        severity: raw["severity"] as BugFrontmatter["severity"],
-      }),
-      ...(raw["related-feature"] !== undefined && {
-        "related-feature": raw["related-feature"] as string,
-      }),
-      created: raw["created"] as string,
-    },
+    frontmatter,
     body: match[2] ?? "",
   };
 }
