@@ -4,7 +4,11 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDirs": ["src", "skills"],
+    "baseUrl": ".",
+    "paths": {
+      "specflow/skill-types": ["src/core/skills/types.ts"]
+    },
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
@@ -16,6 +20,7 @@
     "skipLibCheck": false
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "skills/**/manifest.ts"
   ]
 }

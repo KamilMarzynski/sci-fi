@@ -4,14 +4,22 @@
   "description": "Specification-driven CLI scaffolding for agentic workflows",
   "type": "module",
   "bin": {
-    "specflow": "./dist/cli/index.js"
+    "specflow": "./dist/src/cli/index.js"
+  },
+  "exports": {
+    ".": "./dist/src/cli/index.js",
+    "./skill-types": {
+      "types": "./dist/src/core/skills/types.d.ts",
+      "default": "./dist/src/core/skills/types.js"
+    }
   },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node -e \"const fs=require('node:fs'); const path='dist/cli/index.js'; const shebang='#!/usr/bin/env node\\n'; const contents=fs.readFileSync(path, 'utf8'); if (!contents.startsWith(shebang)) { fs.writeFileSync(path, shebang + contents); } fs.chmodSync(path, 0o755);\"",
-    "prepack": "npm run build && node -e \"require('node:fs').accessSync('dist/cli/index.js')\"",
+    "build": "tsc -p tsconfig.json && node -e \"const fs=require('node:fs'); const path='dist/src/cli/index.js'; const shebang='#!/usr/bin/env node\\n'; const contents=fs.readFileSync(path, 'utf8'); if (!contents.startsWith(shebang)) { fs.writeFileSync(path, shebang + contents); } fs.chmodSync(path, 0o755);\"",
+    "prepack": "npm run build && node -e \"require('node:fs').accessSync('dist/src/cli/index.js')\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",

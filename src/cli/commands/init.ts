@@ -1,12 +1,83 @@
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { cwd, stdin, stdout } from "node:process";
+import { createInterface } from "node:readline/promises";
 import { Command } from "commander";
-import { cwd } from "node:process";
 import { scaffoldInit } from "../../core/init/scaffold.js";
+import { resolveHarness } from "../../core/init/prompt-harness.js";
+import { installSkills } from "../../core/init/install-skills.js";
+import { writeConfig } from "../../core/init/config.js";
+import type { HarnessId } from "../../core/skills/harness/adapter.js";
+import { getAdapter } from "../../core/skills/harness/registry.js";
+import "../../core/skills/harness/register-defaults.js";
+
+interface InitCommandOptions {
+  readonly harness?: string;
+  readonly yes?: boolean;
+}
 
 export function registerInitCommand(program: Command): void {
   program
     .command("init")
     .description("Initialize specflow in the current repository")
-    .action(async () => {
-      await scaffoldInit({ projectRoot: cwd() });
+    .option("--harness <id>", "harness adapter to install skills for")
+    .option("--yes", "skip prompts and use defaults")
+    .action(async (options: InitCommandOptions) => {
+      const projectRoot = cwd();
+      const packageRoot = resolvePackageRoot();
+      const harness = await resolveHarness({
+        flag: options.harness,
+        yes: options.yes === true,
+        ask: askInteractively,
+      });
+
+      // Validate the adapter is implemented before touching the filesystem.
+      getAdapter(harness);
+
+      await scaffoldInit({ projectRoot, harness });
+      await installSkills({ projectRoot, harness, packageRoot });
+      await writeConfig({ projectRoot, harness });
     });
+}
+
+async function askInteractively(
+  choices: readonly HarnessId[],
+): Promise<string> {
+  const rl = createInterface({ input: stdin, output: stdout });
+  try {
+    const numbered = choices
+      .map((id, index) => `  ${index + 1}) ${id}`)
+      .join("\n");
+    const prompt = `Pick a harness:\n${numbered}\nEnter number (default 1): `;
+    const answer = (await rl.question(prompt)).trim();
+
+    if (answer === "") {
+      const first = choices[0];
+      if (first === undefined) {
+        throw new Error("No harness choices available");
+      }
+      return first;
+    }
+
+    const index = Number.parseInt(answer, 10) - 1;
+    const picked = choices[index];
+
+    if (picked === undefined) {
+      return answer;
+    }
+
+    return picked;
+  } finally {
+    rl.close();
+  }
+}
+
+function resolvePackageRoot(): string {
+  const commandsDir = dirname(fileURLToPath(import.meta.url));
+  // When compiled to dist/src/cli/commands/, we need 4 hops.
+  // When running from source at src/cli/commands/ (vitest), we need 3 hops.
+  const distMarker = `${commandsDir.includes("/dist/") ? ".." : ""}`;
+  return distMarker.length > 0
+    ? join(commandsDir, "..", "..", "..", "..")
+    : join(commandsDir, "..", "..", "..");
 }

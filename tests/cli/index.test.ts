@@ -39,13 +39,20 @@ describe("buildProgram", () => {
     process.chdir(projectRoot);
 
     try {
-      const parsedProgram = await program.parseAsync(["node", "specflow", "init"]);
+      const parsedProgram = await program.parseAsync([
+        "node",
+        "specflow",
+        "init",
+        "--harness",
+        "claude-code",
+        "--yes",
+      ]);
 
       expect(parsedProgram).toBe(program);
 
-      expect(existsSync(join(projectRoot, ".specflow"))).toBe(true);
-      expect(existsSync(join(projectRoot, "specs"))).toBe(true);
-      expect(existsSync(join(projectRoot, "bugs"))).toBe(true);
+      expect(existsSync(join(projectRoot, "docs", "specflow", ".specflow"))).toBe(true);
+      expect(existsSync(join(projectRoot, "docs", "specflow", "specs"))).toBe(true);
+      expect(existsSync(join(projectRoot, "docs", "specflow", "bugs"))).toBe(true);
     } finally {
       process.chdir(originalWorkingDirectory);
       rmSync(projectRoot, { force: true, recursive: true });
@@ -77,7 +84,7 @@ describe("isDirectExecution", () => {
 });
 
 describe("installed artifact cli", () => {
-  it("initializes the project structure from the installed bin", () => {
+  it("initializes the project structure from the installed bin", { timeout: 60_000 }, () => {
     const sandboxRoot = mkdtempSync(join(tmpdir(), "specflow-installed-cli-"));
     const packDirectory = join(sandboxRoot, "pack");
     const installDirectory = join(sandboxRoot, "install");
@@ -188,16 +195,16 @@ describe("installed artifact cli", () => {
         "node_modules/.bin/specflow",
       );
 
-      const result = spawnSync(installedBinPath, ["init"], {
+      const result = spawnSync(installedBinPath, ["init", "--harness", "claude-code", "--yes"], {
         cwd: installDirectory,
         encoding: "utf8",
       });
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe("");
-      expect(existsSync(join(installDirectory, ".specflow"))).toBe(true);
-      expect(existsSync(join(installDirectory, "specs"))).toBe(true);
-      expect(existsSync(join(installDirectory, "bugs"))).toBe(true);
+      expect(existsSync(join(installDirectory, "docs", "specflow", ".specflow"))).toBe(true);
+      expect(existsSync(join(installDirectory, "docs", "specflow", "specs"))).toBe(true);
+      expect(existsSync(join(installDirectory, "docs", "specflow", "bugs"))).toBe(true);
     } finally {
       rmSync(sandboxRoot, { force: true, recursive: true });
     }

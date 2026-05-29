@@ -47,12 +47,20 @@ function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
 function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
   return [
     {
-      path: join(specsRoot, "TESTING.md"),
-      contents: buildTestingDocument(),
+      path: join(specsRoot, "EVALUATION.md"),
+      contents: buildEvaluationDocument(),
     },
     {
       path: join(specsRoot, "ROADMAP.md"),
       contents: buildRoadmapDocument(),
+    },
+    {
+      path: join(specsRoot, "ARCHITECTURE.md"),
+      contents: buildArchitectureDocument(),
+    },
+    {
+      path: join(specsRoot, "CONTEXT.md"),
+      contents: buildContextDocument(),
     },
   ];
 }
@@ -162,10 +170,10 @@ This repository uses \`specflow\` to keep implementation work aligned with writt
 `;
 }
 
-function buildTestingDocument(): string {
-  return `# TESTING.md
+function buildEvaluationDocument(): string {
+  return `# EVALUATION.md
 
-Testing is a release gate for this repository.
+Evaluation is a release gate for this repository.
 
 ## Required Checks
 
@@ -195,5 +203,58 @@ function buildRoadmapDocument(): string {
 - Keep generated project conventions clear and easy to maintain.
 - Expand verification as more commands become user-facing.
 - Use this roadmap to track the next approved increments.
+`;
+}
+
+function buildArchitectureDocument(): string {
+  return `# ARCHITECTURE.md
+
+> Read this before starting any spec or plan session.
+> Update this when structural decisions are made during grilling or planning.
+
+## System Overview
+
+<!-- One paragraph. What does this system do and for whom. -->
+
+## Services and Boundaries
+
+<!-- List services, what they own, what they do NOT own. -->
+
+## Communication Patterns
+
+<!-- REST, events, queues, shared DB — what is allowed and what is banned. -->
+
+## Persistence
+
+<!-- Databases, stores, cache layers. Who owns what data. -->
+
+## Tech Stack
+
+<!-- Language, frameworks, runtimes, infra. -->
+
+## Constraints
+
+<!-- Hard limits: latency budgets, data residency, security requirements. -->
+
+## Open Decisions
+
+<!-- Things not yet resolved. Remove when resolved; move to relevant section above. -->
+`;
+}
+
+function buildContextDocument(): string {
+  return `# CONTEXT.md
+
+> Project glossary. Every term used in specs must be defined here.
+> If a term is missing during a spec session, define it and update this file.
+
+## Terms
+
+<!-- Template:
+### TermName
+**Definition:** One clear sentence.
+**Distinct from:** Other terms it might be confused with.
+**Used in:** Links to specs or architecture sections where it appears.
+-->
 `;
 }

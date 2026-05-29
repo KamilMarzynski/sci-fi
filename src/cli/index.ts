@@ -17,7 +17,11 @@ import { registerBugCommand } from "./commands/bug.js";
 import { registerFixCommand } from "./commands/fix.js";
 
 const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json");
+// Compiled to dist/src/cli/index.js: package.json is 3 levels up (../../../).
+// In source at src/cli/index.ts (vitest): package.json is 2 levels up (../../).
+const _cliModuleUrl = import.meta.url;
+const _packageJsonHops = _cliModuleUrl.includes("/dist/src/cli/") ? "../../../" : "../../";
+const packageJson = require(`${_packageJsonHops}package.json`);
 
 function readPackageVersion(value: unknown): string {
   if (

@@ -25,17 +25,24 @@ describe("specflow init", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await buildProgram().parseAsync(["node", "specflow", "init"]);
+    await buildProgram().parseAsync([
+      "node",
+      "specflow",
+      "init",
+      "--harness",
+      "claude-code",
+      "--yes",
+    ]);
 
     await expectDirectory(join(projectRoot, "docs", "specflow", ".specflow"));
     await expectDirectory(join(projectRoot, "docs", "specflow", "specs"));
     await expectDirectory(join(projectRoot, "docs", "specflow", "bugs"));
-    expect(readFileSync(join(projectRoot, "docs", "specflow", "TESTING.md"), "utf8")).toBe(
-      expectedTestingDocument,
-    );
-    expect(readFileSync(join(projectRoot, "docs", "specflow", "ROADMAP.md"), "utf8")).toBe(
-      expectedRoadmapDocument,
-    );
+    expect(
+      readFileSync(join(projectRoot, "docs", "specflow", "EVALUATION.md"), "utf8"),
+    ).toBe(expectedEvaluationDocument);
+    expect(
+      readFileSync(join(projectRoot, "docs", "specflow", "ROADMAP.md"), "utf8"),
+    ).toBe(expectedRoadmapDocument);
   });
 
   it("fails without partial writes when a bootstrap doc path conflicts", async () => {
@@ -43,25 +50,34 @@ describe("specflow init", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await mkdir(join(projectRoot, "docs", "specflow", "TESTING.md"), { recursive: true });
+    await mkdir(join(projectRoot, "docs", "specflow", "EVALUATION.md"), {
+      recursive: true,
+    });
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "init"]),
+      buildProgram().parseAsync([
+        "node",
+        "specflow",
+        "init",
+        "--harness",
+        "claude-code",
+        "--yes",
+      ]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
-        `${join("docs", "specflow", "TESTING.md")}: path exists and is not a regular file.`,
+        `${join("docs", "specflow", "EVALUATION.md")}: path exists and is not a regular file.`,
       ),
     });
 
-    await expect(access(join(projectRoot, "docs", "specflow", ".specflow"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "docs", "specflow", "specs"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "docs", "specflow", "bugs"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", ".specflow")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "specs")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "bugs")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("fails without partial writes when a scaffold directory path conflicts", async () => {
@@ -70,10 +86,21 @@ describe("specflow init", () => {
     process.chdir(projectRoot);
 
     await mkdir(join(projectRoot, "docs", "specflow"), { recursive: true });
-    writeFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "conflict", "utf8");
+    writeFileSync(
+      join(projectRoot, "docs", "specflow", ".specflow"),
+      "conflict",
+      "utf8",
+    );
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "init"]),
+      buildProgram().parseAsync([
+        "node",
+        "specflow",
+        "init",
+        "--harness",
+        "claude-code",
+        "--yes",
+      ]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
         `${join("docs", "specflow", ".specflow")}: path exists and is not a directory.`,
@@ -81,24 +108,24 @@ describe("specflow init", () => {
     });
 
     expect(readFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "utf8")).toBe("conflict");
-    await expect(access(join(projectRoot, "docs", "specflow", "specs"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "docs", "specflow", "bugs"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "docs", "specflow", "TESTING.md"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "docs", "specflow", "ROADMAP.md"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "specs")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "bugs")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "EVALUATION.md")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      access(join(projectRoot, "docs", "specflow", "ROADMAP.md")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
   });
 });
 
-const expectedTestingDocument = `# TESTING.md
+const expectedEvaluationDocument = `# EVALUATION.md
 
-Testing is a release gate for this repository.
+Evaluation is a release gate for this repository.
 
 ## Required Checks
 
