@@ -225,6 +225,9 @@ export function runInstalledCommand(
   };
 }
 
-export function runInstalledInit(installDirectory: string): InstalledCommandResult {
-  return runInstalledCommand(installDirectory, ["init"]);
+export function runInstalledInit(
+  installDirectory: string,
+  args: readonly string[] = [],
+): InstalledCommandResult {
+  return runInstalledCommand(installDirectory, ["init", ...args]);
 }

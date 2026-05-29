@@ -8,6 +8,8 @@ import { resolveHarness } from "../../core/init/prompt-harness.js";
 import { installSkills } from "../../core/init/install-skills.js";
 import { writeConfig } from "../../core/init/config.js";
 import type { HarnessId } from "../../core/skills/harness/adapter.js";
+import { getAdapter } from "../../core/skills/harness/registry.js";
+import "../../core/skills/harness/register-defaults.js";
 
 interface InitCommandOptions {
   readonly harness?: string;
@@ -28,6 +30,9 @@ export function registerInitCommand(program: Command): void {
         yes: options.yes === true,
         ask: askInteractively,
       });
+
+      // Validate the adapter is implemented before touching the filesystem.
+      getAdapter(harness);
 
       await scaffoldInit({ projectRoot, harness });
       await installSkills({ projectRoot, harness, packageRoot });
@@ -68,5 +73,11 @@ async function askInteractively(
 }
 
 function resolvePackageRoot(): string {
-  return join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+  const commandsDir = dirname(fileURLToPath(import.meta.url));
+  // When compiled to dist/src/cli/commands/, we need 4 hops.
+  // When running from source at src/cli/commands/ (vitest), we need 3 hops.
+  const distMarker = `${commandsDir.includes("/dist/") ? ".." : ""}`;
+  return distMarker.length > 0
+    ? join(commandsDir, "..", "..", "..", "..")
+    : join(commandsDir, "..", "..", "..");
 }

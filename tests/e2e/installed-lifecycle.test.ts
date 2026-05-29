@@ -8,7 +8,7 @@ import {
 } from "./installed-test-helpers.js";
 
 describe("installed build lifecycle verification", () => {
-  it("drives a feature from created through done via installed binary", () => {
+  it("drives a feature from created through done via installed binary", { timeout: 60_000 }, () => {
     const installation = createInstalledPackageTestEnvironment("installed-lifecycle-");
 
     try {
@@ -68,7 +68,7 @@ describe("installed build lifecycle verification", () => {
     }
   });
 
-  it("fails spec-ready when spec.md is missing from installed binary", () => {
+  it("fails spec-ready when spec.md is missing from installed binary", { timeout: 60_000 }, () => {
     const installation = createInstalledPackageTestEnvironment("installed-lifecycle-err-");
 
     try {
