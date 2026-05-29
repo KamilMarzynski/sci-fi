@@ -6,8 +6,16 @@
   "bin": {
     "specflow": "./dist/cli/index.js"
   },
+  "exports": {
+    ".": "./dist/cli/index.js",
+    "./skill-types": {
+      "types": "./dist/core/skills/types.d.ts",
+      "default": "./dist/core/skills/types.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node -e \"const fs=require('node:fs'); const path='dist/cli/index.js'; const shebang='#!/usr/bin/env node\\n'; const contents=fs.readFileSync(path, 'utf8'); if (!contents.startsWith(shebang)) { fs.writeFileSync(path, shebang + contents); } fs.chmodSync(path, 0o755);\"",
