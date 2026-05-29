@@ -85,6 +85,64 @@ describe("claudeCodeAdapter — user skills", () => {
   });
 });
 
+describe("claudeCodeAdapter — subagents", () => {
+  it("writes .claude/agents/<id>.md with subagent frontmatter", async () => {
+    const projectRoot = createProjectRoot();
+    const bundle: SkillBundle = {
+      manifest: {
+        id: "code-review",
+        kind: "subagent",
+        description: "Quality review of changes.",
+        allowedTools: ["Read", "Grep"],
+        model: "inherit",
+      },
+      body: "# code-review\n\nstub body\n",
+    };
+
+    await claudeCodeAdapter.install([bundle], projectRoot);
+
+    const written = readFileSync(
+      join(projectRoot, ".claude", "agents", "code-review.md"),
+      "utf8",
+    );
+    const [frontmatterBlock, body] = splitFrontmatter(written);
+    const frontmatter = parse(frontmatterBlock);
+
+    expect(frontmatter).toEqual({
+      name: "code-review",
+      description: "Quality review of changes.",
+      tools: "Read, Grep",
+      model: "inherit",
+    });
+    expect(body).toBe("# code-review\n\nstub body\n");
+  });
+
+  it("omits optional subagent keys when not provided", async () => {
+    const projectRoot = createProjectRoot();
+    const bundle: SkillBundle = {
+      manifest: {
+        id: "verification",
+        kind: "subagent",
+        description: "Verify implementation matches spec.",
+      },
+      body: "# verification\n",
+    };
+
+    await claudeCodeAdapter.install([bundle], projectRoot);
+
+    const written = readFileSync(
+      join(projectRoot, ".claude", "agents", "verification.md"),
+      "utf8",
+    );
+    const [frontmatterBlock] = splitFrontmatter(written);
+
+    expect(parse(frontmatterBlock)).toEqual({
+      name: "verification",
+      description: "Verify implementation matches spec.",
+    });
+  });
+});
+
 function splitFrontmatter(contents: string): [string, string] {
   const trimmed = contents.startsWith("---\n") ? contents.slice(4) : contents;
   const closingIndex = trimmed.indexOf("\n---\n");

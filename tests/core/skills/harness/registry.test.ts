@@ -4,6 +4,7 @@ import {
   InvalidHarnessError,
 } from "../../../../src/core/skills/harness/adapter.js";
 import { getAdapter } from "../../../../src/core/skills/harness/registry.js";
+import "../../../../src/core/skills/harness/register-defaults.js";
 
 describe("getAdapter", () => {
   it("throws InvalidHarnessError for an unknown harness id", () => {
@@ -30,9 +31,9 @@ describe("getAdapter", () => {
     );
   });
 
-  it("throws HarnessNotImplementedError for claude-code until Task 6 registers it", () => {
-    expect(() => getAdapter("claude-code")).toThrowError(
-      HarnessNotImplementedError,
-    );
+  it("returns the Claude Code adapter for claude-code", () => {
+    const adapter = getAdapter("claude-code");
+
+    expect(adapter.id).toBe("claude-code");
   });
 });
