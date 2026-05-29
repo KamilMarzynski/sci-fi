@@ -37,7 +37,7 @@ export class InvalidHarnessError extends Error {
 export class HarnessNotImplementedError extends Error {
   constructor(public readonly harness: HarnessId) {
     super(
-      `Harness "${harness}" is not implemented yet. Track progress at https://github.com/${"<owner>/specflow"}/issues.`,
+      `Harness "${harness}" is not implemented yet. Track progress at https://github.com/KamilMarzynski/spec-flow/issues.`,
     );
     this.name = "HarnessNotImplementedError";
   }
