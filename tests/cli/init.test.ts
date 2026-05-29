@@ -25,7 +25,7 @@ describe("specflow init", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await buildProgram().parseAsync(["node", "specflow", "init"]);
+    await buildProgram().parseAsync(["node", "specflow", "init", "--yes"]);
 
     await expectDirectory(join(projectRoot, "docs", "specflow", ".specflow"));
     await expectDirectory(join(projectRoot, "docs", "specflow", "specs"));
@@ -46,7 +46,7 @@ describe("specflow init", () => {
     await mkdir(join(projectRoot, "docs", "specflow", "TESTING.md"), { recursive: true });
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "init"]),
+      buildProgram().parseAsync(["node", "specflow", "init", "--yes"]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
         `${join("docs", "specflow", "TESTING.md")}: path exists and is not a regular file.`,
@@ -73,7 +73,7 @@ describe("specflow init", () => {
     writeFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "conflict", "utf8");
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "init"]),
+      buildProgram().parseAsync(["node", "specflow", "init", "--yes"]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
         `${join("docs", "specflow", ".specflow")}: path exists and is not a directory.`,

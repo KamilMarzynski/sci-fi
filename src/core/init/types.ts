@@ -1,6 +1,6 @@
-/**
- * Input required to scaffold a specflow-enabled repository.
- */
+import type { HarnessId } from "../skills/harness/adapter.js";
+
 export interface InitOptions {
-  projectRoot: string;
+  readonly projectRoot: string;
+  readonly harness?: HarnessId;
 }
