@@ -27,16 +27,13 @@ describe("specflow init", () => {
 
     await buildProgram().parseAsync(["node", "specflow", "init"]);
 
-    await expectDirectory(join(projectRoot, ".specflow"));
-    await expectDirectory(join(projectRoot, "specs"));
-    await expectDirectory(join(projectRoot, "bugs"));
-    expect(readFileSync(join(projectRoot, "AGENTS.md"), "utf8")).toBe(
-      expectedAgentsDocument,
-    );
-    expect(readFileSync(join(projectRoot, "TESTING.md"), "utf8")).toBe(
+    await expectDirectory(join(projectRoot, "docs", "specflow", ".specflow"));
+    await expectDirectory(join(projectRoot, "docs", "specflow", "specs"));
+    await expectDirectory(join(projectRoot, "docs", "specflow", "bugs"));
+    expect(readFileSync(join(projectRoot, "docs", "specflow", "TESTING.md"), "utf8")).toBe(
       expectedTestingDocument,
     );
-    expect(readFileSync(join(projectRoot, "ROADMAP.md"), "utf8")).toBe(
+    expect(readFileSync(join(projectRoot, "docs", "specflow", "ROADMAP.md"), "utf8")).toBe(
       expectedRoadmapDocument,
     );
   });
@@ -46,23 +43,23 @@ describe("specflow init", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await mkdir(join(projectRoot, "TESTING.md"));
+    await mkdir(join(projectRoot, "docs", "specflow", "TESTING.md"), { recursive: true });
 
     await expect(
       buildProgram().parseAsync(["node", "specflow", "init"]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
-        `${join("TESTING.md")}: path exists and is not a regular file.`,
+        `${join("docs", "specflow", "TESTING.md")}: path exists and is not a regular file.`,
       ),
     });
 
-    await expect(access(join(projectRoot, ".specflow"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", ".specflow"))).rejects.toMatchObject({
       code: "ENOENT",
     });
-    await expect(access(join(projectRoot, "specs"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", "specs"))).rejects.toMatchObject({
       code: "ENOENT",
     });
-    await expect(access(join(projectRoot, "bugs"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", "bugs"))).rejects.toMatchObject({
       code: "ENOENT",
     });
   });
@@ -72,51 +69,32 @@ describe("specflow init", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    writeFileSync(join(projectRoot, ".specflow"), "conflict", "utf8");
+    await mkdir(join(projectRoot, "docs", "specflow"), { recursive: true });
+    writeFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "conflict", "utf8");
 
     await expect(
       buildProgram().parseAsync(["node", "specflow", "init"]),
     ).rejects.toMatchObject({
       message: expect.stringContaining(
-        `${join(".specflow")}: path exists and is not a directory.`,
+        `${join("docs", "specflow", ".specflow")}: path exists and is not a directory.`,
       ),
     });
 
-    expect(readFileSync(join(projectRoot, ".specflow"), "utf8")).toBe("conflict");
-    await expect(access(join(projectRoot, "specs"))).rejects.toMatchObject({
+    expect(readFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "utf8")).toBe("conflict");
+    await expect(access(join(projectRoot, "docs", "specflow", "specs"))).rejects.toMatchObject({
       code: "ENOENT",
     });
-    await expect(access(join(projectRoot, "bugs"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", "bugs"))).rejects.toMatchObject({
       code: "ENOENT",
     });
-    await expect(access(join(projectRoot, "AGENTS.md"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", "TESTING.md"))).rejects.toMatchObject({
       code: "ENOENT",
     });
-    await expect(access(join(projectRoot, "TESTING.md"))).rejects.toMatchObject({
-      code: "ENOENT",
-    });
-    await expect(access(join(projectRoot, "ROADMAP.md"))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, "docs", "specflow", "ROADMAP.md"))).rejects.toMatchObject({
       code: "ENOENT",
     });
   });
 });
-
-const expectedAgentsDocument = `# AGENTS.md
-
-This repository uses \`specflow\` to keep implementation work aligned with written specs.
-
-## Workflow Expectations
-
-- Capture specflow-managed feature work in \`docs/specflow/specs/\` before implementing.
-- Track production bugs in \`bugs/\` with reproduction details and fix status.
-- Keep command wiring thin and move reusable logic into core modules.
-
-## Collaboration Rules
-
-- Treat generated docs as working agreements, not placeholders.
-- Update specs and bug notes when behavior changes.
-- Verify meaningful changes with automated checks before handing work off.
-`;
 
 const expectedTestingDocument = `# TESTING.md
 

@@ -16,8 +16,9 @@ type ScaffoldDirectory = {
  */
 export async function scaffoldInit(options: InitOptions): Promise<void> {
   const { projectRoot } = options;
-  const scaffoldDirectories = buildScaffoldDirectories(projectRoot);
-  const bootstrapDocuments = buildBootstrapDocuments(projectRoot);
+  const specsRoot = join(projectRoot, 'docs', 'specflow');
+  const scaffoldDirectories = buildScaffoldDirectories(specsRoot);
+  const bootstrapDocuments = buildBootstrapDocuments(specsRoot);
 
   await validateScaffoldDirectoryPaths(scaffoldDirectories);
   await validateBootstrapDocumentPaths(bootstrapDocuments);
@@ -35,26 +36,22 @@ export async function scaffoldInit(options: InitOptions): Promise<void> {
   );
 }
 
-function buildScaffoldDirectories(projectRoot: string): ScaffoldDirectory[] {
+function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
   return [
-    { path: join(projectRoot, ".specflow") },
-    { path: join(projectRoot, "specs") },
-    { path: join(projectRoot, "bugs") },
+    { path: join(specsRoot, ".specflow") },
+    { path: join(specsRoot, "specs") },
+    { path: join(specsRoot, "bugs") },
   ];
 }
 
-function buildBootstrapDocuments(projectRoot: string): BootstrapDocument[] {
+function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
   return [
     {
-      path: join(projectRoot, "AGENTS.md"),
-      contents: buildAgentsDocument(),
-    },
-    {
-      path: join(projectRoot, "TESTING.md"),
+      path: join(specsRoot, "TESTING.md"),
       contents: buildTestingDocument(),
     },
     {
-      path: join(projectRoot, "ROADMAP.md"),
+      path: join(specsRoot, "ROADMAP.md"),
       contents: buildRoadmapDocument(),
     },
   ];
