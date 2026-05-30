@@ -151,25 +151,6 @@ function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && "code" in error && error.code === "ENOENT";
 }
 
-function buildAgentsDocument(): string {
-  return `# AGENTS.md
-
-This repository uses \`specflow\` to keep implementation work aligned with written specs.
-
-## Workflow Expectations
-
-- Capture specflow-managed feature work in \`docs/specflow/specs/\` before implementing.
-- Track production bugs in \`bugs/\` with reproduction details and fix status.
-- Keep command wiring thin and move reusable logic into core modules.
-
-## Collaboration Rules
-
-- Treat generated docs as working agreements, not placeholders.
-- Update specs and bug notes when behavior changes.
-- Verify meaningful changes with automated checks before handing work off.
-`;
-}
-
 function buildEvaluationDocument(): string {
   return `# EVALUATION.md
 
