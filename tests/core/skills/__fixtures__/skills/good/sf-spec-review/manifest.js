@@ -1,5 +1,5 @@
 export const manifest = {
-  id: "spec-review",
+  id: "sf-spec-review",
   kind: "subagent",
   description: "Critic pass on a spec.",
 };
