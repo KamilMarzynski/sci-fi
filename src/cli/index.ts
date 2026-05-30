@@ -1,9 +1,10 @@
 import { existsSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { stderr } from "node:process";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command } from "commander";
+import { findPackageRoot } from "../core/package-root.js";
 import { registerInitCommand } from "./commands/init.js";
 import { registerSpecCommand } from "./commands/spec.js";
 import { registerPlanReadyCommand } from "./commands/plan-ready.js";
@@ -17,11 +18,7 @@ import { registerBugCommand } from "./commands/bug.js";
 import { registerFixCommand } from "./commands/fix.js";
 
 const require = createRequire(import.meta.url);
-// Compiled to dist/src/cli/index.js: package.json is 3 levels up (../../../).
-// In source at src/cli/index.ts (vitest): package.json is 2 levels up (../../).
-const _cliModuleUrl = import.meta.url;
-const _packageJsonHops = _cliModuleUrl.includes("/dist/src/cli/") ? "../../../" : "../../";
-const packageJson = require(`${_packageJsonHops}package.json`);
+const packageJson = require(join(findPackageRoot(import.meta.url), "package.json"));
 
 function readPackageVersion(value: unknown): string {
   if (
