@@ -45,11 +45,11 @@ describe("installSkills", () => {
     }
 
     for (const id of [
-      "spec-review",
-      "plan-review",
-      "code-review",
-      "verification",
-      "tdd",
+      "sf-spec-review",
+      "sf-plan-review",
+      "sf-code-review",
+      "sf-verification",
+      "sf-tdd",
     ]) {
       expect(
         existsSync(join(projectRoot, ".claude", "agents", `${id}.md`)),

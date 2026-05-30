@@ -16,16 +16,16 @@ describe("bundled skill catalog", () => {
     const ids = bundles.map((bundle) => bundle.manifest.id).sort();
 
     expect(ids).toEqual([
-      "code-review",
-      "plan-review",
       "sf-bug",
+      "sf-code-review",
       "sf-feature",
       "sf-fix",
       "sf-implement",
       "sf-plan",
-      "spec-review",
-      "tdd",
-      "verification",
+      "sf-plan-review",
+      "sf-spec-review",
+      "sf-tdd",
+      "sf-verification",
     ]);
   });
 
@@ -48,11 +48,11 @@ describe("bundled skill catalog", () => {
       "sf-plan",
     ]);
     expect(subagent.map((bundle) => bundle.manifest.id).sort()).toEqual([
-      "code-review",
-      "plan-review",
-      "spec-review",
-      "tdd",
-      "verification",
+      "sf-code-review",
+      "sf-plan-review",
+      "sf-spec-review",
+      "sf-tdd",
+      "sf-verification",
     ]);
   });
 });

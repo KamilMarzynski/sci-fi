@@ -52,6 +52,17 @@ Running `specflow init` in a repository creates:
 
 Existing bootstrap docs are preserved when the target path is already a regular file. The command fails if one of those doc paths already exists as a non-file entry such as a directory.
 
+## Bundled Skills
+
+`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means:
+
+- `.claude/skills/sf-<id>/SKILL.md` for user-callable skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`)
+- `.claude/agents/sf-<id>.md` for subagents (`sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`)
+
+All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills or agents living in the same directories.
+
+**Ownership:** these files are owned by `specflow`. Rerunning `specflow init` overwrites them in place. If you want to customize behavior, copy the file under a different id (e.g. `my-code-review`) and edit that — your copy will not be touched on rerun.
+
 ## Installed-Build Verification
 
 User-facing CLI changes must be verified from an installed package, not only from source-level tests. This repository keeps that workflow under `.testing/`.
