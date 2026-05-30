@@ -53,16 +53,18 @@ Shipped:
 - Subagent skills renamed with `sf-` prefix: `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`. Removes collision risk with user-authored agents that happen to use generic names.
 - README documents bundled-skill ownership policy: `.claude/skills/sf-*` and `.claude/agents/sf-*` are owned by `specflow` and overwritten by `init`. Users wanting customization should copy under a different id.
 
+### Debt Sweep PR 2 (2026-05-30)
+
+Shipped:
+
+- Dropped duplicate `register-defaults` side-effect import from `src/cli/commands/init.ts`.
+- Deleted dead `buildAgentsDocument` in `src/core/init/scaffold.ts`.
+- `HarnessNotImplementedError` URL is now read from `package.json` `bugs.url` at module load. `package.json` gained `repository`, `bugs`, and `homepage` fields.
+- `package-lock.json` regenerated; stale local-tarball entry from a prior installed-build run is gone.
+- `vitest.config.ts` now splits unit/e2e into projects; the 60s timeout lives in the e2e project (with `fileParallelism: false` so heavy tests don't starve each other) instead of repeated per-test literals.
+- `tests/e2e/installed-init.test.ts` rerun test now overwrites bundled sf-* skill/agent files between runs and asserts the second `init` restores them to bundled content.
+
 ### Known Debt (carry forward)
-
-Minor (PR 2 scope):
-
-- Duplicate `register-defaults` side-effect import in `src/cli/commands/init.ts` and `src/core/init/install-skills.ts` — drop the one in `init.ts`.
-- Dead `buildAgentsDocument` in `src/core/init/scaffold.ts:154` (pre-existing, not in bootstrap list).
-- `HarnessNotImplementedError` URL hardcoded to `KamilMarzynski/spec-flow`. Could read from `package.json` `repository.url`.
-- `package-lock.json` line 674 contains a stale local-tarball path (`file:../../../../../private/tmp/specflow-init-installed-BvOv0e/pack/commander-14.0.3.tgz`) inherited from a prior installed-build run. Blocks fresh `npm install` on a new machine. Regenerate via `rm package-lock.json && npm install`.
-- E2e per-test `{ timeout: 60_000 }` repeated 6+ times. Move into `vitest.config.ts` (e2e-scoped).
-- `tests/e2e/installed-init.test.ts` rerun test does not assert `.claude/skills/` and `.claude/agents/` content survives a second `init`. Add assertion.
 
 Larger (future):
 

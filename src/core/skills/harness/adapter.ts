@@ -1,4 +1,17 @@
+import { createRequire } from "node:module";
+import { join } from "node:path";
+import { findPackageRoot } from "../../package-root.js";
 import type { SkillBundle } from "../types.js";
+
+const require = createRequire(import.meta.url);
+const packageJson = require(
+  join(findPackageRoot(import.meta.url), "package.json"),
+) as { bugs?: { url?: unknown } };
+
+const ISSUES_URL =
+  typeof packageJson.bugs?.url === "string"
+    ? packageJson.bugs.url
+    : "https://github.com";
 
 export type HarnessId =
   | "claude-code"
@@ -37,7 +50,7 @@ export class InvalidHarnessError extends Error {
 export class HarnessNotImplementedError extends Error {
   constructor(public readonly harness: HarnessId) {
     super(
-      `Harness "${harness}" is not implemented yet. Track progress at https://github.com/KamilMarzynski/spec-flow/issues.`,
+      `Harness "${harness}" is not implemented yet. Track progress at ${ISSUES_URL}.`,
     );
     this.name = "HarnessNotImplementedError";
   }

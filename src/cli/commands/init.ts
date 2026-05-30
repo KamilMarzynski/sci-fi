@@ -8,7 +8,6 @@ import { writeConfig } from "../../core/init/config.js";
 import { findPackageRoot } from "../../core/package-root.js";
 import type { HarnessId } from "../../core/skills/harness/adapter.js";
 import { getAdapter } from "../../core/skills/harness/registry.js";
-import "../../core/skills/harness/register-defaults.js";
 
 interface InitCommandOptions {
   readonly harness?: string;
