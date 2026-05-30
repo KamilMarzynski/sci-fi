@@ -14,13 +14,13 @@ describe("loadCatalog", () => {
     });
 
     const ids = bundles.map((bundle) => bundle.manifest.id).sort();
-    expect(ids).toEqual(["sf-feature", "spec-review"]);
+    expect(ids).toEqual(["sf-feature", "sf-spec-review"]);
 
     const feature = bundles.find((bundle) => bundle.manifest.id === "sf-feature");
     expect(feature?.manifest.kind).toBe("user");
     expect(feature?.body).toBe("# sf-feature\n\nstub body\n");
 
-    const review = bundles.find((bundle) => bundle.manifest.id === "spec-review");
+    const review = bundles.find((bundle) => bundle.manifest.id === "sf-spec-review");
     expect(review?.manifest.kind).toBe("subagent");
   });
 
@@ -40,5 +40,14 @@ describe("loadCatalog", () => {
         manifestsRoot: join(fixturesRoot, "missing-body"),
       }),
     ).rejects.toThrowError(/body\.md/);
+  });
+
+  it("rejects manifests that fail schema validation", async () => {
+    await expect(
+      loadCatalog({
+        bodiesRoot: join(fixturesRoot, "invalid"),
+        manifestsRoot: join(fixturesRoot, "invalid"),
+      }),
+    ).rejects.toThrowError(/Invalid manifest/);
   });
 });

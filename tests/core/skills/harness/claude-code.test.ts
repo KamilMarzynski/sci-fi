@@ -90,54 +90,54 @@ describe("claudeCodeAdapter — subagents", () => {
     const projectRoot = createProjectRoot();
     const bundle: SkillBundle = {
       manifest: {
-        id: "code-review",
+        id: "sf-code-review",
         kind: "subagent",
         description: "Quality review of changes.",
         allowedTools: ["Read", "Grep"],
         model: "inherit",
       },
-      body: "# code-review\n\nstub body\n",
+      body: "# sf-code-review\n\nstub body\n",
     };
 
     await claudeCodeAdapter.install([bundle], projectRoot);
 
     const written = readFileSync(
-      join(projectRoot, ".claude", "agents", "code-review.md"),
+      join(projectRoot, ".claude", "agents", "sf-code-review.md"),
       "utf8",
     );
     const [frontmatterBlock, body] = splitFrontmatter(written);
     const frontmatter = parse(frontmatterBlock);
 
     expect(frontmatter).toEqual({
-      name: "code-review",
+      name: "sf-code-review",
       description: "Quality review of changes.",
       tools: "Read, Grep",
       model: "inherit",
     });
-    expect(body).toBe("# code-review\n\nstub body\n");
+    expect(body).toBe("# sf-code-review\n\nstub body\n");
   });
 
   it("omits optional subagent keys when not provided", async () => {
     const projectRoot = createProjectRoot();
     const bundle: SkillBundle = {
       manifest: {
-        id: "verification",
+        id: "sf-verification",
         kind: "subagent",
         description: "Verify implementation matches spec.",
       },
-      body: "# verification\n",
+      body: "# sf-verification\n",
     };
 
     await claudeCodeAdapter.install([bundle], projectRoot);
 
     const written = readFileSync(
-      join(projectRoot, ".claude", "agents", "verification.md"),
+      join(projectRoot, ".claude", "agents", "sf-verification.md"),
       "utf8",
     );
     const [frontmatterBlock] = splitFrontmatter(written);
 
     expect(parse(frontmatterBlock)).toEqual({
-      name: "verification",
+      name: "sf-verification",
       description: "Verify implementation matches spec.",
     });
   });

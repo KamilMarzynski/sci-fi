@@ -1,5 +1,3 @@
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { cwd, stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { Command } from "commander";
@@ -7,6 +5,7 @@ import { scaffoldInit } from "../../core/init/scaffold.js";
 import { resolveHarness } from "../../core/init/prompt-harness.js";
 import { installSkills } from "../../core/init/install-skills.js";
 import { writeConfig } from "../../core/init/config.js";
+import { findPackageRoot } from "../../core/package-root.js";
 import type { HarnessId } from "../../core/skills/harness/adapter.js";
 import { getAdapter } from "../../core/skills/harness/registry.js";
 import "../../core/skills/harness/register-defaults.js";
@@ -24,7 +23,7 @@ export function registerInitCommand(program: Command): void {
     .option("--yes", "skip prompts and use defaults")
     .action(async (options: InitCommandOptions) => {
       const projectRoot = cwd();
-      const packageRoot = resolvePackageRoot();
+      const packageRoot = findPackageRoot(import.meta.url);
       const harness = await resolveHarness({
         flag: options.harness,
         yes: options.yes === true,
@@ -72,12 +71,3 @@ async function askInteractively(
   }
 }
 
-function resolvePackageRoot(): string {
-  const commandsDir = dirname(fileURLToPath(import.meta.url));
-  // When compiled to dist/src/cli/commands/, we need 4 hops.
-  // When running from source at src/cli/commands/ (vitest), we need 3 hops.
-  const distMarker = `${commandsDir.includes("/dist/") ? ".." : ""}`;
-  return distMarker.length > 0
-    ? join(commandsDir, "..", "..", "..", "..")
-    : join(commandsDir, "..", "..", "..");
-}

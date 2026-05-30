@@ -1,3 +1,0 @@
-# spec-review
-
-stub body

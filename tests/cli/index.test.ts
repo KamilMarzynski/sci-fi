@@ -166,6 +166,30 @@ describe("installed artifact cli", () => {
         throw new Error("Expected yaml tarball for offline install");
       }
 
+      execFileSync(
+        "npm",
+        [
+          "pack",
+          "./node_modules/zod",
+          "--pack-destination",
+          packDirectory,
+        ],
+        {
+          cwd: repositoryRoot,
+          encoding: "utf8",
+          env: npmEnvironment,
+        },
+      );
+
+      const [zodArtifactName] = readdirSync(packDirectory).filter((entry) =>
+        entry.startsWith("zod-") && entry.endsWith(".tgz"),
+      );
+      expect(zodArtifactName).toBeDefined();
+
+      if (zodArtifactName === undefined) {
+        throw new Error("Expected zod tarball for offline install");
+      }
+
       writeFileSync(
         join(installDirectory, "package.json"),
         JSON.stringify({ name: "specflow-cli-test", private: true }),
@@ -181,6 +205,7 @@ describe("installed artifact cli", () => {
           "--no-package-lock",
           join(packDirectory, commanderArtifactName),
           join(packDirectory, yamlArtifactName),
+          join(packDirectory, zodArtifactName),
           join(packDirectory, artifactName),
         ],
         {

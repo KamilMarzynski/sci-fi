@@ -56,7 +56,7 @@ describe("installed build init verification", () => {
         ).toBe(true);
         expect(
           existsSync(
-            join(installation.installDirectory, ".claude", "agents", "code-review.md"),
+            join(installation.installDirectory, ".claude", "agents", "sf-code-review.md"),
           ),
         ).toBe(true);
 

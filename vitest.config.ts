@@ -4,7 +4,8 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./tests/setup.ts"],
-    exclude: ["**/.claude/**"],
+    include: ["tests/**/*.test.ts"],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.claude/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],

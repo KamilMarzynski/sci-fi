@@ -17,6 +17,7 @@
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": false
   },
   "include": [

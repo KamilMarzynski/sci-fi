@@ -1,7 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { stringify } from "yaml";
-import type { SkillBundle, SkillManifest } from "../types.js";
+import type {
+  SkillBundle,
+  SkillManifest,
+  SubagentSkillManifest,
+  UserSkillManifest,
+} from "../types.js";
 import type { HarnessAdapter } from "./adapter.js";
 
 export const claudeCodeAdapter: HarnessAdapter = {
@@ -50,7 +55,7 @@ function buildFrontmatter(manifest: SkillManifest): Record<string, unknown> {
 }
 
 function buildUserFrontmatter(
-  manifest: SkillManifest,
+  manifest: UserSkillManifest,
 ): Record<string, unknown> {
   const frontmatter: Record<string, unknown> = {
     name: manifest.id,
@@ -73,7 +78,7 @@ function buildUserFrontmatter(
 }
 
 function buildSubagentFrontmatter(
-  manifest: SkillManifest,
+  manifest: SubagentSkillManifest,
 ): Record<string, unknown> {
   const frontmatter: Record<string, unknown> = {
     name: manifest.id,

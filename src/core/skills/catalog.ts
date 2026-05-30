@@ -1,7 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import type { SkillBundle, SkillManifest } from "./types.js";
+import { skillManifestSchema, type SkillBundle, type SkillManifest } from "./types.js";
 
 export interface LoadCatalogOptions {
   readonly bodiesRoot: string;
@@ -52,15 +52,20 @@ async function loadManifest(modulePath: string): Promise<SkillManifest> {
   const moduleUrl = pathToFileURL(modulePath).href;
   const imported = (await import(moduleUrl)) as { manifest?: unknown };
 
-  if (
-    imported.manifest === undefined ||
-    typeof imported.manifest !== "object" ||
-    imported.manifest === null
-  ) {
+  if (imported.manifest === undefined) {
     throw new Error(`manifest export missing from ${modulePath}`);
   }
 
-  return imported.manifest as SkillManifest;
+  const result = skillManifestSchema.safeParse(imported.manifest);
+  if (!result.success) {
+    throw new Error(
+      `Invalid manifest at ${modulePath}: ${result.error.issues
+        .map((issue) => `${issue.path.join(".") || "<root>"}: ${issue.message}`)
+        .join("; ")}`,
+    );
+  }
+
+  return result.data;
 }
 
 async function assertFileExists(path: string): Promise<void> {

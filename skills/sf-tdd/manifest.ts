@@ -1,8 +1,8 @@
 import type { SkillManifest } from "specflow/skill-types";
 
 export const manifest: SkillManifest = {
-  id: "spec-review",
+  id: "sf-tdd",
   kind: "subagent",
   description:
-    "Critic pass on a spec.md. Surfaces ambiguity, missing AC, CONTEXT.md gaps.",
+    "Enforce tests-first discipline. Writes failing test before implementation per task.",
 };
