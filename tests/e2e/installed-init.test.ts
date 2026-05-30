@@ -15,7 +15,6 @@ import {
 describe("installed build init verification", () => {
   it(
     "initializes the project structure from an installed package in the dedicated workspace",
-    { timeout: 60_000 },
     () => {
       const installation = createInstalledPackageTestEnvironment("installed-init-");
 
@@ -81,7 +80,6 @@ describe("installed build init verification", () => {
 
   it(
     "allows a safe installed-build rerun without overwriting existing bootstrap docs or generated files",
-    { timeout: 60_000 },
     () => {
       const installation = createInstalledPackageTestEnvironment("installed-init-");
 
@@ -101,12 +99,30 @@ describe("installed build init verification", () => {
         const specPath = join(specflowRoot, "specs", "existing-spec.md");
         const bugPath = join(specflowRoot, "bugs", "existing-bug.md");
         const statePath = join(specflowRoot, ".specflow", "state.json");
+        const skillPath = join(
+          installation.installDirectory,
+          ".claude",
+          "skills",
+          "sf-feature",
+          "SKILL.md",
+        );
+        const agentPath = join(
+          installation.installDirectory,
+          ".claude",
+          "agents",
+          "sf-code-review.md",
+        );
 
         writeFileSync(evaluationPath, preservedEvaluationDocument, "utf8");
         writeFileSync(roadmapPath, preservedRoadmapDocument, "utf8");
         writeFileSync(specPath, preservedSpecDocument, "utf8");
         writeFileSync(bugPath, preservedBugDocument, "utf8");
         writeFileSync(statePath, preservedStateDocument, "utf8");
+
+        const skillBeforeRerun = readFileSync(skillPath, "utf8");
+        const agentBeforeRerun = readFileSync(agentPath, "utf8");
+        writeFileSync(skillPath, "user override\n", "utf8");
+        writeFileSync(agentPath, "user override\n", "utf8");
 
         const rerun = runInstalledInit(installation.installDirectory, [
           "--harness",
@@ -124,6 +140,12 @@ describe("installed build init verification", () => {
         expect(existsSync(join(specflowRoot, ".specflow"))).toBe(true);
         expect(existsSync(join(specflowRoot, "specs"))).toBe(true);
         expect(existsSync(join(specflowRoot, "bugs"))).toBe(true);
+
+        // Bundled sf-* skills and agents are spec-flow-owned: rerun must
+        // overwrite local edits back to the bundled content (documented in
+        // README).
+        expect(readFileSync(skillPath, "utf8")).toBe(skillBeforeRerun);
+        expect(readFileSync(agentPath, "utf8")).toBe(agentBeforeRerun);
       } finally {
         cleanupInstalledPackageTestEnvironment(installation);
       }
@@ -132,7 +154,6 @@ describe("installed build init verification", () => {
 
   it(
     "returns a stable non-zero exit and concise stderr on an init conflict",
-    { timeout: 60_000 },
     () => {
       const installation = createInstalledPackageTestEnvironment("installed-init-");
 
@@ -182,7 +203,6 @@ describe("installed build init verification", () => {
 
   it(
     "returns a stable non-zero exit when the chosen harness is not implemented",
-    { timeout: 60_000 },
     () => {
       const installation = createInstalledPackageTestEnvironment("installed-init-");
 

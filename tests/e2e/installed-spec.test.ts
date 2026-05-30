@@ -11,7 +11,7 @@ import {
 } from "./installed-test-helpers.js";
 
 describe("installed build spec verification", () => {
-  it("creates a feature container from an installed package", { timeout: 60_000 }, () => {
+  it("creates a feature container from an installed package", () => {
     const installation = createInstalledPackageTestEnvironment("installed-spec-");
 
     try {

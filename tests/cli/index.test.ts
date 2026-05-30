@@ -84,7 +84,7 @@ describe("isDirectExecution", () => {
 });
 
 describe("installed artifact cli", () => {
-  it("initializes the project structure from the installed bin", { timeout: 60_000 }, () => {
+  it("initializes the project structure from the installed bin", () => {
     const sandboxRoot = mkdtempSync(join(tmpdir(), "specflow-installed-cli-"));
     const packDirectory = join(sandboxRoot, "pack");
     const installDirectory = join(sandboxRoot, "install");
