@@ -54,12 +54,9 @@ Existing bootstrap docs are preserved when the target path is already a regular 
 
 ## Bundled Skills
 
-`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means:
+`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 10 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
 
-- `.claude/skills/sf-<id>/SKILL.md` for user-callable skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`)
-- `.claude/agents/sf-<id>.md` for subagents (`sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`)
-
-All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills or agents living in the same directories.
+All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills living in the same directories.
 
 **Ownership:** these files are owned by `specflow`. Rerunning `specflow init` overwrites them in place. If you want to customize behavior, copy the file under a different id (e.g. `my-code-review`) and edit that — your copy will not be touched on rerun.
 

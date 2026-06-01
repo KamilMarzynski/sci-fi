@@ -29,30 +29,25 @@ describe("bundled skill catalog", () => {
     ]);
   });
 
-  it("partitions 5 user skills and 5 subagents", async () => {
+  it("all 10 skills are user skills", async () => {
     const bundles = await loadCatalog({
       bodiesRoot: join(packageRoot, "skills"),
       manifestsRoot: join(packageRoot, "dist", "skills"),
     });
 
-    const user = bundles.filter((bundle) => bundle.manifest.kind === "user");
-    const subagent = bundles.filter(
-      (bundle) => bundle.manifest.kind === "subagent",
-    );
+    const kinds = bundles.map((bundle) => bundle.manifest.kind);
 
-    expect(user.map((bundle) => bundle.manifest.id).sort()).toEqual([
-      "sf-bug",
-      "sf-feature",
-      "sf-fix",
-      "sf-implement",
-      "sf-plan",
-    ]);
-    expect(subagent.map((bundle) => bundle.manifest.id).sort()).toEqual([
-      "sf-code-review",
-      "sf-plan-review",
-      "sf-spec-review",
-      "sf-tdd",
-      "sf-verification",
+    expect(kinds).toEqual([
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
+      "user",
     ]);
   });
 });

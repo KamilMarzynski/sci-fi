@@ -38,13 +38,6 @@ describe("installSkills", () => {
       "sf-fix",
       "sf-bug",
       "sf-implement",
-    ]) {
-      expect(
-        existsSync(join(projectRoot, ".claude", "skills", id, "SKILL.md")),
-      ).toBe(true);
-    }
-
-    for (const id of [
       "sf-spec-review",
       "sf-plan-review",
       "sf-code-review",
@@ -52,7 +45,7 @@ describe("installSkills", () => {
       "sf-tdd",
     ]) {
       expect(
-        existsSync(join(projectRoot, ".claude", "agents", `${id}.md`)),
+        existsSync(join(projectRoot, ".claude", "skills", id, "SKILL.md")),
       ).toBe(true);
     }
   });

@@ -36,11 +36,11 @@ Spec + plan: `docs/superpowers/{specs,plans}/2026-05-29-skills-init-bundle*.md`.
 
 Shipped:
 
-- `skills/<id>/{body.md,manifest.ts}` single source of truth for 10 stub skills (5 user `sf-*`, 5 subagent `*-review` / `tdd` / `verification`).
+- `skills/<id>/{body.md,manifest.ts}` single source of truth for 10 stub skills (all `sf-*` user skills).
 - `src/core/skills/` — `types`, `catalog`, `harness/{adapter,registry,claude-code,register-defaults}`.
 - `src/core/init/` additions — `prompt-harness`, `install-skills`, `config`.
 - Scaffold docs: `TESTING.md` replaced by `EVALUATION.md`; `ARCHITECTURE.md` and `CONTEXT.md` added.
-- CLI: `specflow init --harness <id> [--yes]`. Claude Code adapter writes `.claude/skills/<id>/SKILL.md` and `.claude/agents/<id>.md`. Other harnesses defined in interface, throw `HarnessNotImplementedError` before any FS write.
+- CLI: `specflow init --harness <id> [--yes]`. Claude Code adapter writes `.claude/skills/<id>/SKILL.md`. Other harnesses defined in interface, throw `HarnessNotImplementedError` before any FS write.
 - `package.json` self-reference subpath `specflow/skill-types` for typed manifests.
 - 147/147 tests pass.
 
@@ -50,8 +50,8 @@ Shipped:
 
 - `findPackageRoot` walk-up replaces brittle `import.meta.url.includes("/dist/...")` checks in `src/cli/index.ts` and `src/cli/commands/init.ts`. Util lives at `src/core/package-root.ts`.
 - Zod schema is now the source of truth for `SkillManifest`. `src/core/skills/types.ts` defines `skillManifestSchema` (discriminated union on `kind`); `SkillManifest = z.infer<...>`. `loadCatalog` parses on import and throws structured errors on invalid manifests.
-- Subagent skills renamed with `sf-` prefix: `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`. Removes collision risk with user-authored agents that happen to use generic names.
-- README documents bundled-skill ownership policy: `.claude/skills/sf-*` and `.claude/agents/sf-*` are owned by `specflow` and overwritten by `init`. Users wanting customization should copy under a different id.
+- Review skills renamed with `sf-` prefix: `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`. Removes collision risk with user-authored skills that happen to use generic names.
+- README documents bundled-skill ownership policy: `.claude/skills/sf-*` is owned by `specflow` and overwritten by `init`. Users wanting customization should copy under a different id.
 
 ### Debt Sweep PR 2 (2026-05-30)
 
@@ -62,7 +62,7 @@ Shipped:
 - `HarnessNotImplementedError` URL is now read from `package.json` `bugs.url` at module load. `package.json` gained `repository`, `bugs`, and `homepage` fields.
 - `package-lock.json` regenerated; stale local-tarball entry from a prior installed-build run is gone.
 - `vitest.config.ts` now splits unit/e2e into projects; the 60s timeout lives in the e2e project (with `fileParallelism: false` so heavy tests don't starve each other) instead of repeated per-test literals.
-- `tests/e2e/installed-init.test.ts` rerun test now overwrites bundled sf-* skill/agent files between runs and asserts the second `init` restores them to bundled content.
+- `tests/e2e/installed-init.test.ts` rerun test now overwrites bundled sf-* skill files between runs and asserts the second `init` restores them to bundled content.
 
 ### Known Debt (carry forward)
 
@@ -74,7 +74,7 @@ By design (not debt):
 
 - All 10 skill bodies are stubs. Real prompt content lives in follow-up specs (one per skill, or grouped).
 - Only Claude Code adapter is implemented. OpenCode / Codex / Cursor / AGENTS.md fallback throw `HarnessNotImplementedError` until follow-up specs add them.
-- No `specflow update` command yet. Rerunning `init` overwrites `.claude/skills/sf-*` and `.claude/agents/sf-*` by design — documented in README. Custom user edits belong in separate skills, not in the bundled `sf-*` files.
+- No `specflow update` command yet. Rerunning `init` overwrites `.claude/skills/sf-*` by design — documented in README. Custom user edits belong in separate skills, not in the bundled `sf-*` files.
 
 ## Next Focus
 

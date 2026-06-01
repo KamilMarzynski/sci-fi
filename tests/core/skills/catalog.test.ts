@@ -21,7 +21,7 @@ describe("loadCatalog", () => {
     expect(feature?.body).toBe("# sf-feature\n\nstub body\n");
 
     const review = bundles.find((bundle) => bundle.manifest.id === "sf-spec-review");
-    expect(review?.manifest.kind).toBe("subagent");
+    expect(review?.manifest.kind).toBe("user");
   });
 
   it("throws when manifest.id does not match the folder name", async () => {

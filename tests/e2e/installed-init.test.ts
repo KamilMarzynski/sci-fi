@@ -55,7 +55,13 @@ describe("installed build init verification", () => {
         ).toBe(true);
         expect(
           existsSync(
-            join(installation.installDirectory, ".claude", "agents", "sf-code-review.md"),
+            join(
+              installation.installDirectory,
+              ".claude",
+              "skills",
+              "sf-code-review",
+              "SKILL.md",
+            ),
           ),
         ).toBe(true);
 
@@ -106,11 +112,12 @@ describe("installed build init verification", () => {
           "sf-feature",
           "SKILL.md",
         );
-        const agentPath = join(
+        const reviewSkillPath = join(
           installation.installDirectory,
           ".claude",
-          "agents",
-          "sf-code-review.md",
+          "skills",
+          "sf-code-review",
+          "SKILL.md",
         );
 
         writeFileSync(evaluationPath, preservedEvaluationDocument, "utf8");
@@ -120,9 +127,9 @@ describe("installed build init verification", () => {
         writeFileSync(statePath, preservedStateDocument, "utf8");
 
         const skillBeforeRerun = readFileSync(skillPath, "utf8");
-        const agentBeforeRerun = readFileSync(agentPath, "utf8");
+        const reviewBeforeRerun = readFileSync(reviewSkillPath, "utf8");
         writeFileSync(skillPath, "user override\n", "utf8");
-        writeFileSync(agentPath, "user override\n", "utf8");
+        writeFileSync(reviewSkillPath, "user override\n", "utf8");
 
         const rerun = runInstalledInit(installation.installDirectory, [
           "--harness",
@@ -141,11 +148,10 @@ describe("installed build init verification", () => {
         expect(existsSync(join(specflowRoot, "specs"))).toBe(true);
         expect(existsSync(join(specflowRoot, "bugs"))).toBe(true);
 
-        // Bundled sf-* skills and agents are spec-flow-owned: rerun must
-        // overwrite local edits back to the bundled content (documented in
-        // README).
+        // Bundled sf-* skills are spec-flow-owned: rerun must overwrite
+        // local edits back to the bundled content (documented in README).
         expect(readFileSync(skillPath, "utf8")).toBe(skillBeforeRerun);
-        expect(readFileSync(agentPath, "utf8")).toBe(agentBeforeRerun);
+        expect(readFileSync(reviewSkillPath, "utf8")).toBe(reviewBeforeRerun);
       } finally {
         cleanupInstalledPackageTestEnvironment(installation);
       }

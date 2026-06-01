@@ -24,7 +24,7 @@ function createProjectRoot(): string {
   return projectRoot;
 }
 
-describe("claudeCodeAdapter — user skills", () => {
+describe("claudeCodeAdapter", () => {
   it("writes .claude/skills/<id>/SKILL.md with full frontmatter and body", async () => {
     const projectRoot = createProjectRoot();
     const bundle: SkillBundle = {
@@ -81,64 +81,6 @@ describe("claudeCodeAdapter — user skills", () => {
     expect(frontmatter).toEqual({
       name: "sf-bug",
       description: "Create a bug report.",
-    });
-  });
-});
-
-describe("claudeCodeAdapter — subagents", () => {
-  it("writes .claude/agents/<id>.md with subagent frontmatter", async () => {
-    const projectRoot = createProjectRoot();
-    const bundle: SkillBundle = {
-      manifest: {
-        id: "sf-code-review",
-        kind: "subagent",
-        description: "Quality review of changes.",
-        allowedTools: ["Read", "Grep"],
-        model: "inherit",
-      },
-      body: "# sf-code-review\n\nstub body\n",
-    };
-
-    await claudeCodeAdapter.install([bundle], projectRoot);
-
-    const written = readFileSync(
-      join(projectRoot, ".claude", "agents", "sf-code-review.md"),
-      "utf8",
-    );
-    const [frontmatterBlock, body] = splitFrontmatter(written);
-    const frontmatter = parse(frontmatterBlock);
-
-    expect(frontmatter).toEqual({
-      name: "sf-code-review",
-      description: "Quality review of changes.",
-      tools: "Read, Grep",
-      model: "inherit",
-    });
-    expect(body).toBe("# sf-code-review\n\nstub body\n");
-  });
-
-  it("omits optional subagent keys when not provided", async () => {
-    const projectRoot = createProjectRoot();
-    const bundle: SkillBundle = {
-      manifest: {
-        id: "sf-verification",
-        kind: "subagent",
-        description: "Verify implementation matches spec.",
-      },
-      body: "# sf-verification\n",
-    };
-
-    await claudeCodeAdapter.install([bundle], projectRoot);
-
-    const written = readFileSync(
-      join(projectRoot, ".claude", "agents", "sf-verification.md"),
-      "utf8",
-    );
-    const [frontmatterBlock] = splitFrontmatter(written);
-
-    expect(parse(frontmatterBlock)).toEqual({
-      name: "sf-verification",
-      description: "Verify implementation matches spec.",
     });
   });
 });
