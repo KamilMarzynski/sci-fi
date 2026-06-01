@@ -1,16 +1,10 @@
 import { mkdir, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { slugify } from "../slugify.js";
 import { buildFeatureDirectoryPath } from "../specs/paths.js";
 import { writeFixFile } from "./frontmatter.js";
 import { formatFixId } from "./id.js";
 import { buildFixFilePath, buildFixesDirectoryPath } from "./paths.js";
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && "code" in error && error.code === "ENOENT";

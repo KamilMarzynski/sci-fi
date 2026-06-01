@@ -1,15 +1,9 @@
 import { mkdir, readdir } from "node:fs/promises";
+import { slugify } from "../slugify.js";
 import { writeBugFile } from "./frontmatter.js";
 import { formatBugId } from "./id.js";
 import { buildBugFilePath, buildBugsRootPath } from "./paths.js";
 import type { BugSeverity } from "./types.js";
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export interface CreateBugOptions {
   projectRoot: string;

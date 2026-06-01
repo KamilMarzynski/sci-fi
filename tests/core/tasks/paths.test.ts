@@ -14,4 +14,16 @@ describe("task path helpers", () => {
       join("/repo", "docs", "specflow", "specs", "user-auth", "tasks", "setup-database.md"),
     );
   });
+
+  it("rejects path traversal in feature slug", () => {
+    expect(() => buildTasksDirectoryPath("/repo", "../../../etc")).toThrow(
+      'Invalid feature slug "../../../etc"',
+    );
+  });
+
+  it("rejects path traversal in task slug", () => {
+    expect(() => buildTaskFilePath("/repo", "user-auth", "../../../evil")).toThrow(
+      'Invalid task slug "../../../evil"',
+    );
+  });
 });
