@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { cwd } from "node:process";
+import { emitError, emitSuccess, jsonMode } from "../../core/output/index.js";
 import { updateFeatureStatus } from "../../core/specs/transition.js";
 
 function createTimestamp(): string {
@@ -11,8 +12,23 @@ export function registerSpecReadyCommand(program: Command): void {
     .command("spec-ready")
     .description("Mark a feature as spec-ready (validates spec.md exists)")
     .argument("<slug>", "feature folder slug")
-    .action(async (slug: string) => {
-      await updateFeatureStatus(cwd(), slug, "spec-ready", createTimestamp());
-      process.stdout.write(`feature ${slug} marked as spec-ready\n`);
+    .option("--json", "output as structured JSON")
+    .action(async (slug: string, _options: unknown, command: Command) => {
+      const json = jsonMode(command);
+      try {
+        const result = await updateFeatureStatus(
+          cwd(),
+          slug,
+          "spec-ready",
+          createTimestamp(),
+        );
+        emitSuccess({ action: "spec-ready", ...result }, json, [
+          `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
+          `  ID: ${result.id}`,
+          `  Timestamp: ${result.timestamp}`,
+        ]);
+      } catch (error) {
+        emitError(error, json);
+      }
     });
 }

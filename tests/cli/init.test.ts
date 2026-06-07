@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 describe("specflow init", () => {
   const temporaryDirectories: string[] = [];
@@ -54,20 +55,11 @@ describe("specflow init", () => {
       recursive: true,
     });
 
-    await expect(
-      buildProgram().parseAsync([
-        "node",
-        "specflow",
-        "init",
-        "--harness",
-        "claude-code",
-        "--yes",
-      ]),
-    ).rejects.toMatchObject({
-      message: expect.stringContaining(
-        `${join("docs", "specflow", "EVALUATION.md")}: path exists and is not a regular file.`,
-      ),
-    });
+    const run = await runCli(["init", "--harness", "claude-code", "--yes"]);
+    expect(run.exitCode).not.toBe(0);
+    expect(run.stderr).toContain(
+      `${join("docs", "specflow", "EVALUATION.md")}: path exists and is not a regular file.`,
+    );
 
     await expect(
       access(join(projectRoot, "docs", "specflow", ".specflow")),
@@ -92,20 +84,11 @@ describe("specflow init", () => {
       "utf8",
     );
 
-    await expect(
-      buildProgram().parseAsync([
-        "node",
-        "specflow",
-        "init",
-        "--harness",
-        "claude-code",
-        "--yes",
-      ]),
-    ).rejects.toMatchObject({
-      message: expect.stringContaining(
-        `${join("docs", "specflow", ".specflow")}: path exists and is not a directory.`,
-      ),
-    });
+    const run = await runCli(["init", "--harness", "claude-code", "--yes"]);
+    expect(run.exitCode).not.toBe(0);
+    expect(run.stderr).toContain(
+      `${join("docs", "specflow", ".specflow")}: path exists and is not a directory.`,
+    );
 
     expect(readFileSync(join(projectRoot, "docs", "specflow", ".specflow"), "utf8")).toBe("conflict");
     await expect(

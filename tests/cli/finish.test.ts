@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -62,9 +63,9 @@ describe("finish command", () => {
       "utf8",
     );
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]),
-    ).rejects.toThrow("not all tasks are complete");
+    const run = await runCli(["finish", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("not all tasks are complete");
   });
 
   it("fails when there are open fixes", async () => {
@@ -94,11 +95,17 @@ describe("finish command", () => {
       "utf8",
     );
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]),
-    ).rejects.toThrow(
-      /Cannot finish user-auth.*FIX-0001.*open.*Resolve or mark wont-fix before finishing/s,
-    );
+    const run = await runCli(["finish", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("Cannot finish user-auth");
+    expect(run.stderr).toContain("FIX-0001");
+
+    const jsonRun = await runCli(["finish", "user-auth", "--json"]);
+    expect(jsonRun.exitCode).toBe(4);
+    const payload = JSON.parse(jsonRun.stderr);
+    expect(payload.ok).toBe(false);
+    expect(payload.error.code).toBe("PRECONDITION_FAILED");
+    expect(payload.error.details.openFixes[0].id).toBe("FIX-0001");
   });
 
   it("succeeds when all fixes are resolved", async () => {

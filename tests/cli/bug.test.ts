@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
 import { readBugFile } from "../../src/core/bugs/frontmatter.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -76,15 +77,9 @@ describe("bug command", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await expect(
-      buildProgram().parseAsync([
-        "node",
-        "specflow",
-        "bug",
-        "something",
-        "--severity",
-        "invalid",
-      ]),
-    ).rejects.toThrow("Invalid severity");
+    const run = await runCli(["bug", "something", "--severity", "invalid"]);
+    expect(run.exitCode).toBe(2);
+    expect(run.stderr).toContain("Invalid severity");
+    expect(run.stderr).toContain("INVALID_ARGUMENT");
   });
 });

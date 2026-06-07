@@ -1,4 +1,5 @@
 import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
+import { SpecflowError } from "../output/errors.js";
 import { buildFeaturesRootPath, buildFeatureDirectoryPath, buildFeatureMetadataPath } from "./paths.js";
 import { createInitialFeatureMetadata } from "./metadata.js";
 import { formatFeatureId } from "./id.js";
@@ -35,8 +36,10 @@ export async function createFeature(
   );
 
   if (existingFeatureDirectory !== null) {
-    throw new Error(
+    throw new SpecflowError(
+      "CONFLICT",
       `Cannot create feature ${slug}: ${featureDirectoryPath} already exists.`,
+      { hint: "Choose a different slug or inspect it with `specflow status <slug>`." },
     );
   }
 

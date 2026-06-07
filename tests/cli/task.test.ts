@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { readTaskFile } from "../../src/core/tasks/frontmatter.js";
 import { buildTaskFilePath } from "../../src/core/tasks/paths.js";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -100,8 +101,8 @@ describe("task done", () => {
 
     await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "task", "done", "user-auth", "setup-database"]),
-    ).rejects.toThrow("task is not in-progress");
+    const run = await runCli(["task", "done", "user-auth", "setup-database"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("task is not in-progress");
   });
 });

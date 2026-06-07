@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -58,8 +59,8 @@ describe("start command", () => {
     );
     await writeFile(join(featureDir, "spec.md"), "# Spec\n", "utf8");
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "start", "user-auth"]),
-    ).rejects.toThrow("must be plan-ready");
+    const run = await runCli(["start", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("must be plan-ready");
   });
 });

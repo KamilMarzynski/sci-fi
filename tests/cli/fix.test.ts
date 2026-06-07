@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
 import { readFixFile } from "../../src/core/fixes/frontmatter.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -98,15 +99,9 @@ describe("fix command", () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await expect(
-      buildProgram().parseAsync([
-        "node",
-        "specflow",
-        "fix",
-        "some description",
-        "--feature",
-        "nonexistent",
-      ]),
-    ).rejects.toThrow('Feature "nonexistent" does not exist.');
+    const run = await runCli(["fix", "some description", "--feature", "nonexistent"]);
+    expect(run.exitCode).toBe(3);
+    expect(run.stderr).toContain('Feature "nonexistent" does not exist.');
+    expect(run.stderr).toContain("NOT_FOUND");
   });
 });

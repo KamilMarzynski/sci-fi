@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -64,9 +65,9 @@ describe("plan-ready command", () => {
       "utf8",
     );
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "plan-ready", "user-auth"]),
-    ).rejects.toThrow("architecture.md is missing");
+    const run = await runCli(["plan-ready", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("architecture.md is missing");
   });
 
   it("fails when no task files exist", async () => {
@@ -78,8 +79,8 @@ describe("plan-ready command", () => {
     await writeFile(join(featureDir, "spec.md"), "# Spec\n", "utf8");
     await writeFile(join(featureDir, "architecture.md"), "# Architecture\n", "utf8");
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "plan-ready", "user-auth"]),
-    ).rejects.toThrow("no task files were found");
+    const run = await runCli(["plan-ready", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("no task files were found");
   });
 });

@@ -1,5 +1,6 @@
 import { mkdir, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { SpecflowError } from "../output/errors.js";
 import { slugify } from "../slugify.js";
 import { buildFeatureDirectoryPath } from "../specs/paths.js";
 import { writeFixFile } from "./frontmatter.js";
@@ -31,7 +32,11 @@ export async function createFix(
   const metadataPath = join(featureDir, ".specflow.json");
   await stat(metadataPath).catch((error: unknown) => {
     if (isMissingPathError(error)) {
-      throw new Error(`Feature "${featureSlug}" does not exist.`);
+      throw new SpecflowError(
+        "NOT_FOUND",
+        `Feature "${featureSlug}" does not exist.`,
+        { hint: `Create it with \`specflow spec ${featureSlug}\`.` },
+      );
     }
     throw error;
   });

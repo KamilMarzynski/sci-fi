@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { cwd } from "node:process";
+import { emitError, emitSuccess, jsonMode } from "../../core/output/index.js";
 import { updateFeatureStatus } from "../../core/specs/transition.js";
 
 function createTimestamp(): string {
@@ -11,8 +12,23 @@ export function registerStartCommand(program: Command): void {
     .command("start")
     .description("Mark a feature as in-progress (requires plan-ready status)")
     .argument("<slug>", "feature folder slug")
-    .action(async (slug: string) => {
-      await updateFeatureStatus(cwd(), slug, "in-progress", createTimestamp());
-      process.stdout.write(`feature ${slug} marked as in-progress\n`);
+    .option("--json", "output as structured JSON")
+    .action(async (slug: string, _options: unknown, command: Command) => {
+      const json = jsonMode(command);
+      try {
+        const result = await updateFeatureStatus(
+          cwd(),
+          slug,
+          "in-progress",
+          createTimestamp(),
+        );
+        emitSuccess({ action: "start", ...result }, json, [
+          `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
+          `  ID: ${result.id}`,
+          `  Timestamp: ${result.timestamp}`,
+        ]);
+      } catch (error) {
+        emitError(error, json);
+      }
     });
 }

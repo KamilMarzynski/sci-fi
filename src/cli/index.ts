@@ -1,9 +1,10 @@
 import { existsSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
-import { stderr } from "node:process";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Command } from "commander";
+import { Command, CommanderError } from "commander";
+import { emitError } from "../core/output/index.js";
+import { SpecflowError } from "../core/output/errors.js";
 import { findPackageRoot } from "../core/package-root.js";
 import { registerInitCommand } from "./commands/init.js";
 import { registerSpecCommand } from "./commands/spec.js";
@@ -39,7 +40,8 @@ export function buildProgram(): Command {
   program
     .name("specflow")
     .description("Specification-driven CLI scaffolding for agentic workflows")
-    .version(readPackageVersion(packageJson));
+    .version(readPackageVersion(packageJson))
+    .exitOverride();
 
   registerInitCommand(program);
   registerSpecCommand(program);
@@ -53,7 +55,19 @@ export function buildProgram(): Command {
   registerBugCommand(program);
   registerFixCommand(program);
 
+  applyExitOverride(program);
+
   return program;
+}
+
+function applyExitOverride(command: Command): void {
+  // Suppress Commander's own "error: ..." line so usage failures surface only
+  // through the structured emitError output (avoids double-printing).
+  command.configureOutput({ writeErr: () => {} });
+  for (const child of command.commands) {
+    child.exitOverride();
+    applyExitOverride(child);
+  }
 }
 
 export function isDirectExecution(
@@ -82,24 +96,38 @@ function normalizeExecutionPath(path: string): string {
   return realpathSync(resolvedPath);
 }
 
-function formatCliError(error: unknown): string {
-  if (error instanceof Error && error.message.length > 0) {
-    return error.message;
+function handleCliError(error: unknown, argv: readonly string[]): void {
+  const json = argv.includes("--json");
+
+  if (error instanceof CommanderError) {
+    // Help/version requests exit cleanly; Commander already wrote output.
+    if (error.exitCode === 0) {
+      process.exitCode = 0;
+      return;
+    }
+
+    const message = error.message.replace(/^error:\s*/i, "");
+    emitError(
+      new SpecflowError("INVALID_ARGUMENT", message, {
+        hint: "Run `specflow --help` (or `<command> --help`) for usage.",
+        cause: error,
+      }),
+      json,
+    );
+    return;
   }
 
-  return "specflow failed with an unexpected error.";
+  emitError(error, json);
 }
 
 async function runCli(argv: readonly string[]): Promise<void> {
-  await buildProgram().parseAsync(argv);
+  try {
+    await buildProgram().parseAsync(argv as string[]);
+  } catch (error) {
+    handleCliError(error, argv);
+  }
 }
 
 if (isDirectExecution(import.meta.url, process.argv)) {
-  await runCli(process.argv).catch((error: unknown) => {
-    stderr.write(`${formatCliError(error)}\n`);
-    process.exitCode =
-      process.exitCode === undefined || process.exitCode === 0
-        ? 1
-        : process.exitCode;
-  });
+  await runCli(process.argv);
 }

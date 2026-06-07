@@ -179,8 +179,8 @@ describe("installed build init verification", () => {
         const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, "docs", "specflow", "bugs")}: path exists and is not a directory.`;
 
         expect(result.status).not.toBe(0);
-        expect(result.stderr).toBe(`${expectedErrorMessage}\n`);
-        expect(result.stderr).not.toContain("Error:");
+        expect(result.stderr).toContain(expectedErrorMessage);
+        expect(result.stderr).not.toContain("    at ");
         expect(result.stderr).not.toContain("node:internal");
         expect(
           existsSync(join(installation.installDirectory, "docs", "specflow", ".specflow")),

@@ -4,12 +4,20 @@ import { buildFeatureMetadataPath } from "./paths.js";
 import { inspectFeatureLifecycle, validateStatusTransition } from "./lifecycle.js";
 import type { FeatureMetadata, FeatureStatus } from "./types.js";
 
+export interface UpdateFeatureStatusResult {
+  id: string;
+  slug: string;
+  previousStatus: FeatureStatus;
+  newStatus: FeatureStatus;
+  timestamp: string;
+}
+
 export async function updateFeatureStatus(
   projectRoot: string,
   slug: string,
   targetStatus: FeatureStatus,
   now: string,
-): Promise<void> {
+): Promise<UpdateFeatureStatusResult> {
   const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
   const tasks = await listTasks(projectRoot, slug);
   const allTasksDone =
@@ -33,4 +41,12 @@ export async function updateFeatureStatus(
 
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);
   await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2) + "\n", "utf8");
+
+  return {
+    id: metadata.id,
+    slug: metadata.slug,
+    previousStatus: metadata.status,
+    newStatus: targetStatus,
+    timestamp: now,
+  };
 }

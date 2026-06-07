@@ -12,7 +12,7 @@ export interface InstallSkillsOptions {
 
 export async function installSkills(
   options: InstallSkillsOptions,
-): Promise<void> {
+): Promise<string[]> {
   const adapter = getAdapter(options.harness);
   const bundles = await loadCatalog({
     bodiesRoot: join(options.packageRoot, "skills"),
@@ -20,4 +20,6 @@ export async function installSkills(
   });
 
   await adapter.install(bundles, options.projectRoot);
+
+  return bundles.map((bundle) => bundle.manifest.id);
 }

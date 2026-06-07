@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildProgram } from "../../src/cli/index.js";
+import { runCli } from "./helpers.js";
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -49,8 +50,36 @@ describe("spec-ready command", () => {
       "utf8",
     );
 
-    await expect(
-      buildProgram().parseAsync(["node", "specflow", "spec-ready", "user-auth"]),
-    ).rejects.toThrow("spec.md is missing");
+    const run = await runCli(["spec-ready", "user-auth"]);
+    expect(run.exitCode).toBe(4);
+    expect(run.stderr).toContain("spec.md is missing");
+    expect(run.stderr).toContain("PRECONDITION_FAILED");
+  });
+
+  it("emits structured JSON on success with --json", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-spec-ready-"));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    await mkdir(featureDir, { recursive: true });
+    await writeFile(
+      join(featureDir, ".specflow.json"),
+      JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "created", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
+      "utf8",
+    );
+    await writeFile(join(featureDir, "spec.md"), "# Spec\n", "utf8");
+
+    const run = await runCli(["spec-ready", "user-auth", "--json"]);
+    expect(run.exitCode).toBe(0);
+    const payload = JSON.parse(run.stdout);
+    expect(payload.ok).toBe(true);
+    expect(payload.data).toMatchObject({
+      action: "spec-ready",
+      id: "FEAT-0001",
+      slug: "user-auth",
+      previousStatus: "created",
+      newStatus: "spec-ready",
+    });
   });
 });

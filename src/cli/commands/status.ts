@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { cwd } from "node:process";
 import { listFixes } from "../../core/fixes/list.js";
+import { emitError, emitSuccess, jsonMode } from "../../core/output/index.js";
 import { inspectFeatureLifecycle } from "../../core/specs/lifecycle.js";
 import { listTasks } from "../../core/tasks/list.js";
 
@@ -9,41 +10,60 @@ export function registerStatusCommand(program: Command): void {
     .command("status")
     .description("Show lifecycle status and artifact inventory for a feature")
     .argument("<slug>", "feature folder slug")
-    .action(async (slug: string) => {
-      const projectRoot = cwd();
-      const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
-      const tasks = await listTasks(projectRoot, slug);
-      const fixes = await listFixes(projectRoot, slug);
+    .option("--json", "output as structured JSON")
+    .action(async (slug: string, _options: unknown, command: Command) => {
+      const json = jsonMode(command);
+      try {
+        const projectRoot = cwd();
+        const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
+        const tasks = await listTasks(projectRoot, slug);
+        const fixes = await listFixes(projectRoot, slug);
 
-      const { metadata, artifacts } = lifecycle;
-      const title = metadata.title !== undefined ? ` (${metadata.title})` : "";
+        const { metadata, artifacts } = lifecycle;
 
-      process.stdout.write(`slug:    ${metadata.slug}${title}\n`);
-      process.stdout.write(`id:      ${metadata.id}\n`);
-      process.stdout.write(`status:  ${metadata.status}\n`);
-      process.stdout.write(`\n`);
-      process.stdout.write(
-        `spec.md:          ${artifacts.specExists ? "present" : "missing"}\n`,
-      );
-      process.stdout.write(
-        `architecture.md:  ${artifacts.architectureExists ? "present" : "missing"}\n`,
-      );
-      process.stdout.write(
-        `tasks:            ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? "" : "s"}\n`,
-      );
+        const data = {
+          slug: metadata.slug,
+          id: metadata.id,
+          ...(metadata.title !== undefined && { title: metadata.title }),
+          status: metadata.status,
+          artifacts: {
+            spec: artifacts.specExists,
+            architecture: artifacts.architectureExists,
+            taskCount: artifacts.taskFileCount,
+          },
+          tasks: tasks.map((task) => ({ slug: task.slug, status: task.status })),
+          fixes: fixes.map((fix) => ({
+            id: fix.id,
+            slug: fix.slug,
+            status: fix.status,
+          })),
+        };
 
-      if (tasks.length > 0) {
-        process.stdout.write(`\n`);
-        for (const task of tasks) {
-          process.stdout.write(`  ${task.slug}\t${task.status}\n`);
-        }
-      }
+        const title =
+          metadata.title !== undefined ? ` (${metadata.title})` : "";
+        const humanLines = [
+          `slug:    ${metadata.slug}${title}`,
+          `id:      ${metadata.id}`,
+          `status:  ${metadata.status}`,
+          ``,
+          `spec.md:          ${artifacts.specExists ? "present" : "missing"}`,
+          `architecture.md:  ${artifacts.architectureExists ? "present" : "missing"}`,
+          `tasks:            ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? "" : "s"}`,
+          ...(tasks.length > 0
+            ? ["", ...tasks.map((task) => `  ${task.slug}\t${task.status}`)]
+            : []),
+          ...(fixes.length > 0
+            ? [
+                "",
+                "fixes:",
+                ...fixes.map((fix) => `  ${fix.id}  ${fix.status}  ${fix.slug}`),
+              ]
+            : []),
+        ];
 
-      if (fixes.length > 0) {
-        process.stdout.write(`\nfixes:\n`);
-        for (const fix of fixes) {
-          process.stdout.write(`  ${fix.id}  ${fix.status}  ${fix.slug}\n`);
-        }
+        emitSuccess(data, json, humanLines);
+      } catch (error) {
+        emitError(error, json);
       }
     });
 }

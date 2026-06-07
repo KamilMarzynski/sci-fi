@@ -1,5 +1,6 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { SpecflowError } from "../output/errors.js";
 import { buildFeatureDirectoryPath, buildFeatureMetadataPath } from "./paths.js";
 import type { FeatureMetadata, FeatureStatus } from "./types.js";
 
@@ -59,10 +60,25 @@ export async function inspectFeatureLifecycle(
 ): Promise<FeatureLifecycle> {
   const featureRoot = buildFeatureDirectoryPath(projectRoot, slug);
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);
-  const parsed = JSON.parse(await readFile(metadataPath, "utf8"));
+  const rawMetadata = await readFile(metadataPath, "utf8").catch(
+    (error: unknown): never => {
+      if (isMissingPathError(error)) {
+        throw new SpecflowError(
+          "NOT_FOUND",
+          `Feature "${slug}" does not exist.`,
+          { hint: `Create it with \`specflow spec ${slug}\`.`, cause: error },
+        );
+      }
+      throw error;
+    },
+  );
+  const parsed = JSON.parse(rawMetadata);
 
   if (!isValidFeatureMetadata(parsed)) {
-    throw new Error(`Invalid metadata file at ${metadataPath}`);
+    throw new SpecflowError(
+      "INTERNAL",
+      `Invalid metadata file at ${metadataPath}`,
+    );
   }
 
   const metadata = parsed;
@@ -104,15 +120,27 @@ export async function validateStatusTransition(
   context?: ValidationContext,
 ): Promise<void> {
   if (targetStatus === "spec-ready" && !artifacts.specExists) {
-    throw new Error("Cannot mark feature as spec-ready: spec.md is missing.");
+    throw new SpecflowError(
+      "PRECONDITION_FAILED",
+      "Cannot mark feature as spec-ready: spec.md is missing.",
+      { hint: "Write spec.md in the feature directory, then retry." },
+    );
   }
 
   if (targetStatus === "plan-ready") {
     if (!artifacts.architectureExists) {
-      throw new Error("Cannot mark feature as plan-ready: architecture.md is missing.");
+      throw new SpecflowError(
+        "PRECONDITION_FAILED",
+        "Cannot mark feature as plan-ready: architecture.md is missing.",
+        { hint: "Write architecture.md in the feature directory, then retry." },
+      );
     }
     if (artifacts.taskFileCount < 1) {
-      throw new Error("Cannot mark feature as plan-ready: no task files were found.");
+      throw new SpecflowError(
+        "PRECONDITION_FAILED",
+        "Cannot mark feature as plan-ready: no task files were found.",
+        { hint: "Add at least one task under the feature's tasks/ directory." },
+      );
     }
   }
 
@@ -121,14 +149,18 @@ export async function validateStatusTransition(
     context?.currentStatus !== undefined &&
     context.currentStatus !== "plan-ready"
   ) {
-    throw new Error(
+    throw new SpecflowError(
+      "PRECONDITION_FAILED",
       "Cannot start feature: feature must be plan-ready before starting implementation.",
+      { hint: "Run `specflow plan-ready <slug>` first." },
     );
   }
 
   if (targetStatus === "done" && context?.allTasksDone === false) {
-    throw new Error(
+    throw new SpecflowError(
+      "PRECONDITION_FAILED",
       "Cannot mark feature as done: not all tasks are complete.",
+      { hint: "Finish remaining tasks with `specflow task done <slug> <task>`." },
     );
   }
 }
