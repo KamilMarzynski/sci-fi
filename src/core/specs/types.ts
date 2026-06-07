@@ -1,9 +1,9 @@
 export const FEATURE_STATUS_VALUES = [
-  "created",
-  "spec-ready",
-  "plan-ready",
-  "in-progress",
-  "done",
+  'created',
+  'spec-ready',
+  'plan-ready',
+  'in-progress',
+  'done',
 ] as const;
 
 export type FeatureStatus = (typeof FEATURE_STATUS_VALUES)[number];

@@ -1,9 +1,9 @@
-import { mkdir, readdir } from "node:fs/promises";
-import { slugify } from "../slugify.js";
-import { writeBugFile } from "./frontmatter.js";
-import { formatBugId } from "./id.js";
-import { buildBugFilePath, buildBugsRootPath } from "./paths.js";
-import type { BugSeverity } from "./types.js";
+import { mkdir, readdir } from 'node:fs/promises';
+import { slugify } from '../slugify.js';
+import { writeBugFile } from './frontmatter.js';
+import { formatBugId } from './id.js';
+import { buildBugFilePath, buildBugsRootPath } from './paths.js';
+import type { BugSeverity } from './types.js';
 
 export interface CreateBugOptions {
   projectRoot: string;
@@ -18,18 +18,14 @@ export interface CreateBugResult {
   filePath: string;
 }
 
-export async function createBug(
-  options: CreateBugOptions,
-): Promise<CreateBugResult> {
+export async function createBug(options: CreateBugOptions): Promise<CreateBugResult> {
   const { projectRoot, description, relatedFeature, severity, now } = options;
   const bugsRoot = buildBugsRootPath(projectRoot);
 
   await mkdir(bugsRoot, { recursive: true });
 
   const existing = await readdir(bugsRoot, { withFileTypes: true });
-  const mdCount = existing.filter(
-    (e) => e.isFile() && e.name.endsWith(".md"),
-  ).length;
+  const mdCount = existing.filter((e) => e.isFile() && e.name.endsWith('.md')).length;
 
   const id = formatBugId(mdCount + 1);
   const slug = slugify(description);
@@ -39,9 +35,9 @@ export async function createBug(
     frontmatter: {
       id,
       slug,
-      status: "open",
+      status: 'open',
       ...(severity !== undefined && { severity }),
-      ...(relatedFeature !== undefined && { "related-feature": relatedFeature }),
+      ...(relatedFeature !== undefined && { 'related-feature': relatedFeature }),
       created: now,
     },
     body: `# ${description}\n`,

@@ -1,45 +1,45 @@
-import { existsSync, realpathSync } from "node:fs";
-import { createRequire } from "node:module";
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { Command, CommanderError } from "commander";
-import { emitError } from "../core/output/index.js";
-import { SpecflowError } from "../core/output/errors.js";
-import { findPackageRoot } from "../core/package-root.js";
-import { registerInitCommand } from "./commands/init.js";
-import { registerSpecCommand } from "./commands/spec.js";
-import { registerPlanReadyCommand } from "./commands/plan-ready.js";
-import { registerSpecReadyCommand } from "./commands/spec-ready.js";
-import { registerStartCommand } from "./commands/start.js";
-import { registerFinishCommand } from "./commands/finish.js";
-import { registerListCommand } from "./commands/list.js";
-import { registerStatusCommand } from "./commands/status.js";
-import { registerTaskCommand } from "./commands/task.js";
-import { registerBugCommand } from "./commands/bug.js";
-import { registerFixCommand } from "./commands/fix.js";
+import { existsSync, realpathSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Command, CommanderError } from 'commander';
+import { SpecflowError } from '../core/output/errors.js';
+import { emitError } from '../core/output/index.js';
+import { findPackageRoot } from '../core/package-root.js';
+import { registerBugCommand } from './commands/bug.js';
+import { registerFinishCommand } from './commands/finish.js';
+import { registerFixCommand } from './commands/fix.js';
+import { registerInitCommand } from './commands/init.js';
+import { registerListCommand } from './commands/list.js';
+import { registerPlanReadyCommand } from './commands/plan-ready.js';
+import { registerSpecCommand } from './commands/spec.js';
+import { registerSpecReadyCommand } from './commands/spec-ready.js';
+import { registerStartCommand } from './commands/start.js';
+import { registerStatusCommand } from './commands/status.js';
+import { registerTaskCommand } from './commands/task.js';
 
 const require = createRequire(import.meta.url);
-const packageJson = require(join(findPackageRoot(import.meta.url), "package.json"));
+const packageJson = require(join(findPackageRoot(import.meta.url), 'package.json'));
 
 function readPackageVersion(value: unknown): string {
   if (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
-    "version" in value &&
-    typeof value.version === "string"
+    'version' in value &&
+    typeof value.version === 'string'
   ) {
     return value.version;
   }
 
-  throw new Error("Unable to read version from package.json");
+  throw new Error('Unable to read version from package.json');
 }
 
 export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name("specflow")
-    .description("Specification-driven CLI scaffolding for agentic workflows")
+    .name('specflow')
+    .description('Specification-driven CLI scaffolding for agentic workflows')
     .version(readPackageVersion(packageJson))
     .exitOverride();
 
@@ -70,20 +70,14 @@ function applyExitOverride(command: Command): void {
   }
 }
 
-export function isDirectExecution(
-  moduleUrl: string,
-  argv: readonly string[],
-): boolean {
+export function isDirectExecution(moduleUrl: string, argv: readonly string[]): boolean {
   const scriptPath = argv[1];
 
   if (scriptPath === undefined) {
     return false;
   }
 
-  return (
-    normalizeExecutionPath(fileURLToPath(moduleUrl)) ===
-    normalizeExecutionPath(scriptPath)
-  );
+  return normalizeExecutionPath(fileURLToPath(moduleUrl)) === normalizeExecutionPath(scriptPath);
 }
 
 function normalizeExecutionPath(path: string): string {
@@ -97,7 +91,7 @@ function normalizeExecutionPath(path: string): string {
 }
 
 function handleCliError(error: unknown, argv: readonly string[]): void {
-  const json = argv.includes("--json");
+  const json = argv.includes('--json');
 
   if (error instanceof CommanderError) {
     // Help/version requests exit cleanly; Commander already wrote output.
@@ -106,10 +100,10 @@ function handleCliError(error: unknown, argv: readonly string[]): void {
       return;
     }
 
-    const message = error.message.replace(/^error:\s*/i, "");
+    const message = error.message.replace(/^error:\s*/i, '');
     emitError(
-      new SpecflowError("INVALID_ARGUMENT", message, {
-        hint: "Run `specflow --help` (or `<command> --help`) for usage.",
+      new SpecflowError('INVALID_ARGUMENT', message, {
+        hint: 'Run `specflow --help` (or `<command> --help`) for usage.',
         cause: error,
       }),
       json,

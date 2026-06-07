@@ -1,8 +1,8 @@
-import { Command } from "commander";
-import { cwd } from "node:process";
-import { relative } from "node:path";
-import { createFix } from "../../core/fixes/create.js";
-import { emitError, emitSuccess, jsonMode } from "../../core/output/index.js";
+import { relative } from 'node:path';
+import { cwd } from 'node:process';
+import type { Command } from 'commander';
+import { createFix } from '../../core/fixes/create.js';
+import { emitError, emitSuccess, jsonMode } from '../../core/output/index.js';
 
 function createTimestamp(): string {
   return new Date().toISOString();
@@ -10,13 +10,11 @@ function createTimestamp(): string {
 
 export function registerFixCommand(program: Command): void {
   program
-    .command("fix")
-    .description(
-      "Create a fix inside a feature's fixes/ directory (blocks finish until resolved)",
-    )
-    .argument("<description>", "short description of the fix")
-    .requiredOption("--feature <slug>", "feature slug to attach this fix to")
-    .option("--json", "output as structured JSON")
+    .command('fix')
+    .description("Create a fix inside a feature's fixes/ directory (blocks finish until resolved)")
+    .argument('<description>', 'short description of the fix')
+    .requiredOption('--feature <slug>', 'feature slug to attach this fix to')
+    .option('--json', 'output as structured JSON')
     .action(
       async (
         description: string,
@@ -36,7 +34,7 @@ export function registerFixCommand(program: Command): void {
           const path = relative(projectRoot, result.filePath);
           emitSuccess(
             {
-              action: "fix",
+              action: 'fix',
               id: result.id,
               description,
               feature: options.feature,

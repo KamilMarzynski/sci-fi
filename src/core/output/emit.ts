@@ -1,5 +1,5 @@
-import { stderr, stdout } from "node:process";
-import { toSpecflowError } from "./errors.js";
+import { stderr, stdout } from 'node:process';
+import { toSpecflowError } from './errors.js';
 
 interface OptionReader {
   opts(): Record<string, unknown>;
@@ -10,7 +10,7 @@ export function jsonMode(command: OptionReader): boolean {
 }
 
 function ensureTrailingNewline(text: string): string {
-  return text.endsWith("\n") ? text : `${text}\n`;
+  return text.endsWith('\n') ? text : `${text}\n`;
 }
 
 export function emitSuccess<T>(
@@ -23,7 +23,7 @@ export function emitSuccess<T>(
     return;
   }
 
-  const text = Array.isArray(humanLines) ? humanLines.join("\n") : (humanLines as string);
+  const text = Array.isArray(humanLines) ? humanLines.join('\n') : (humanLines as string);
   stdout.write(ensureTrailingNewline(text));
 }
 

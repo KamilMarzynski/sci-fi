@@ -1,9 +1,4 @@
-export const FIX_STATUS_VALUES = [
-  "open",
-  "in-progress",
-  "resolved",
-  "wont-fix",
-] as const;
+export const FIX_STATUS_VALUES = ['open', 'in-progress', 'resolved', 'wont-fix'] as const;
 
 export type FixStatus = (typeof FIX_STATUS_VALUES)[number];
 

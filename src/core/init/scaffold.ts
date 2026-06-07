@@ -1,6 +1,6 @@
-import { mkdir, stat, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-import type { InitOptions } from "./types.js";
+import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import type { InitOptions } from './types.js';
 
 type BootstrapDocument = {
   path: string;
@@ -24,42 +24,38 @@ export async function scaffoldInit(options: InitOptions): Promise<void> {
   await validateBootstrapDocumentPaths(bootstrapDocuments);
 
   await Promise.all([
-    ...scaffoldDirectories.map((directory) =>
-      mkdir(directory.path, { recursive: true }),
-    ),
+    ...scaffoldDirectories.map((directory) => mkdir(directory.path, { recursive: true })),
   ]);
 
   await Promise.all(
-    bootstrapDocuments.map((document) =>
-      writeBootstrapDocument(document.path, document.contents),
-    ),
+    bootstrapDocuments.map((document) => writeBootstrapDocument(document.path, document.contents)),
   );
 }
 
 function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
   return [
-    { path: join(specsRoot, ".specflow") },
-    { path: join(specsRoot, "specs") },
-    { path: join(specsRoot, "bugs") },
+    { path: join(specsRoot, '.specflow') },
+    { path: join(specsRoot, 'specs') },
+    { path: join(specsRoot, 'bugs') },
   ];
 }
 
 function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
   return [
     {
-      path: join(specsRoot, "EVALUATION.md"),
+      path: join(specsRoot, 'EVALUATION.md'),
       contents: buildEvaluationDocument(),
     },
     {
-      path: join(specsRoot, "ROADMAP.md"),
+      path: join(specsRoot, 'ROADMAP.md'),
       contents: buildRoadmapDocument(),
     },
     {
-      path: join(specsRoot, "ARCHITECTURE.md"),
+      path: join(specsRoot, 'ARCHITECTURE.md'),
       contents: buildArchitectureDocument(),
     },
     {
-      path: join(specsRoot, "CONTEXT.md"),
+      path: join(specsRoot, 'CONTEXT.md'),
       contents: buildContextDocument(),
     },
   ];
@@ -70,15 +66,13 @@ async function validateScaffoldDirectoryPaths(
 ): Promise<void> {
   await Promise.all(
     scaffoldDirectories.map(async (directory) => {
-      const existingEntry = await stat(directory.path).catch(
-        (error: unknown): null => {
-          if (isMissingPathError(error)) {
-            return null;
-          }
+      const existingEntry = await stat(directory.path).catch((error: unknown): null => {
+        if (isMissingPathError(error)) {
+          return null;
+        }
 
-          throw error;
-        },
-      );
+        throw error;
+      });
 
       if (existingEntry === null || existingEntry.isDirectory()) {
         return;
@@ -96,15 +90,13 @@ async function validateBootstrapDocumentPaths(
 ): Promise<void> {
   await Promise.all(
     bootstrapDocuments.map(async (document) => {
-      const existingEntry = await stat(document.path).catch(
-        (error: unknown): null => {
-          if (isMissingPathError(error)) {
-            return null;
-          }
+      const existingEntry = await stat(document.path).catch((error: unknown): null => {
+        if (isMissingPathError(error)) {
+          return null;
+        }
 
-          throw error;
-        },
-      );
+        throw error;
+      });
 
       if (existingEntry === null || existingEntry.isFile()) {
         return;
@@ -117,11 +109,8 @@ async function validateBootstrapDocumentPaths(
   );
 }
 
-async function writeBootstrapDocument(
-  filePath: string,
-  contents: string,
-): Promise<void> {
-  await writeFile(filePath, contents, { encoding: "utf8", flag: "wx" }).catch(
+async function writeBootstrapDocument(filePath: string, contents: string): Promise<void> {
+  await writeFile(filePath, contents, { encoding: 'utf8', flag: 'wx' }).catch(
     async (error: unknown) => {
       if (isPathAlreadyPresentError(error)) {
         const existingEntry = await stat(filePath);
@@ -141,14 +130,12 @@ async function writeBootstrapDocument(
   );
 }
 
-function isPathAlreadyPresentError(
-  error: unknown,
-): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "EEXIST";
+function isPathAlreadyPresentError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && 'code' in error && error.code === 'EEXIST';
 }
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 function buildEvaluationDocument(): string {

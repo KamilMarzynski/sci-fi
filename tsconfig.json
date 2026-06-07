@@ -20,8 +20,5 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": false
   },
-  "include": [
-    "src/**/*.ts",
-    "skills/**/manifest.ts"
-  ]
+  "include": ["src/**/*.ts", "skills/**/manifest.ts"]
 }

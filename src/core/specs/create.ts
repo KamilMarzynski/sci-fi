@@ -1,8 +1,12 @@
-import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
-import { SpecflowError } from "../output/errors.js";
-import { buildFeaturesRootPath, buildFeatureDirectoryPath, buildFeatureMetadataPath } from "./paths.js";
-import { createInitialFeatureMetadata } from "./metadata.js";
-import { formatFeatureId } from "./id.js";
+import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
+import { SpecflowError } from '../output/errors.js';
+import { formatFeatureId } from './id.js';
+import { createInitialFeatureMetadata } from './metadata.js';
+import {
+  buildFeatureDirectoryPath,
+  buildFeatureMetadataPath,
+  buildFeaturesRootPath,
+} from './paths.js';
 
 export interface CreateFeatureOptions {
   projectRoot: string;
@@ -17,9 +21,7 @@ export interface CreateFeatureResult {
   metadataPath: string;
 }
 
-export async function createFeature(
-  options: CreateFeatureOptions,
-): Promise<CreateFeatureResult> {
+export async function createFeature(options: CreateFeatureOptions): Promise<CreateFeatureResult> {
   const { projectRoot, slug, title, now } = options;
   const featuresRootPath = buildFeaturesRootPath(projectRoot);
   const featureDirectoryPath = buildFeatureDirectoryPath(projectRoot, slug);
@@ -37,9 +39,9 @@ export async function createFeature(
 
   if (existingFeatureDirectory !== null) {
     throw new SpecflowError(
-      "CONFLICT",
+      'CONFLICT',
       `Cannot create feature ${slug}: ${featureDirectoryPath} already exists.`,
-      { hint: "Choose a different slug or inspect it with `specflow status <slug>`." },
+      { hint: 'Choose a different slug or inspect it with `specflow status <slug>`.' },
     );
   }
 
@@ -59,7 +61,7 @@ export async function createFeature(
     createdAt: now,
   });
 
-  await writeFile(metadataPath, JSON.stringify(metadata, null, 2) + "\n", "utf8");
+  await writeFile(metadataPath, `${JSON.stringify(metadata, null, 2)}\n`, 'utf8');
 
   return {
     id: nextId,
@@ -69,5 +71,5 @@ export async function createFeature(
 }
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }

@@ -1,12 +1,11 @@
-import type { CreateFeatureMetadataInput, FeatureMetadata } from "./types.js";
+import type { CreateFeatureMetadataInput, FeatureMetadata } from './types.js';
+
 export {
   buildFeatureDirectoryPath,
   buildFeatureMetadataPath,
-} from "./paths.js";
+} from './paths.js';
 
-export function createInitialFeatureMetadata(
-  input: CreateFeatureMetadataInput,
-): FeatureMetadata {
+export function createInitialFeatureMetadata(input: CreateFeatureMetadataInput): FeatureMetadata {
   const { id, slug, title, createdAt } = input;
 
   return {
@@ -14,7 +13,7 @@ export function createInitialFeatureMetadata(
     id,
     slug,
     ...(title !== undefined && { title }),
-    status: "created",
+    status: 'created',
     createdAt,
     updatedAt: createdAt,
   };

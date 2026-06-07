@@ -1,9 +1,9 @@
 import {
-  InvalidHarnessError,
-  KNOWN_HARNESS_IDS,
-  isHarnessId,
   type HarnessId,
-} from "../skills/harness/adapter.js";
+  InvalidHarnessError,
+  isHarnessId,
+  KNOWN_HARNESS_IDS,
+} from '../skills/harness/adapter.js';
 
 export type HarnessAsk = (choices: readonly HarnessId[]) => Promise<string>;
 
@@ -13,11 +13,9 @@ export interface ResolveHarnessOptions {
   readonly ask: HarnessAsk;
 }
 
-const DEFAULT_HARNESS: HarnessId = "claude-code";
+const DEFAULT_HARNESS: HarnessId = 'claude-code';
 
-export async function resolveHarness(
-  options: ResolveHarnessOptions,
-): Promise<HarnessId> {
+export async function resolveHarness(options: ResolveHarnessOptions): Promise<HarnessId> {
   if (options.flag !== undefined) {
     return validate(options.flag);
   }

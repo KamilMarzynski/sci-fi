@@ -1,11 +1,11 @@
-import { readdir } from "node:fs/promises";
-import { join } from "node:path";
-import { readTaskFile } from "./frontmatter.js";
-import { buildTasksDirectoryPath } from "./paths.js";
-import type { TaskFrontmatter } from "./types.js";
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+import { readTaskFile } from './frontmatter.js';
+import { buildTasksDirectoryPath } from './paths.js';
+import type { TaskFrontmatter } from './types.js';
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 export async function listTasks(
@@ -14,16 +14,12 @@ export async function listTasks(
 ): Promise<TaskFrontmatter[]> {
   const tasksDir = buildTasksDirectoryPath(projectRoot, featureSlug);
 
-  const entries = await readdir(tasksDir, { withFileTypes: true }).catch(
-    (error: unknown) => {
-      if (isMissingPathError(error)) return [];
-      throw error;
-    },
-  );
+  const entries = await readdir(tasksDir, { withFileTypes: true }).catch((error: unknown) => {
+    if (isMissingPathError(error)) return [];
+    throw error;
+  });
 
-  const taskFiles = entries.filter(
-    (entry) => entry.isFile() && entry.name.endsWith(".md"),
-  );
+  const taskFiles = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md'));
 
   return Promise.all(
     taskFiles.map((entry) =>

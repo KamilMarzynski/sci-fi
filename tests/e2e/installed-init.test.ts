@@ -1,237 +1,194 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import {
   cleanupInstalledPackageTestEnvironment,
   createInstalledPackageTestEnvironment,
   runInstalledInit,
-} from "./installed-test-helpers.js";
+} from './installed-test-helpers.js';
 
-describe("installed build init verification", () => {
-  it(
-    "initializes the project structure from an installed package in the dedicated workspace",
-    () => {
-      const installation = createInstalledPackageTestEnvironment("installed-init-");
+describe('installed build init verification', () => {
+  it('initializes the project structure from an installed package in the dedicated workspace', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
 
-      try {
-        const result = runInstalledInit(installation.installDirectory, [
-          "--harness",
-          "claude-code",
-        ]);
+    try {
+      const result = runInstalledInit(installation.installDirectory, ['--harness', 'claude-code']);
 
-        expect(result.status).toBe(0);
-        expect(result.stderr).toBe("");
-        expect(existsSync(join(installation.installDirectory, "docs", "specflow", ".specflow"))).toBe(true);
-        expect(existsSync(join(installation.installDirectory, "docs", "specflow", "specs"))).toBe(true);
-        expect(existsSync(join(installation.installDirectory, "docs", "specflow", "bugs"))).toBe(true);
-        expect(
-          readFileSync(
-            join(installation.installDirectory, "docs", "specflow", "EVALUATION.md"),
-            "utf8",
-          ),
-        ).toBe(expectedEvaluationDocument);
-        expect(
-          readFileSync(
-            join(installation.installDirectory, "docs", "specflow", "ROADMAP.md"),
-            "utf8",
-          ),
-        ).toBe(expectedRoadmapDocument);
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', '.specflow'))).toBe(
+        true,
+      );
+      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'specs'))).toBe(
+        true,
+      );
+      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'bugs'))).toBe(
+        true,
+      );
+      expect(
+        readFileSync(
+          join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md'),
+          'utf8',
+        ),
+      ).toBe(expectedEvaluationDocument);
+      expect(
+        readFileSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md'), 'utf8'),
+      ).toBe(expectedRoadmapDocument);
 
-        expect(
-          existsSync(
-            join(
-              installation.installDirectory,
-              ".claude",
-              "skills",
-              "sf-feature",
-              "SKILL.md",
-            ),
-          ),
-        ).toBe(true);
-        expect(
-          existsSync(
-            join(
-              installation.installDirectory,
-              ".claude",
-              "skills",
-              "sf-code-review",
-              "SKILL.md",
-            ),
-          ),
-        ).toBe(true);
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.claude', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.claude', 'skills', 'sf-code-review', 'SKILL.md'),
+        ),
+      ).toBe(true);
 
-        const config = JSON.parse(
-          readFileSync(
-            join(
-              installation.installDirectory,
-              "docs",
-              "specflow",
-              ".specflow",
-              "config.json",
-            ),
-            "utf8",
-          ),
-        );
-        expect(config).toEqual({ version: 1, harness: "claude-code" });
-      } finally {
-        cleanupInstalledPackageTestEnvironment(installation);
-      }
-    },
-  );
+      const config = JSON.parse(
+        readFileSync(
+          join(installation.installDirectory, 'docs', 'specflow', '.specflow', 'config.json'),
+          'utf8',
+        ),
+      );
+      expect(config).toEqual({ version: 1, harness: 'claude-code' });
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
 
-  it(
-    "allows a safe installed-build rerun without overwriting existing bootstrap docs or generated files",
-    () => {
-      const installation = createInstalledPackageTestEnvironment("installed-init-");
+  it('allows a safe installed-build rerun without overwriting existing bootstrap docs or generated files', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
 
-      try {
-        const initialRun = runInstalledInit(installation.installDirectory, [
-          "--harness",
-          "claude-code",
-          "--yes",
-        ]);
+    try {
+      const initialRun = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'claude-code',
+        '--yes',
+      ]);
 
-        expect(initialRun.status).toBe(0);
-        expect(initialRun.stderr).toBe("");
+      expect(initialRun.status).toBe(0);
+      expect(initialRun.stderr).toBe('');
 
-        const specflowRoot = join(installation.installDirectory, "docs", "specflow");
-        const evaluationPath = join(specflowRoot, "EVALUATION.md");
-        const roadmapPath = join(specflowRoot, "ROADMAP.md");
-        const specPath = join(specflowRoot, "specs", "existing-spec.md");
-        const bugPath = join(specflowRoot, "bugs", "existing-bug.md");
-        const statePath = join(specflowRoot, ".specflow", "state.json");
-        const skillPath = join(
-          installation.installDirectory,
-          ".claude",
-          "skills",
-          "sf-feature",
-          "SKILL.md",
-        );
-        const reviewSkillPath = join(
-          installation.installDirectory,
-          ".claude",
-          "skills",
-          "sf-code-review",
-          "SKILL.md",
-        );
+      const specflowRoot = join(installation.installDirectory, 'docs', 'specflow');
+      const evaluationPath = join(specflowRoot, 'EVALUATION.md');
+      const roadmapPath = join(specflowRoot, 'ROADMAP.md');
+      const specPath = join(specflowRoot, 'specs', 'existing-spec.md');
+      const bugPath = join(specflowRoot, 'bugs', 'existing-bug.md');
+      const statePath = join(specflowRoot, '.specflow', 'state.json');
+      const skillPath = join(
+        installation.installDirectory,
+        '.claude',
+        'skills',
+        'sf-feature',
+        'SKILL.md',
+      );
+      const reviewSkillPath = join(
+        installation.installDirectory,
+        '.claude',
+        'skills',
+        'sf-code-review',
+        'SKILL.md',
+      );
 
-        writeFileSync(evaluationPath, preservedEvaluationDocument, "utf8");
-        writeFileSync(roadmapPath, preservedRoadmapDocument, "utf8");
-        writeFileSync(specPath, preservedSpecDocument, "utf8");
-        writeFileSync(bugPath, preservedBugDocument, "utf8");
-        writeFileSync(statePath, preservedStateDocument, "utf8");
+      writeFileSync(evaluationPath, preservedEvaluationDocument, 'utf8');
+      writeFileSync(roadmapPath, preservedRoadmapDocument, 'utf8');
+      writeFileSync(specPath, preservedSpecDocument, 'utf8');
+      writeFileSync(bugPath, preservedBugDocument, 'utf8');
+      writeFileSync(statePath, preservedStateDocument, 'utf8');
 
-        const skillBeforeRerun = readFileSync(skillPath, "utf8");
-        const reviewBeforeRerun = readFileSync(reviewSkillPath, "utf8");
-        writeFileSync(skillPath, "user override\n", "utf8");
-        writeFileSync(reviewSkillPath, "user override\n", "utf8");
+      const skillBeforeRerun = readFileSync(skillPath, 'utf8');
+      const reviewBeforeRerun = readFileSync(reviewSkillPath, 'utf8');
+      writeFileSync(skillPath, 'user override\n', 'utf8');
+      writeFileSync(reviewSkillPath, 'user override\n', 'utf8');
 
-        const rerun = runInstalledInit(installation.installDirectory, [
-          "--harness",
-          "claude-code",
-          "--yes",
-        ]);
+      const rerun = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'claude-code',
+        '--yes',
+      ]);
 
-        expect(rerun.status).toBe(0);
-        expect(rerun.stderr).toBe("");
-        expect(readFileSync(evaluationPath, "utf8")).toBe(preservedEvaluationDocument);
-        expect(readFileSync(roadmapPath, "utf8")).toBe(preservedRoadmapDocument);
-        expect(readFileSync(specPath, "utf8")).toBe(preservedSpecDocument);
-        expect(readFileSync(bugPath, "utf8")).toBe(preservedBugDocument);
-        expect(readFileSync(statePath, "utf8")).toBe(preservedStateDocument);
-        expect(existsSync(join(specflowRoot, ".specflow"))).toBe(true);
-        expect(existsSync(join(specflowRoot, "specs"))).toBe(true);
-        expect(existsSync(join(specflowRoot, "bugs"))).toBe(true);
+      expect(rerun.status).toBe(0);
+      expect(rerun.stderr).toBe('');
+      expect(readFileSync(evaluationPath, 'utf8')).toBe(preservedEvaluationDocument);
+      expect(readFileSync(roadmapPath, 'utf8')).toBe(preservedRoadmapDocument);
+      expect(readFileSync(specPath, 'utf8')).toBe(preservedSpecDocument);
+      expect(readFileSync(bugPath, 'utf8')).toBe(preservedBugDocument);
+      expect(readFileSync(statePath, 'utf8')).toBe(preservedStateDocument);
+      expect(existsSync(join(specflowRoot, '.specflow'))).toBe(true);
+      expect(existsSync(join(specflowRoot, 'specs'))).toBe(true);
+      expect(existsSync(join(specflowRoot, 'bugs'))).toBe(true);
 
-        // Bundled sf-* skills are spec-flow-owned: rerun must overwrite
-        // local edits back to the bundled content (documented in README).
-        expect(readFileSync(skillPath, "utf8")).toBe(skillBeforeRerun);
-        expect(readFileSync(reviewSkillPath, "utf8")).toBe(reviewBeforeRerun);
-      } finally {
-        cleanupInstalledPackageTestEnvironment(installation);
-      }
-    },
-  );
+      // Bundled sf-* skills are spec-flow-owned: rerun must overwrite
+      // local edits back to the bundled content (documented in README).
+      expect(readFileSync(skillPath, 'utf8')).toBe(skillBeforeRerun);
+      expect(readFileSync(reviewSkillPath, 'utf8')).toBe(reviewBeforeRerun);
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
 
-  it(
-    "returns a stable non-zero exit and concise stderr on an init conflict",
-    () => {
-      const installation = createInstalledPackageTestEnvironment("installed-init-");
+  it('returns a stable non-zero exit and concise stderr on an init conflict', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
 
-      try {
-        mkdirSync(join(installation.installDirectory, "docs", "specflow"), { recursive: true });
-        writeFileSync(
-          join(installation.installDirectory, "docs", "specflow", "bugs"),
-          "conflict",
-          "utf8",
-        );
+    try {
+      mkdirSync(join(installation.installDirectory, 'docs', 'specflow'), { recursive: true });
+      writeFileSync(
+        join(installation.installDirectory, 'docs', 'specflow', 'bugs'),
+        'conflict',
+        'utf8',
+      );
 
-        const result = runInstalledInit(installation.installDirectory, [
-          "--harness",
-          "claude-code",
-          "--yes",
-        ]);
-        const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, "docs", "specflow", "bugs")}: path exists and is not a directory.`;
+      const result = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'claude-code',
+        '--yes',
+      ]);
+      const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, 'docs', 'specflow', 'bugs')}: path exists and is not a directory.`;
 
-        expect(result.status).not.toBe(0);
-        expect(result.stderr).toContain(expectedErrorMessage);
-        expect(result.stderr).not.toContain("    at ");
-        expect(result.stderr).not.toContain("node:internal");
-        expect(
-          existsSync(join(installation.installDirectory, "docs", "specflow", ".specflow")),
-        ).toBe(false);
-        expect(
-          existsSync(join(installation.installDirectory, "docs", "specflow", "specs")),
-        ).toBe(false);
-        expect(
-          readFileSync(
-            join(installation.installDirectory, "docs", "specflow", "bugs"),
-            "utf8",
-          ),
-        ).toBe("conflict");
-        expect(
-          existsSync(join(installation.installDirectory, "docs", "specflow", "EVALUATION.md")),
-        ).toBe(false);
-        expect(
-          existsSync(join(installation.installDirectory, "docs", "specflow", "ROADMAP.md")),
-        ).toBe(false);
-        expect(existsSync(join(installation.installDirectory, ".claude"))).toBe(false);
-      } finally {
-        cleanupInstalledPackageTestEnvironment(installation);
-      }
-    },
-  );
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain(expectedErrorMessage);
+      expect(result.stderr).not.toContain('    at ');
+      expect(result.stderr).not.toContain('node:internal');
+      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', '.specflow'))).toBe(
+        false,
+      );
+      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'specs'))).toBe(
+        false,
+      );
+      expect(
+        readFileSync(join(installation.installDirectory, 'docs', 'specflow', 'bugs'), 'utf8'),
+      ).toBe('conflict');
+      expect(
+        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md')),
+      ).toBe(false);
+      expect(
+        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md')),
+      ).toBe(false);
+      expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
 
-  it(
-    "returns a stable non-zero exit when the chosen harness is not implemented",
-    () => {
-      const installation = createInstalledPackageTestEnvironment("installed-init-");
+  it('returns a stable non-zero exit when the chosen harness is not implemented', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
 
-      try {
-        const result = runInstalledInit(installation.installDirectory, [
-          "--harness",
-          "opencode",
-        ]);
+    try {
+      const result = runInstalledInit(installation.installDirectory, ['--harness', 'opencode']);
 
-        expect(result.status).not.toBe(0);
-        expect(result.stderr).toContain("opencode");
-        expect(result.stderr).toContain("not implemented");
-        expect(existsSync(join(installation.installDirectory, ".claude"))).toBe(false);
-        expect(
-          existsSync(
-            join(installation.installDirectory, "docs", "specflow", "EVALUATION.md"),
-          ),
-        ).toBe(false);
-      } finally {
-        cleanupInstalledPackageTestEnvironment(installation);
-      }
-    },
-  );
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('opencode');
+      expect(result.stderr).toContain('not implemented');
+      expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
+      expect(
+        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md')),
+      ).toBe(false);
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
 });
 
 const expectedEvaluationDocument = `# EVALUATION.md

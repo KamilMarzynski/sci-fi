@@ -1,20 +1,13 @@
-import { execFileSync, spawnSync } from "node:child_process";
-import {
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { expect } from "vitest";
+import { execFileSync, spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { expect } from 'vitest';
 
-export const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
-export const verificationRoot = join(repositoryRoot, ".testing");
-export const sandboxesRoot = join(verificationRoot, "sandboxes");
-export const artifactsRoot = join(verificationRoot, "artifacts");
+export const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url));
+export const verificationRoot = join(repositoryRoot, '.testing');
+export const sandboxesRoot = join(verificationRoot, 'sandboxes');
+export const artifactsRoot = join(verificationRoot, 'artifacts');
 
 export type InstalledDependencyNode = {
   path?: string;
@@ -26,21 +19,17 @@ export type InstalledDependencyTree = InstalledDependencyNode & {
 };
 
 export function isInstalledDependencyNode(value: unknown): value is InstalledDependencyNode {
-  if (typeof value !== "object" || value === null) {
+  if (typeof value !== 'object' || value === null) {
     return false;
   }
 
-  const dependencies = Reflect.get(value, "dependencies");
-  const path = Reflect.get(value, "path");
+  const dependencies = Reflect.get(value, 'dependencies');
+  const path = Reflect.get(value, 'path');
 
   return (
-    (path === undefined || typeof path === "string") &&
-    (
-      dependencies === undefined ||
-      (typeof dependencies === "object" &&
-        dependencies !== null &&
-        !Array.isArray(dependencies))
-    )
+    (path === undefined || typeof path === 'string') &&
+    (dependencies === undefined ||
+      (typeof dependencies === 'object' && dependencies !== null && !Array.isArray(dependencies)))
   );
 }
 
@@ -49,11 +38,11 @@ export function isInstalledDependencyTree(value: unknown): value is InstalledDep
     return false;
   }
 
-  const declaredDependencies = Reflect.get(value, "_dependencies");
+  const declaredDependencies = Reflect.get(value, '_dependencies');
 
   return (
     declaredDependencies === undefined ||
-    (typeof declaredDependencies === "object" &&
+    (typeof declaredDependencies === 'object' &&
       declaredDependencies !== null &&
       !Array.isArray(declaredDependencies))
   );
@@ -61,25 +50,23 @@ export function isInstalledDependencyTree(value: unknown): value is InstalledDep
 
 export function readInstalledProductionDependencyTree(): InstalledDependencyTree {
   const dependencyTreeContents = execFileSync(
-    "npm",
-    ["ls", "--omit=dev", "--all", "--json", "--long"],
+    'npm',
+    ['ls', '--omit=dev', '--all', '--json', '--long'],
     {
       cwd: repositoryRoot,
-      encoding: "utf8",
+      encoding: 'utf8',
     },
   );
   const dependencyTree = JSON.parse(dependencyTreeContents);
 
   if (!isInstalledDependencyTree(dependencyTree)) {
-    throw new Error("Expected npm ls to return an installed dependency tree");
+    throw new Error('Expected npm ls to return an installed dependency tree');
   }
 
   return dependencyTree;
 }
 
-export function collectInstalledDependencyPaths(
-  dependencyTree: InstalledDependencyTree,
-): string[] {
+export function collectInstalledDependencyPaths(dependencyTree: InstalledDependencyTree): string[] {
   const stagedPaths = new Set<string>();
   const pendingNodes = Object.keys(dependencyTree._dependencies ?? {}).map(
     (dependencyName) => dependencyTree.dependencies?.[dependencyName],
@@ -93,7 +80,7 @@ export function collectInstalledDependencyPaths(
     }
 
     if (dependencyNode.path === undefined) {
-      throw new Error("Expected installed dependency node to include a package path");
+      throw new Error('Expected installed dependency node to include a package path');
     }
 
     if (stagedPaths.has(dependencyNode.path)) {
@@ -114,14 +101,14 @@ export function packPackage(
 ): string {
   const existingArtifacts = new Set(readdirSync(packDirectory));
 
-  execFileSync("npm", ["pack", packageSpecifier, "--pack-destination", packDirectory], {
+  execFileSync('npm', ['pack', packageSpecifier, '--pack-destination', packDirectory], {
     cwd: repositoryRoot,
-    encoding: "utf8",
+    encoding: 'utf8',
     env: npmEnvironment,
   });
 
   const newArtifacts = readdirSync(packDirectory).filter(
-    (entry) => entry.endsWith(".tgz") && !existingArtifacts.has(entry),
+    (entry) => entry.endsWith('.tgz') && !existingArtifacts.has(entry),
   );
 
   expect(newArtifacts).toHaveLength(1);
@@ -146,9 +133,9 @@ export function createInstalledPackageTestEnvironment(
 ): InstalledPackageTestEnvironment {
   const sandboxRoot = mkdtempSync(join(sandboxesRoot, sandboxPrefix));
   const artifactRoot = mkdtempSync(join(artifactsRoot, sandboxPrefix));
-  const packDirectory = join(artifactRoot, "pack");
-  const installDirectory = join(sandboxRoot, "workspace");
-  const cacheDirectory = join(sandboxRoot, ".npm-cache");
+  const packDirectory = join(artifactRoot, 'pack');
+  const installDirectory = join(sandboxRoot, 'workspace');
+  const cacheDirectory = join(sandboxRoot, '.npm-cache');
   const npmEnvironment = {
     ...process.env,
     npm_config_cache: cacheDirectory,
@@ -159,30 +146,30 @@ export function createInstalledPackageTestEnvironment(
   mkdirSync(cacheDirectory, { recursive: true });
 
   const installedDependencyTree = readInstalledProductionDependencyTree();
-  const packageArtifactPath = packPackage(".", packDirectory, npmEnvironment);
+  const packageArtifactPath = packPackage('.', packDirectory, npmEnvironment);
   const runtimeDependencyArtifactPaths = collectInstalledDependencyPaths(
     installedDependencyTree,
   ).map((dependencyPath) => packPackage(dependencyPath, packDirectory, npmEnvironment));
 
   writeFileSync(
-    join(installDirectory, "package.json"),
-    JSON.stringify({ name: "specflow-installed-test", private: true }),
+    join(installDirectory, 'package.json'),
+    JSON.stringify({ name: 'specflow-installed-test', private: true }),
   );
 
   execFileSync(
-    "npm",
+    'npm',
     [
-      "install",
-      "--offline",
-      "--no-audit",
-      "--no-fund",
-      "--no-package-lock",
+      'install',
+      '--offline',
+      '--no-audit',
+      '--no-fund',
+      '--no-package-lock',
       ...runtimeDependencyArtifactPaths,
       packageArtifactPath,
     ],
     {
       cwd: installDirectory,
-      encoding: "utf8",
+      encoding: 'utf8',
       env: npmEnvironment,
     },
   );
@@ -211,11 +198,11 @@ export function runInstalledCommand(
   installDirectory: string,
   args: readonly string[],
 ): InstalledCommandResult {
-  const installedBinPath = join(installDirectory, "node_modules", ".bin", "specflow");
+  const installedBinPath = join(installDirectory, 'node_modules', '.bin', 'specflow');
 
   const result = spawnSync(installedBinPath, args, {
     cwd: installDirectory,
-    encoding: "utf8",
+    encoding: 'utf8',
   });
 
   return {
@@ -229,5 +216,5 @@ export function runInstalledInit(
   installDirectory: string,
   args: readonly string[] = [],
 ): InstalledCommandResult {
-  return runInstalledCommand(installDirectory, ["init", ...args]);
+  return runInstalledCommand(installDirectory, ['init', ...args]);
 }

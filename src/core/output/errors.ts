@@ -1,9 +1,9 @@
 export type ErrorCode =
-  | "INVALID_ARGUMENT"
-  | "NOT_FOUND"
-  | "CONFLICT"
-  | "PRECONDITION_FAILED"
-  | "INTERNAL";
+  | 'INVALID_ARGUMENT'
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'PRECONDITION_FAILED'
+  | 'INTERNAL';
 
 const EXIT_CODES: Record<ErrorCode, number> = {
   INVALID_ARGUMENT: 2,
@@ -26,7 +26,7 @@ export class SpecflowError extends Error {
 
   constructor(code: ErrorCode, message: string, options: SpecflowErrorOptions = {}) {
     super(message, options.cause !== undefined ? { cause: options.cause } : undefined);
-    this.name = "SpecflowError";
+    this.name = 'SpecflowError';
     this.code = code;
     if (options.hint !== undefined) {
       this.hint = options.hint;
@@ -49,7 +49,7 @@ export function toSpecflowError(error: unknown): SpecflowError {
   const message =
     error instanceof Error && error.message.length > 0
       ? error.message
-      : "specflow failed with an unexpected error.";
+      : 'specflow failed with an unexpected error.';
 
-  return new SpecflowError("INTERNAL", message, { cause: error });
+  return new SpecflowError('INTERNAL', message, { cause: error });
 }

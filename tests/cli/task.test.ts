@@ -1,20 +1,18 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
-import { readTaskFile } from "../../src/core/tasks/frontmatter.js";
-import { buildTaskFilePath } from "../../src/core/tasks/paths.js";
-import { buildProgram } from "../../src/cli/index.js";
-import { runCli } from "./helpers.js";
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, describe, expect, it } from 'vitest';
+import { buildProgram } from '../../src/cli/index.js';
+import { readTaskFile } from '../../src/core/tasks/frontmatter.js';
+import { buildTaskFilePath } from '../../src/core/tasks/paths.js';
+import { runCli } from './helpers.js';
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
 
 afterEach(async () => {
   process.chdir(originalWorkingDirectory);
-  await Promise.all(
-    temporaryDirectories.map((dir) => rm(dir, { recursive: true, force: true })),
-  );
+  await Promise.all(temporaryDirectories.map((dir) => rm(dir, { recursive: true, force: true })));
   temporaryDirectories.length = 0;
 });
 
@@ -24,85 +22,99 @@ async function createTaskFile(
   taskSlug: string,
   status: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, "docs", "specflow", "specs", featureSlug, "tasks");
+  const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', featureSlug, 'tasks');
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
     `---\nid: TASK-001\nslug: ${taskSlug}\nstatus: ${status}\ndepends-on: []\n---\n# ${taskSlug}\n`,
-    "utf8",
+    'utf8',
   );
 }
 
-describe("task list", () => {
-  it("prints all tasks for a feature", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+describe('task list', () => {
+  it('prints all tasks for a feature', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
-    await createTaskFile(projectRoot, "user-auth", "implement-auth", "in-progress");
+    await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'pending');
+    await createTaskFile(projectRoot, 'user-auth', 'implement-auth', 'in-progress');
 
     const output: string[] = [];
     const originalWrite = process.stdout.write.bind(process.stdout);
     process.stdout.write = (chunk: string | Uint8Array): boolean => {
-      if (typeof chunk === "string") output.push(chunk);
+      if (typeof chunk === 'string') output.push(chunk);
       return true;
     };
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "task", "list", "user-auth"]);
+      await buildProgram().parseAsync(['node', 'specflow', 'task', 'list', 'user-auth']);
     } finally {
       process.stdout.write = originalWrite;
     }
 
-    const combined = output.join("");
-    expect(combined).toContain("setup-database");
-    expect(combined).toContain("pending");
-    expect(combined).toContain("implement-auth");
-    expect(combined).toContain("in-progress");
+    const combined = output.join('');
+    expect(combined).toContain('setup-database');
+    expect(combined).toContain('pending');
+    expect(combined).toContain('implement-auth');
+    expect(combined).toContain('in-progress');
   });
 });
 
-describe("task start", () => {
-  it("marks a task as in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+describe('task start', () => {
+  it('marks a task as in-progress', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
+    await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'pending');
 
-    await buildProgram().parseAsync(["node", "specflow", "task", "start", "user-auth", "setup-database"]);
+    await buildProgram().parseAsync([
+      'node',
+      'specflow',
+      'task',
+      'start',
+      'user-auth',
+      'setup-database',
+    ]);
 
-    const filePath = buildTaskFilePath(projectRoot, "user-auth", "setup-database");
+    const filePath = buildTaskFilePath(projectRoot, 'user-auth', 'setup-database');
     const file = await readTaskFile(filePath);
-    expect(file.frontmatter.status).toBe("in-progress");
+    expect(file.frontmatter.status).toBe('in-progress');
   });
 });
 
-describe("task done", () => {
-  it("marks an in-progress task as done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+describe('task done', () => {
+  it('marks an in-progress task as done', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await createTaskFile(projectRoot, "user-auth", "setup-database", "in-progress");
+    await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'in-progress');
 
-    await buildProgram().parseAsync(["node", "specflow", "task", "done", "user-auth", "setup-database"]);
+    await buildProgram().parseAsync([
+      'node',
+      'specflow',
+      'task',
+      'done',
+      'user-auth',
+      'setup-database',
+    ]);
 
-    const filePath = buildTaskFilePath(projectRoot, "user-auth", "setup-database");
+    const filePath = buildTaskFilePath(projectRoot, 'user-auth', 'setup-database');
     const file = await readTaskFile(filePath);
-    expect(file.frontmatter.status).toBe("done");
+    expect(file.frontmatter.status).toBe('done');
   });
 
-  it("fails when task is not in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+  it('fails when task is not in-progress', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
+    await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'pending');
 
-    const run = await runCli(["task", "done", "user-auth", "setup-database"]);
+    const run = await runCli(['task', 'done', 'user-auth', 'setup-database']);
     expect(run.exitCode).toBe(4);
-    expect(run.stderr).toContain("task is not in-progress");
+    expect(run.stderr).toContain('task is not in-progress');
   });
 });

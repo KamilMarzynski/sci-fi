@@ -1,8 +1,8 @@
-import { writeFile } from "node:fs/promises";
-import { listTasks } from "../tasks/list.js";
-import { buildFeatureMetadataPath } from "./paths.js";
-import { inspectFeatureLifecycle, validateStatusTransition } from "./lifecycle.js";
-import type { FeatureMetadata, FeatureStatus } from "./types.js";
+import { writeFile } from 'node:fs/promises';
+import { listTasks } from '../tasks/list.js';
+import { inspectFeatureLifecycle, validateStatusTransition } from './lifecycle.js';
+import { buildFeatureMetadataPath } from './paths.js';
+import type { FeatureMetadata, FeatureStatus } from './types.js';
 
 export interface UpdateFeatureStatusResult {
   id: string;
@@ -20,8 +20,7 @@ export async function updateFeatureStatus(
 ): Promise<UpdateFeatureStatusResult> {
   const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
   const tasks = await listTasks(projectRoot, slug);
-  const allTasksDone =
-    tasks.length > 0 && tasks.every((t) => t.status === "done");
+  const allTasksDone = tasks.length > 0 && tasks.every((t) => t.status === 'done');
 
   await validateStatusTransition(lifecycle.artifacts, targetStatus, {
     currentStatus: lifecycle.metadata.status,
@@ -40,7 +39,7 @@ export async function updateFeatureStatus(
   };
 
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);
-  await writeFile(metadataPath, JSON.stringify(updatedMetadata, null, 2) + "\n", "utf8");
+  await writeFile(metadataPath, `${JSON.stringify(updatedMetadata, null, 2)}\n`, 'utf8');
 
   return {
     id: metadata.id,

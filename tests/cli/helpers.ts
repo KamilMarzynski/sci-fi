@@ -1,4 +1,4 @@
-import { buildProgram } from "../../src/cli/index.js";
+import { buildProgram } from '../../src/cli/index.js';
 
 export interface CliRun {
   stdout: string;
@@ -21,23 +21,23 @@ export async function runCli(args: readonly string[]): Promise<CliRun> {
 
   process.exitCode = 0;
   process.stdout.write = (chunk: string | Uint8Array): boolean => {
-    if (typeof chunk === "string") out.push(chunk);
+    if (typeof chunk === 'string') out.push(chunk);
     return true;
   };
   process.stderr.write = (chunk: string | Uint8Array): boolean => {
-    if (typeof chunk === "string") err.push(chunk);
+    if (typeof chunk === 'string') err.push(chunk);
     return true;
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", ...args]);
+    await buildProgram().parseAsync(['node', 'specflow', ...args]);
   } finally {
     process.stdout.write = originalOut;
     process.stderr.write = originalErr;
   }
 
-  const exitCode = typeof process.exitCode === "number" ? process.exitCode : 0;
+  const exitCode = typeof process.exitCode === 'number' ? process.exitCode : 0;
   process.exitCode = originalExitCode;
 
-  return { stdout: out.join(""), stderr: err.join(""), exitCode };
+  return { stdout: out.join(''), stderr: err.join(''), exitCode };
 }

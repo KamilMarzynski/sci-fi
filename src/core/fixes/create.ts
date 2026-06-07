@@ -1,14 +1,14 @@
-import { mkdir, readdir, stat } from "node:fs/promises";
-import { join } from "node:path";
-import { SpecflowError } from "../output/errors.js";
-import { slugify } from "../slugify.js";
-import { buildFeatureDirectoryPath } from "../specs/paths.js";
-import { writeFixFile } from "./frontmatter.js";
-import { formatFixId } from "./id.js";
-import { buildFixFilePath, buildFixesDirectoryPath } from "./paths.js";
+import { mkdir, readdir, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+import { SpecflowError } from '../output/errors.js';
+import { slugify } from '../slugify.js';
+import { buildFeatureDirectoryPath } from '../specs/paths.js';
+import { writeFixFile } from './frontmatter.js';
+import { formatFixId } from './id.js';
+import { buildFixesDirectoryPath, buildFixFilePath } from './paths.js';
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 export interface CreateFixOptions {
@@ -23,20 +23,16 @@ export interface CreateFixResult {
   filePath: string;
 }
 
-export async function createFix(
-  options: CreateFixOptions,
-): Promise<CreateFixResult> {
+export async function createFix(options: CreateFixOptions): Promise<CreateFixResult> {
   const { projectRoot, description, featureSlug, now } = options;
 
   const featureDir = buildFeatureDirectoryPath(projectRoot, featureSlug);
-  const metadataPath = join(featureDir, ".specflow.json");
+  const metadataPath = join(featureDir, '.specflow.json');
   await stat(metadataPath).catch((error: unknown) => {
     if (isMissingPathError(error)) {
-      throw new SpecflowError(
-        "NOT_FOUND",
-        `Feature "${featureSlug}" does not exist.`,
-        { hint: `Create it with \`specflow spec ${featureSlug}\`.` },
-      );
+      throw new SpecflowError('NOT_FOUND', `Feature "${featureSlug}" does not exist.`, {
+        hint: `Create it with \`specflow spec ${featureSlug}\`.`,
+      });
     }
     throw error;
   });
@@ -45,9 +41,7 @@ export async function createFix(
   await mkdir(fixesDir, { recursive: true });
 
   const existing = await readdir(fixesDir, { withFileTypes: true });
-  const mdCount = existing.filter(
-    (e) => e.isFile() && e.name.endsWith(".md"),
-  ).length;
+  const mdCount = existing.filter((e) => e.isFile() && e.name.endsWith('.md')).length;
 
   const id = formatFixId(mdCount + 1);
   const slug = slugify(description);
@@ -57,7 +51,7 @@ export async function createFix(
     frontmatter: {
       id,
       slug,
-      status: "open",
+      status: 'open',
       feature: featureSlug,
       created: now,
     },

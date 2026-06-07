@@ -1,5 +1,5 @@
 export const manifest = {
-  id: "sf-feature",
-  kind: "wizard",
-  description: "Invalid kind value.",
+  id: 'sf-feature',
+  kind: 'wizard',
+  description: 'Invalid kind value.',
 };

@@ -1,8 +1,8 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const skillManifestSchema = z.object({
   id: z.string().min(1),
-  kind: z.literal("user"),
+  kind: z.literal('user'),
   description: z.string().min(1),
   allowedTools: z.array(z.string()).optional(),
   argumentHint: z.string().optional(),

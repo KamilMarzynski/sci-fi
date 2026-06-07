@@ -1,65 +1,60 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
-import { TASK_STATUS_VALUES, type TaskFrontmatter } from "./types.js";
+import { readFile, writeFile } from 'node:fs/promises';
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { TASK_STATUS_VALUES, type TaskFrontmatter } from './types.js';
 
 export interface TaskFile {
   frontmatter: TaskFrontmatter;
   body: string;
 }
 
-function isValidTaskStatus(value: unknown): value is TaskFrontmatter["status"] {
-  return (
-    typeof value === "string" &&
-    (TASK_STATUS_VALUES as readonly string[]).includes(value)
-  );
+function isValidTaskStatus(value: unknown): value is TaskFrontmatter['status'] {
+  return typeof value === 'string' && (TASK_STATUS_VALUES as readonly string[]).includes(value);
 }
 
-function isValidRawFrontmatter(
-  raw: unknown,
-): raw is Record<string, unknown> & {
+function isValidRawFrontmatter(raw: unknown): raw is Record<string, unknown> & {
   id: string;
   slug: string;
   status: string;
-  "depends-on": unknown[];
+  'depends-on': unknown[];
 } {
-  if (typeof raw !== "object" || raw === null) return false;
+  if (typeof raw !== 'object' || raw === null) return false;
   const obj = raw as Record<string, unknown>;
-  const allowedKeys = new Set(["id", "slug", "status", "depends-on"]);
+  const allowedKeys = new Set(['id', 'slug', 'status', 'depends-on']);
   if (Object.keys(obj).some((key) => !allowedKeys.has(key))) return false;
   return (
-    typeof obj["id"] === "string" &&
-    typeof obj["slug"] === "string" &&
-    isValidTaskStatus(obj["status"]) &&
-    Array.isArray(obj["depends-on"])
+    typeof obj.id === 'string' &&
+    typeof obj.slug === 'string' &&
+    isValidTaskStatus(obj.status) &&
+    Array.isArray(obj['depends-on'])
   );
 }
 
 const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/;
 
 export async function readTaskFile(filePath: string): Promise<TaskFile> {
-  const content = await readFile(filePath, "utf8");
+  const content = await readFile(filePath, 'utf8');
   const match = FRONTMATTER_PATTERN.exec(content);
 
   if (!match) {
     throw new Error(`Task file at ${filePath} is missing YAML frontmatter.`);
   }
 
-  const yamlPart = match[1] ?? "";
-  const body = match[2] ?? "";
+  const yamlPart = match[1] ?? '';
+  const body = match[2] ?? '';
   const raw = parseYaml(yamlPart);
 
   if (!isValidRawFrontmatter(raw)) {
     throw new Error(`Task file at ${filePath} has invalid frontmatter.`);
   }
 
-  const dependsOnRaw = raw["depends-on"];
+  const dependsOnRaw = raw['depends-on'];
 
   return {
     frontmatter: {
       id: raw.id,
       slug: raw.slug,
-      status: raw.status as TaskFrontmatter["status"],
-      dependsOn: dependsOnRaw.filter((v): v is string => typeof v === "string"),
+      status: raw.status as TaskFrontmatter['status'],
+      dependsOn: dependsOnRaw.filter((v): v is string => typeof v === 'string'),
     },
     body,
   };
@@ -71,8 +66,8 @@ export async function writeTaskFile(filePath: string, file: TaskFile): Promise<v
     slug: file.frontmatter.slug,
     status: file.frontmatter.status,
   };
-  rawFrontmatter["depends-on"] = file.frontmatter.dependsOn;
+  rawFrontmatter['depends-on'] = file.frontmatter.dependsOn;
 
   const content = `---\n${stringifyYaml(rawFrontmatter)}---\n${file.body}`;
-  await writeFile(filePath, content, "utf8");
+  await writeFile(filePath, content, 'utf8');
 }

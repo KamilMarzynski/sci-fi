@@ -1,16 +1,14 @@
-import { readdir, readFile, stat } from "node:fs/promises";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-import { skillManifestSchema, type SkillBundle, type SkillManifest } from "./types.js";
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { type SkillBundle, type SkillManifest, skillManifestSchema } from './types.js';
 
 export interface LoadCatalogOptions {
   readonly bodiesRoot: string;
   readonly manifestsRoot: string;
 }
 
-export async function loadCatalog(
-  options: LoadCatalogOptions,
-): Promise<SkillBundle[]> {
+export async function loadCatalog(options: LoadCatalogOptions): Promise<SkillBundle[]> {
   const entries = await readdir(options.bodiesRoot, { withFileTypes: true });
   const directories = entries
     .filter((entry) => entry.isDirectory())
@@ -21,14 +19,10 @@ export async function loadCatalog(
   const bundles: SkillBundle[] = [];
 
   for (const folder of directories) {
-    const manifest = await loadManifest(
-      join(options.manifestsRoot, folder, "manifest.js"),
-    );
+    const manifest = await loadManifest(join(options.manifestsRoot, folder, 'manifest.js'));
 
     if (manifest.id !== folder) {
-      throw new Error(
-        `manifest.id "${manifest.id}" does not match folder "${folder}"`,
-      );
+      throw new Error(`manifest.id "${manifest.id}" does not match folder "${folder}"`);
     }
 
     if (seenIds.has(manifest.id)) {
@@ -37,9 +31,9 @@ export async function loadCatalog(
 
     seenIds.add(manifest.id);
 
-    const bodyPath = join(options.bodiesRoot, folder, "body.md");
+    const bodyPath = join(options.bodiesRoot, folder, 'body.md');
     await assertFileExists(bodyPath);
-    const body = await readFile(bodyPath, { encoding: "utf8" });
+    const body = await readFile(bodyPath, { encoding: 'utf8' });
 
     bundles.push({ manifest, body });
   }
@@ -60,8 +54,8 @@ async function loadManifest(modulePath: string): Promise<SkillManifest> {
   if (!result.success) {
     throw new Error(
       `Invalid manifest at ${modulePath}: ${result.error.issues
-        .map((issue) => `${issue.path.join(".") || "<root>"}: ${issue.message}`)
-        .join("; ")}`,
+        .map((issue) => `${issue.path.join('.') || '<root>'}: ${issue.message}`)
+        .join('; ')}`,
     );
   }
 
@@ -72,8 +66,8 @@ async function assertFileExists(path: string): Promise<void> {
   await stat(path).catch((error: unknown) => {
     if (
       error instanceof Error &&
-      "code" in error &&
-      (error as NodeJS.ErrnoException).code === "ENOENT"
+      'code' in error &&
+      (error as NodeJS.ErrnoException).code === 'ENOENT'
     ) {
       throw new Error(`Missing file: ${path}`);
     }

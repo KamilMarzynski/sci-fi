@@ -1,5 +1,5 @@
 export const manifest = {
-  id: "sf-feature",
-  kind: "user",
-  description: "Missing body.",
+  id: 'sf-feature',
+  kind: 'user',
+  description: 'Missing body.',
 };

@@ -1,19 +1,19 @@
 import {
+  type HarnessAdapter,
+  type HarnessId,
   HarnessNotImplementedError,
   InvalidHarnessError,
   isHarnessId,
-  type HarnessAdapter,
-  type HarnessId,
-} from "./adapter.js";
+} from './adapter.js';
 
-type RegistryEntry = HarnessAdapter | "not-implemented";
+type RegistryEntry = HarnessAdapter | 'not-implemented';
 
 const registry: Record<HarnessId, RegistryEntry> = {
-  "claude-code": "not-implemented",
-  opencode: "not-implemented",
-  codex: "not-implemented",
-  cursor: "not-implemented",
-  "agents-md": "not-implemented",
+  'claude-code': 'not-implemented',
+  opencode: 'not-implemented',
+  codex: 'not-implemented',
+  cursor: 'not-implemented',
+  'agents-md': 'not-implemented',
 };
 
 export function registerAdapter(adapter: HarnessAdapter): void {
@@ -27,7 +27,7 @@ export function getAdapter(id: string): HarnessAdapter {
 
   const entry = registry[id];
 
-  if (entry === "not-implemented") {
+  if (entry === 'not-implemented') {
     throw new HarnessNotImplementedError(id);
   }
 

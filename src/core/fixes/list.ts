@@ -1,11 +1,11 @@
-import { readdir } from "node:fs/promises";
-import { join } from "node:path";
-import { readFixFile } from "./frontmatter.js";
-import { buildFixesDirectoryPath } from "./paths.js";
-import type { FixFrontmatter } from "./types.js";
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+import { readFixFile } from './frontmatter.js';
+import { buildFixesDirectoryPath } from './paths.js';
+import type { FixFrontmatter } from './types.js';
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
 export async function listFixes(
@@ -14,16 +14,12 @@ export async function listFixes(
 ): Promise<FixFrontmatter[]> {
   const fixesDir = buildFixesDirectoryPath(projectRoot, featureSlug);
 
-  const entries = await readdir(fixesDir, { withFileTypes: true }).catch(
-    (error: unknown) => {
-      if (isMissingPathError(error)) return [];
-      throw error;
-    },
-  );
+  const entries = await readdir(fixesDir, { withFileTypes: true }).catch((error: unknown) => {
+    if (isMissingPathError(error)) return [];
+    throw error;
+  });
 
-  const mdFiles = entries.filter(
-    (e) => e.isFile() && e.name.endsWith(".md"),
-  );
+  const mdFiles = entries.filter((e) => e.isFile() && e.name.endsWith('.md'));
 
   const results = await Promise.all(
     mdFiles.map(async (entry) => {
@@ -40,7 +36,5 @@ export async function listOpenFixes(
   featureSlug: string,
 ): Promise<FixFrontmatter[]> {
   const fixes = await listFixes(projectRoot, featureSlug);
-  return fixes.filter(
-    (f) => f.status === "open" || f.status === "in-progress",
-  );
+  return fixes.filter((f) => f.status === 'open' || f.status === 'in-progress');
 }
