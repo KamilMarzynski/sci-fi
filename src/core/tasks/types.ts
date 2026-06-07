@@ -10,6 +10,5 @@ export interface TaskFrontmatter {
   id: string;
   slug: string;
   status: TaskStatus;
-  parallel: boolean;
   dependsOn: string[];
 }

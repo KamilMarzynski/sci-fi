@@ -26,17 +26,18 @@ docs/specflow/specs/<slug>/
     └── ...
 ```
 
-Task files have YAML frontmatter written by the planning agent. The CLI reads and updates `status` only; `parallel` and `depends-on` are agent-owned and never modified by the CLI.
+Task files have YAML frontmatter written by the planning agent. The CLI reads and updates `status` only; `depends-on` is agent-owned and never modified by the CLI.
 
 ```yaml
 ---
 id: TASK-001
 slug: setup-database
 status: pending        # pending | in-progress | done
-parallel: false        # orchestrator uses this for dispatch decisions
 depends-on: []         # task slugs that must complete first
 ---
 ```
+
+Parallelism is derived from `depends-on`, not declared: a task is runnable once all its dependencies are `done`, and any tasks runnable at the same time may run in parallel. To serialize two otherwise-independent tasks, add a `depends-on` edge between them.
 
 ---
 
@@ -90,7 +91,7 @@ All mutation commands exit non-zero on validation failure (CI-friendly).
 
 /specflow:implement <slug>
   → specflow start <slug>          # set in-progress
-  → orchestrator reads tasks (parallel/depends-on), dispatches agents
+  → orchestrator reads tasks (depends-on), dispatches agents
   → per task: specflow task start <slug> <task>
   → task agent: work → eval subagent → repeat until pass
   → per task: specflow task done <slug> <task>   # after code review passes

@@ -21,7 +21,7 @@ describe("readTaskFile", () => {
 
     await writeFile(
       filePath,
-      `---\nid: TASK-001\nslug: setup-database\nstatus: pending\nparallel: false\ndepends-on: []\n---\n# Setup Database\n\nCreate the schema.\n`,
+      `---\nid: TASK-001\nslug: setup-database\nstatus: pending\ndepends-on: []\n---\n# Setup Database\n\nCreate the schema.\n`,
       "utf8",
     );
 
@@ -31,7 +31,6 @@ describe("readTaskFile", () => {
       id: "TASK-001",
       slug: "setup-database",
       status: "pending",
-      parallel: false,
       dependsOn: [],
     });
     expect(file.body).toBe("# Setup Database\n\nCreate the schema.\n");
@@ -44,7 +43,7 @@ describe("readTaskFile", () => {
 
     await writeFile(
       filePath,
-      `---\nid: TASK-002\nslug: task\nstatus: pending\nparallel: false\ndepends-on:\n  - setup-database\n---\nbody\n`,
+      `---\nid: TASK-002\nslug: task\nstatus: pending\ndepends-on:\n  - setup-database\n---\nbody\n`,
       "utf8",
     );
 
@@ -71,6 +70,20 @@ describe("readTaskFile", () => {
 
     await expect(readTaskFile(filePath)).rejects.toThrow("invalid frontmatter");
   });
+
+  it("throws when frontmatter has unknown keys", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    temporaryDirectories.push(dir);
+    const filePath = join(dir, "task.md");
+
+    await writeFile(
+      filePath,
+      `---\nid: TASK-001\nslug: task\nstatus: pending\nparallel: false\ndepends-on: []\n---\nbody\n`,
+      "utf8",
+    );
+
+    await expect(readTaskFile(filePath)).rejects.toThrow("invalid frontmatter");
+  });
 });
 
 describe("writeTaskFile", () => {
@@ -84,7 +97,6 @@ describe("writeTaskFile", () => {
         id: "TASK-001",
         slug: "setup-database",
         status: "in-progress",
-        parallel: false,
         dependsOn: [],
       },
       body: "# Setup Database\n",
@@ -106,7 +118,6 @@ describe("writeTaskFile", () => {
         id: "TASK-002",
         slug: "implement-auth",
         status: "pending",
-        parallel: true,
         dependsOn: ["setup-database"],
       },
       body: "body\n",
@@ -114,6 +125,5 @@ describe("writeTaskFile", () => {
 
     const readBack = await readTaskFile(filePath);
     expect(readBack.frontmatter.dependsOn).toEqual(["setup-database"]);
-    expect(readBack.frontmatter.parallel).toBe(true);
   });
 });

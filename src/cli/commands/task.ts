@@ -15,7 +15,7 @@ export function registerTaskCommand(program: Command): void {
     .action(async (slug: string) => {
       const tasks = await listTasks(cwd(), slug);
       for (const t of tasks) {
-        process.stdout.write(`${t.slug}\t${t.status}\tparallel=${String(t.parallel)}\n`);
+        process.stdout.write(`${t.slug}\t${t.status}\tdepends-on=${t.dependsOn.join(",")}\n`);
       }
     });
 

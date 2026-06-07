@@ -13,8 +13,8 @@ afterEach(async () => {
   temporaryDirectories.length = 0;
 });
 
-function makeTaskContent(slug: string, status: string, parallel = false): string {
-  return `---\nid: TASK-001\nslug: ${slug}\nstatus: ${status}\nparallel: ${String(parallel)}\ndepends-on: []\n---\n# ${slug}\n`;
+function makeTaskContent(slug: string, status: string): string {
+  return `---\nid: TASK-001\nslug: ${slug}\nstatus: ${status}\ndepends-on: []\n---\n# ${slug}\n`;
 }
 
 describe("listTasks", () => {

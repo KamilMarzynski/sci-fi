@@ -34,7 +34,7 @@ describe("start command", () => {
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
       join(tasksDir, "setup-db.md"),
-      "---\nid: TASK-001\nslug: setup-db\nstatus: pending\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "---\nid: TASK-001\nslug: setup-db\nstatus: pending\ndepends-on: []\n---\n# Setup DB\n",
       "utf8",
     );
 

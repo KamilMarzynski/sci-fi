@@ -27,7 +27,7 @@ async function createTaskFile(
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
-    `---\nid: TASK-001\nslug: ${taskSlug}\nstatus: ${status}\nparallel: false\ndepends-on: []\n---\n# ${taskSlug}\n`,
+    `---\nid: TASK-001\nslug: ${taskSlug}\nstatus: ${status}\ndepends-on: []\n---\n# ${taskSlug}\n`,
     "utf8",
   );
 }

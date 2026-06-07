@@ -25,7 +25,7 @@ async function createTaskFile(
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
-    `---\nid: TASK-001\nslug: ${taskSlug}\nstatus: ${status}\nparallel: false\ndepends-on: []\n---\n# ${taskSlug}\n`,
+    `---\nid: TASK-001\nslug: ${taskSlug}\nstatus: ${status}\ndepends-on: []\n---\n# ${taskSlug}\n`,
     "utf8",
   );
 }
@@ -62,7 +62,7 @@ describe("updateTaskStatus", () => {
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
       join(tasksDir, "setup-database.md"),
-      `---\nid: TASK-001\nslug: setup-database\nstatus: pending\nparallel: false\ndepends-on: []\n---\n# Setup Database\n\nDetailed description.\n`,
+      `---\nid: TASK-001\nslug: setup-database\nstatus: pending\ndepends-on: []\n---\n# Setup Database\n\nDetailed description.\n`,
       "utf8",
     );
 

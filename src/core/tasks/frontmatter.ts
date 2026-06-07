@@ -20,16 +20,16 @@ function isValidRawFrontmatter(
   id: string;
   slug: string;
   status: string;
-  parallel: boolean;
   "depends-on": unknown[];
 } {
   if (typeof raw !== "object" || raw === null) return false;
   const obj = raw as Record<string, unknown>;
+  const allowedKeys = new Set(["id", "slug", "status", "depends-on"]);
+  if (Object.keys(obj).some((key) => !allowedKeys.has(key))) return false;
   return (
     typeof obj["id"] === "string" &&
     typeof obj["slug"] === "string" &&
     isValidTaskStatus(obj["status"]) &&
-    typeof obj["parallel"] === "boolean" &&
     Array.isArray(obj["depends-on"])
   );
 }
@@ -59,7 +59,6 @@ export async function readTaskFile(filePath: string): Promise<TaskFile> {
       id: raw.id,
       slug: raw.slug,
       status: raw.status as TaskFrontmatter["status"],
-      parallel: raw.parallel,
       dependsOn: dependsOnRaw.filter((v): v is string => typeof v === "string"),
     },
     body,
@@ -71,7 +70,6 @@ export async function writeTaskFile(filePath: string, file: TaskFile): Promise<v
     id: file.frontmatter.id,
     slug: file.frontmatter.slug,
     status: file.frontmatter.status,
-    parallel: file.frontmatter.parallel,
   };
   rawFrontmatter["depends-on"] = file.frontmatter.dependsOn;
 

@@ -39,7 +39,7 @@ describe("finish command", () => {
     const tasksDir = await scaffoldInProgressFeature(projectRoot);
     await writeFile(
       join(tasksDir, "setup-db.md"),
-      "---\nid: TASK-001\nslug: setup-db\nstatus: done\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "---\nid: TASK-001\nslug: setup-db\nstatus: done\ndepends-on: []\n---\n# Setup DB\n",
       "utf8",
     );
 
@@ -58,7 +58,7 @@ describe("finish command", () => {
     const tasksDir = await scaffoldInProgressFeature(projectRoot);
     await writeFile(
       join(tasksDir, "setup-db.md"),
-      "---\nid: TASK-001\nslug: setup-db\nstatus: in-progress\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "---\nid: TASK-001\nslug: setup-db\nstatus: in-progress\ndepends-on: []\n---\n# Setup DB\n",
       "utf8",
     );
 
@@ -75,7 +75,7 @@ describe("finish command", () => {
     const tasksDir = await scaffoldInProgressFeature(projectRoot);
     await writeFile(
       join(tasksDir, "setup-db.md"),
-      "---\nid: TASK-001\nslug: setup-db\nstatus: done\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "---\nid: TASK-001\nslug: setup-db\nstatus: done\ndepends-on: []\n---\n# Setup DB\n",
       "utf8",
     );
 
@@ -109,7 +109,7 @@ describe("finish command", () => {
     const tasksDir = await scaffoldInProgressFeature(projectRoot);
     await writeFile(
       join(tasksDir, "setup-db.md"),
-      "---\nid: TASK-001\nslug: setup-db\nstatus: done\nparallel: false\ndepends-on: []\n---\n# Setup DB\n",
+      "---\nid: TASK-001\nslug: setup-db\nstatus: done\ndepends-on: []\n---\n# Setup DB\n",
       "utf8",
     );
 
