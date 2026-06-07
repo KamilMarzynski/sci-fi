@@ -54,7 +54,7 @@ Existing bootstrap docs are preserved when the target path is already a regular 
 
 ## Bundled Skills
 
-`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 10 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
+`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
 
 All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills living in the same directories.
 

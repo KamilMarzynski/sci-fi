@@ -22,7 +22,7 @@ afterEach(async () => {
 });
 
 describe("installSkills", () => {
-  it("installs all 10 bundled skills to the claude-code targets", async () => {
+  it("installs all 11 bundled skills to the claude-code targets", async () => {
     const projectRoot = mkdtempSync(join(tmpdir(), "specflow-install-"));
     temporaryDirectories.push(projectRoot);
 
@@ -37,6 +37,7 @@ describe("installSkills", () => {
       "sf-plan",
       "sf-fix",
       "sf-bug",
+      "sf-change",
       "sf-implement",
       "sf-spec-review",
       "sf-plan-review",

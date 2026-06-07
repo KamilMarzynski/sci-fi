@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageRoot = join(__dirname, "..", "..", "..");
 
 describe("bundled skill catalog", () => {
-  it("loads exactly 10 skills with matching ids", async () => {
+  it("loads exactly 11 skills with matching ids", async () => {
     const bundles = await loadCatalog({
       bodiesRoot: join(packageRoot, "skills"),
       manifestsRoot: join(packageRoot, "dist", "skills"),
@@ -17,6 +17,7 @@ describe("bundled skill catalog", () => {
 
     expect(ids).toEqual([
       "sf-bug",
+      "sf-change",
       "sf-code-review",
       "sf-feature",
       "sf-fix",
@@ -29,7 +30,7 @@ describe("bundled skill catalog", () => {
     ]);
   });
 
-  it("all 10 skills are user skills", async () => {
+  it("all 11 skills are user skills", async () => {
     const bundles = await loadCatalog({
       bodiesRoot: join(packageRoot, "skills"),
       manifestsRoot: join(packageRoot, "dist", "skills"),
@@ -38,6 +39,7 @@ describe("bundled skill catalog", () => {
     const kinds = bundles.map((bundle) => bundle.manifest.kind);
 
     expect(kinds).toEqual([
+      "user",
       "user",
       "user",
       "user",

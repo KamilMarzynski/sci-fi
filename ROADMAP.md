@@ -36,7 +36,7 @@ Spec + plan: `docs/superpowers/{specs,plans}/2026-05-29-skills-init-bundle*.md`.
 
 Shipped:
 
-- `skills/<id>/{body.md,manifest.ts}` single source of truth for 10 stub skills (all `sf-*` user skills).
+- `skills/<id>/{body.md,manifest.ts}` single source of truth for 11 stub skills (all `sf-*` user skills).
 - `src/core/skills/` — `types`, `catalog`, `harness/{adapter,registry,claude-code,register-defaults}`.
 - `src/core/init/` additions — `prompt-harness`, `install-skills`, `config`.
 - Scaffold docs: `TESTING.md` replaced by `EVALUATION.md`; `ARCHITECTURE.md` and `CONTEXT.md` added.
@@ -72,7 +72,7 @@ Larger (future):
 
 By design (not debt):
 
-- All 10 skill bodies are stubs. Real prompt content lives in follow-up specs (one per skill, or grouped).
+- All 11 skill bodies are stubs. Real prompt content lives in follow-up specs (one per skill, or grouped).
 - Only Claude Code adapter is implemented. OpenCode / Codex / Cursor / AGENTS.md fallback throw `HarnessNotImplementedError` until follow-up specs add them.
 - No `specflow update` command yet. Rerunning `init` overwrites `.claude/skills/sf-*` by design — documented in README. Custom user edits belong in separate skills, not in the bundled `sf-*` files.
 
@@ -80,7 +80,7 @@ By design (not debt):
 
 Two work streams:
 
-1. Author real prompt content for the 10 stub skills.
+1. Author real prompt content for the 11 stub skills.
 2. Continue the original roadmap with `Spec Lifecycle`.
 
 Order is open — pick based on which unlocks more value next session.
