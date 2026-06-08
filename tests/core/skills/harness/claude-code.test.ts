@@ -28,11 +28,9 @@ describe('claudeCodeAdapter', () => {
     const bundle: SkillBundle = {
       manifest: {
         id: 'sf-feature',
-        kind: 'user',
         description: 'Start grilling session for a new feature.',
         argumentHint: '[title]',
         allowedTools: ['Read', 'Write'],
-        disableModelInvocation: true,
       },
       body: '# sf-feature\n\nstub body\n',
     };
@@ -51,7 +49,6 @@ describe('claudeCodeAdapter', () => {
       description: 'Start grilling session for a new feature.',
       'argument-hint': '[title]',
       'allowed-tools': 'Read, Write',
-      'disable-model-invocation': true,
     });
     expect(bodyLines.join('\n')).toBe('# sf-feature\n\nstub body\n');
   });
@@ -61,7 +58,6 @@ describe('claudeCodeAdapter', () => {
     const bundle: SkillBundle = {
       manifest: {
         id: 'sf-bug',
-        kind: 'user',
         description: 'Create a bug report.',
       },
       body: '# sf-bug\n',

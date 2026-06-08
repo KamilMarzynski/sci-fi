@@ -38,9 +38,5 @@ function buildFrontmatter(manifest: SkillManifest): Record<string, unknown> {
     frontmatter['allowed-tools'] = manifest.allowedTools.join(', ');
   }
 
-  if (manifest.disableModelInvocation === true) {
-    frontmatter['disable-model-invocation'] = true;
-  }
-
   return frontmatter;
 }
