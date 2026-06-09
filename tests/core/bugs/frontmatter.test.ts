@@ -13,7 +13,7 @@ afterEach(async () => {
 
 describe('writeBugFile / readBugFile', () => {
   it('round-trips a bug file with all optional fields', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-bug-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-bug-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'BUG-0001-login-crash.md');
 
@@ -40,7 +40,7 @@ describe('writeBugFile / readBugFile', () => {
   });
 
   it('round-trips a bug file with only required fields', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-bug-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-bug-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'BUG-0002-null-ref.md');
 
@@ -64,7 +64,7 @@ describe('writeBugFile / readBugFile', () => {
   });
 
   it('throws on missing frontmatter', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-bug-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-bug-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'bad.md');
 
@@ -74,7 +74,7 @@ describe('writeBugFile / readBugFile', () => {
   });
 
   it('throws when frontmatter is invalid', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-bug-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-bug-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'bad.md');
 

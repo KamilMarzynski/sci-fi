@@ -28,7 +28,7 @@ function makeMetadata(slug: string, id: string, status: string): string {
 
 describe('listFeatures', () => {
   it('returns empty array when specs directory does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
     temporaryDirectories.push(projectRoot);
 
     const features = await listFeatures({ projectRoot });
@@ -36,19 +36,19 @@ describe('listFeatures', () => {
   });
 
   it('returns metadata for all feature directories', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
     temporaryDirectories.push(projectRoot);
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
 
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       makeMetadata('user-auth', 'FEAT-0001', 'created'),
       'utf8',
     );
     await writeFile(
-      join(specsDir, 'payment-flow', '.specflow.json'),
+      join(specsDir, 'payment-flow', '.scifi.json'),
       makeMetadata('payment-flow', 'FEAT-0002', 'spec-ready'),
       'utf8',
     );
@@ -61,19 +61,19 @@ describe('listFeatures', () => {
   });
 
   it('filters features by status', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
     temporaryDirectories.push(projectRoot);
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
 
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       makeMetadata('user-auth', 'FEAT-0001', 'created'),
       'utf8',
     );
     await writeFile(
-      join(specsDir, 'payment-flow', '.specflow.json'),
+      join(specsDir, 'payment-flow', '.scifi.json'),
       makeMetadata('payment-flow', 'FEAT-0002', 'spec-ready'),
       'utf8',
     );

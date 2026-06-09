@@ -14,7 +14,7 @@ afterEach(async () => {
 
 describe('createBug', () => {
   it('creates bugs/ dir and writes a bug file', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-create-'));
     temporaryDirectories.push(projectRoot);
 
     const result = await createBug({
@@ -36,7 +36,7 @@ describe('createBug', () => {
   });
 
   it('creates a bug with optional severity and related-feature', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-create-'));
     temporaryDirectories.push(projectRoot);
 
     const result = await createBug({
@@ -53,7 +53,7 @@ describe('createBug', () => {
   });
 
   it('assigns sequential IDs based on existing file count', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-create-'));
     temporaryDirectories.push(projectRoot);
 
     const first = await createBug({
@@ -72,7 +72,7 @@ describe('createBug', () => {
   });
 
   it('creates bugs/ dir if it does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-create-'));
     temporaryDirectories.push(projectRoot);
 
     await createBug({

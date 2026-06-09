@@ -153,7 +153,7 @@ export function createInstalledPackageTestEnvironment(
 
   writeFileSync(
     join(installDirectory, 'package.json'),
-    JSON.stringify({ name: 'specflow-installed-test', private: true }),
+    JSON.stringify({ name: 'scifi-installed-test', private: true }),
   );
 
   execFileSync(
@@ -198,7 +198,7 @@ export function runInstalledCommand(
   installDirectory: string,
   args: readonly string[],
 ): InstalledCommandResult {
-  const installedBinPath = join(installDirectory, 'node_modules', '.bin', 'specflow');
+  const installedBinPath = join(installDirectory, 'node_modules', '.bin', 'scifi');
 
   const result = spawnSync(installedBinPath, args, {
     cwd: installDirectory,

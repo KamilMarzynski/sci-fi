@@ -1,7 +1,7 @@
 import { cwd } from 'node:process';
 import type { Command } from 'commander';
 import { listOpenFixes } from '../../core/fixes/list.js';
-import { emitError, emitSuccess, jsonMode, SpecflowError } from '../../core/output/index.js';
+import { emitError, emitSuccess, jsonMode, ScifiError } from '../../core/output/index.js';
 import { updateFeatureStatus } from '../../core/specs/transition.js';
 
 function createTimestamp(): string {
@@ -22,7 +22,7 @@ export function registerFinishCommand(program: Command): void {
 
         if (openFixes.length > 0) {
           const ids = openFixes.map((f) => f.id).join(', ');
-          throw new SpecflowError(
+          throw new ScifiError(
             'PRECONDITION_FAILED',
             `Cannot finish ${slug}: ${openFixes.length} open fix${openFixes.length === 1 ? '' : 'es'} block completion`,
             {

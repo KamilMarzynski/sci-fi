@@ -13,20 +13,20 @@ const EXIT_CODES: Record<ErrorCode, number> = {
   INTERNAL: 1,
 };
 
-export interface SpecflowErrorOptions {
+export interface ScifiErrorOptions {
   hint?: string;
   details?: unknown;
   cause?: unknown;
 }
 
-export class SpecflowError extends Error {
+export class ScifiError extends Error {
   readonly code: ErrorCode;
   readonly hint?: string;
   readonly details?: unknown;
 
-  constructor(code: ErrorCode, message: string, options: SpecflowErrorOptions = {}) {
+  constructor(code: ErrorCode, message: string, options: ScifiErrorOptions = {}) {
     super(message, options.cause !== undefined ? { cause: options.cause } : undefined);
-    this.name = 'SpecflowError';
+    this.name = 'ScifiError';
     this.code = code;
     if (options.hint !== undefined) {
       this.hint = options.hint;
@@ -41,15 +41,15 @@ export class SpecflowError extends Error {
   }
 }
 
-export function toSpecflowError(error: unknown): SpecflowError {
-  if (error instanceof SpecflowError) {
+export function toScifiError(error: unknown): ScifiError {
+  if (error instanceof ScifiError) {
     return error;
   }
 
   const message =
     error instanceof Error && error.message.length > 0
       ? error.message
-      : 'specflow failed with an unexpected error.';
+      : 'scifi failed with an unexpected error.';
 
-  return new SpecflowError('INTERNAL', message, { cause: error });
+  return new ScifiError('INTERNAL', message, { cause: error });
 }

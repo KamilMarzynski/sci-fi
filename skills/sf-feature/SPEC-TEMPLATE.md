@@ -1,7 +1,7 @@
 # Spec: <title>
 
 - **Slug:** <slug>
-- **ID:** <feature id from `specflow spec`>
+- **ID:** <feature id from `scifi spec`>
 - **Status:** draft
 
 ## Problem / Why

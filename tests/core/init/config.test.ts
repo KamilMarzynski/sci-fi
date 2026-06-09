@@ -17,29 +17,29 @@ afterEach(async () => {
 
 describe('writeConfig', () => {
   it('writes config.json with the chosen harness', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-config-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-config-'));
     temporaryDirectories.push(projectRoot);
-    await mkdir(join(projectRoot, 'docs', 'specflow', '.specflow'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', '.scifi'), {
       recursive: true,
     });
 
     await writeConfig({ projectRoot, harness: 'claude-code' });
 
     const written = JSON.parse(
-      readFileSync(join(projectRoot, 'docs', 'specflow', '.specflow', 'config.json'), 'utf8'),
+      readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
     );
 
     expect(written).toEqual({ version: 1, harness: 'claude-code' });
   });
 
   it('preserves existing config.json on rerun', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-config-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-config-'));
     temporaryDirectories.push(projectRoot);
-    await mkdir(join(projectRoot, 'docs', 'specflow', '.specflow'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', '.scifi'), {
       recursive: true,
     });
     const { writeFile } = await import('node:fs/promises');
-    const configPath = join(projectRoot, 'docs', 'specflow', '.specflow', 'config.json');
+    const configPath = join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json');
     await writeFile(configPath, '{"version":1,"harness":"opencode"}', 'utf8');
 
     await writeConfig({ projectRoot, harness: 'claude-code' });

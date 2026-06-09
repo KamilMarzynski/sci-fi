@@ -1,5 +1,5 @@
 import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
-import { SpecflowError } from '../output/errors.js';
+import { ScifiError } from '../output/errors.js';
 import { formatFeatureId } from './id.js';
 import { createInitialFeatureMetadata } from './metadata.js';
 import {
@@ -38,10 +38,10 @@ export async function createFeature(options: CreateFeatureOptions): Promise<Crea
   );
 
   if (existingFeatureDirectory !== null) {
-    throw new SpecflowError(
+    throw new ScifiError(
       'CONFLICT',
       `Cannot create feature ${slug}: ${featureDirectoryPath} already exists.`,
-      { hint: 'Choose a different slug or inspect it with `specflow status <slug>`.' },
+      { hint: 'Choose a different slug or inspect it with `scifi status <slug>`.' },
     );
   }
 

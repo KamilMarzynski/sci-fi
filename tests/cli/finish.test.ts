@@ -16,11 +16,11 @@ afterEach(async () => {
 });
 
 async function scaffoldInProgressFeature(projectRoot: string): Promise<string> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
   const tasksDir = join(featureDir, 'tasks');
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     `${JSON.stringify(
       {
         version: 1,
@@ -42,7 +42,7 @@ async function scaffoldInProgressFeature(projectRoot: string): Promise<string> {
 
 describe('finish command', () => {
   it('transitions in-progress feature to done when all tasks are done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-finish-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-finish-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -53,17 +53,17 @@ describe('finish command', () => {
       'utf8',
     );
 
-    await buildProgram().parseAsync(['node', 'specflow', 'finish', 'user-auth']);
+    await buildProgram().parseAsync(['node', 'scifi', 'finish', 'user-auth']);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
-    const metadata = JSON.parse(await readFile(join(featureDir, '.specflow.json'), 'utf8')) as {
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
+    const metadata = JSON.parse(await readFile(join(featureDir, '.scifi.json'), 'utf8')) as {
       status: string;
     };
     expect(metadata.status).toBe('done');
   });
 
   it('fails when a task is not done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-finish-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-finish-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -80,7 +80,7 @@ describe('finish command', () => {
   });
 
   it('fails when there are open fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-finish-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-finish-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -91,7 +91,7 @@ describe('finish command', () => {
       'utf8',
     );
 
-    const fixesDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', 'fixes');
+    const fixesDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', 'fixes');
     await mkdir(fixesDir, { recursive: true });
     await writeFile(
       join(fixesDir, 'FIX-0001-token-expiry.md'),
@@ -113,7 +113,7 @@ describe('finish command', () => {
   });
 
   it('succeeds when all fixes are resolved', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-finish-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-finish-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -124,7 +124,7 @@ describe('finish command', () => {
       'utf8',
     );
 
-    const fixesDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', 'fixes');
+    const fixesDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', 'fixes');
     await mkdir(fixesDir, { recursive: true });
     await writeFile(
       join(fixesDir, 'FIX-0001-token-expiry.md'),
@@ -132,10 +132,10 @@ describe('finish command', () => {
       'utf8',
     );
 
-    await buildProgram().parseAsync(['node', 'specflow', 'finish', 'user-auth']);
+    await buildProgram().parseAsync(['node', 'scifi', 'finish', 'user-auth']);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
-    const metadata = JSON.parse(await readFile(join(featureDir, '.specflow.json'), 'utf8')) as {
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
+    const metadata = JSON.parse(await readFile(join(featureDir, '.scifi.json'), 'utf8')) as {
       status: string;
     };
     expect(metadata.status).toBe('done');

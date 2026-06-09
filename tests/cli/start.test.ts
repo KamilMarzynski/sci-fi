@@ -16,14 +16,14 @@ afterEach(async () => {
 
 describe('start command', () => {
   it('transitions plan-ready feature to in-progress', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-start-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-start-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -48,23 +48,23 @@ describe('start command', () => {
       'utf8',
     );
 
-    await buildProgram().parseAsync(['node', 'specflow', 'start', 'user-auth']);
+    await buildProgram().parseAsync(['node', 'scifi', 'start', 'user-auth']);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, '.specflow.json'), 'utf8')) as {
+    const metadata = JSON.parse(await readFile(join(featureDir, '.scifi.json'), 'utf8')) as {
       status: string;
     };
     expect(metadata.status).toBe('in-progress');
   });
 
   it('fails when feature is not plan-ready', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-start-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-start-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,

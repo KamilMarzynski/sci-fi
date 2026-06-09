@@ -17,7 +17,7 @@ afterEach(async () => {
 });
 
 function createProjectRoot(): string {
-  const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-cc-adapter-'));
+  const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-cc-adapter-'));
   temporaryDirectories.push(projectRoot);
   return projectRoot;
 }

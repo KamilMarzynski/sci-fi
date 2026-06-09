@@ -15,15 +15,15 @@ afterEach(async () => {
 
 describe('list command', () => {
   it('prints all features when no filter applied', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -40,7 +40,7 @@ describe('list command', () => {
       'utf8',
     );
     await writeFile(
-      join(specsDir, 'payment-flow', '.specflow.json'),
+      join(specsDir, 'payment-flow', '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -64,7 +64,7 @@ describe('list command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'list']);
+      await buildProgram().parseAsync(['node', 'scifi', 'list']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -77,15 +77,15 @@ describe('list command', () => {
   });
 
   it('filters features by status', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -101,7 +101,7 @@ describe('list command', () => {
       'utf8',
     );
     await writeFile(
-      join(specsDir, 'payment-flow', '.specflow.json'),
+      join(specsDir, 'payment-flow', '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -125,7 +125,7 @@ describe('list command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'list', '--status', 'spec-ready']);
+      await buildProgram().parseAsync(['node', 'scifi', 'list', '--status', 'spec-ready']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -136,14 +136,14 @@ describe('list command', () => {
   });
 
   it('shows open fix count for features with fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -176,7 +176,7 @@ describe('list command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'list']);
+      await buildProgram().parseAsync(['node', 'scifi', 'list']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -190,14 +190,14 @@ describe('list command', () => {
   });
 
   it('shows dash for features with no open fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, 'docs', 'specflow', 'specs');
+    const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
     await mkdir(join(specsDir, 'user-auth'), { recursive: true });
     await writeFile(
-      join(specsDir, 'user-auth', '.specflow.json'),
+      join(specsDir, 'user-auth', '.scifi.json'),
       JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -217,7 +217,7 @@ describe('list command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'list']);
+      await buildProgram().parseAsync(['node', 'scifi', 'list']);
     } finally {
       process.stdout.write = originalWrite;
     }

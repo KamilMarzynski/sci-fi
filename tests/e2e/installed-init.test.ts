@@ -16,23 +16,23 @@ describe('installed build init verification', () => {
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
-      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', '.specflow'))).toBe(
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(
         true,
       );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'specs'))).toBe(
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(
         true,
       );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'bugs'))).toBe(
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'))).toBe(
         true,
       );
       expect(
         readFileSync(
-          join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md'),
+          join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md'),
           'utf8',
         ),
       ).toBe(expectedEvaluationDocument);
       expect(
-        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md')),
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md')),
       ).toBe(false);
 
       expect(
@@ -48,7 +48,7 @@ describe('installed build init verification', () => {
 
       const config = JSON.parse(
         readFileSync(
-          join(installation.installDirectory, 'docs', 'specflow', '.specflow', 'config.json'),
+          join(installation.installDirectory, 'docs', 'scifi', '.scifi', 'config.json'),
           'utf8',
         ),
       );
@@ -71,11 +71,11 @@ describe('installed build init verification', () => {
       expect(initialRun.status).toBe(0);
       expect(initialRun.stderr).toBe('');
 
-      const specflowRoot = join(installation.installDirectory, 'docs', 'specflow');
-      const evaluationPath = join(specflowRoot, 'EVALUATION.md');
-      const specPath = join(specflowRoot, 'specs', 'existing-spec.md');
-      const bugPath = join(specflowRoot, 'bugs', 'existing-bug.md');
-      const statePath = join(specflowRoot, '.specflow', 'state.json');
+      const scifiRoot = join(installation.installDirectory, 'docs', 'scifi');
+      const evaluationPath = join(scifiRoot, 'EVALUATION.md');
+      const specPath = join(scifiRoot, 'specs', 'existing-spec.md');
+      const bugPath = join(scifiRoot, 'bugs', 'existing-bug.md');
+      const statePath = join(scifiRoot, '.scifi', 'state.json');
       const skillPath = join(
         installation.installDirectory,
         '.claude',
@@ -113,11 +113,11 @@ describe('installed build init verification', () => {
       expect(readFileSync(specPath, 'utf8')).toBe(preservedSpecDocument);
       expect(readFileSync(bugPath, 'utf8')).toBe(preservedBugDocument);
       expect(readFileSync(statePath, 'utf8')).toBe(preservedStateDocument);
-      expect(existsSync(join(specflowRoot, '.specflow'))).toBe(true);
-      expect(existsSync(join(specflowRoot, 'specs'))).toBe(true);
-      expect(existsSync(join(specflowRoot, 'bugs'))).toBe(true);
+      expect(existsSync(join(scifiRoot, '.scifi'))).toBe(true);
+      expect(existsSync(join(scifiRoot, 'specs'))).toBe(true);
+      expect(existsSync(join(scifiRoot, 'bugs'))).toBe(true);
 
-      // Bundled sf-* skills are spec-flow-owned: rerun must overwrite
+      // Bundled sf-* skills are sci-fi-owned: rerun must overwrite
       // local edits back to the bundled content (documented in README).
       expect(readFileSync(skillPath, 'utf8')).toBe(skillBeforeRerun);
       expect(readFileSync(reviewSkillPath, 'utf8')).toBe(reviewBeforeRerun);
@@ -130,9 +130,9 @@ describe('installed build init verification', () => {
     const installation = createInstalledPackageTestEnvironment('installed-init-');
 
     try {
-      mkdirSync(join(installation.installDirectory, 'docs', 'specflow'), { recursive: true });
+      mkdirSync(join(installation.installDirectory, 'docs', 'scifi'), { recursive: true });
       writeFileSync(
-        join(installation.installDirectory, 'docs', 'specflow', 'bugs'),
+        join(installation.installDirectory, 'docs', 'scifi', 'bugs'),
         'conflict',
         'utf8',
       );
@@ -142,26 +142,26 @@ describe('installed build init verification', () => {
         'claude-code',
         '--yes',
       ]);
-      const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, 'docs', 'specflow', 'bugs')}: path exists and is not a directory.`;
+      const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, 'docs', 'scifi', 'bugs')}: path exists and is not a directory.`;
 
       expect(result.status).not.toBe(0);
       expect(result.stderr).toContain(expectedErrorMessage);
       expect(result.stderr).not.toContain('    at ');
       expect(result.stderr).not.toContain('node:internal');
-      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', '.specflow'))).toBe(
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(
         false,
       );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'specflow', 'specs'))).toBe(
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(
         false,
       );
       expect(
-        readFileSync(join(installation.installDirectory, 'docs', 'specflow', 'bugs'), 'utf8'),
+        readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'), 'utf8'),
       ).toBe('conflict');
       expect(
-        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md')),
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
       ).toBe(false);
       expect(
-        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md')),
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md')),
       ).toBe(false);
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
     } finally {
@@ -180,7 +180,7 @@ describe('installed build init verification', () => {
       expect(result.stderr).toContain('not implemented');
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
       expect(
-        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'EVALUATION.md')),
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
       ).toBe(false);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);

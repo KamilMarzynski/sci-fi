@@ -14,10 +14,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string, status: string): Promise<string> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', slug);
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     `${JSON.stringify(
       {
         version: 1,
@@ -36,7 +36,7 @@ async function scaffoldFeature(projectRoot: string, slug: string, status: string
 }
 
 async function setup(slug: string, status: string): Promise<string> {
-  const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-'));
+  const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-plan-'));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
   const featureDir = await scaffoldFeature(projectRoot, slug, status);

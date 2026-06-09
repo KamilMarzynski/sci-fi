@@ -16,16 +16,16 @@ function makeFixContent(id: string, slug: string, status: string, feature: strin
 }
 
 async function scaffoldFixesDir(projectRoot: string, featureSlug: string): Promise<string> {
-  const fixesDir = join(projectRoot, 'docs', 'specflow', 'specs', featureSlug, 'fixes');
+  const fixesDir = join(projectRoot, 'docs', 'scifi', 'specs', featureSlug, 'fixes');
   await mkdir(fixesDir, { recursive: true });
   return fixesDir;
 }
 
 describe('listFixes', () => {
   it('returns empty array when fixes/ dir does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-fixes-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'auth-flow');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'auth-flow');
     await mkdir(featureDir, { recursive: true });
 
     const fixes = await listFixes(projectRoot, 'auth-flow');
@@ -33,7 +33,7 @@ describe('listFixes', () => {
   });
 
   it('returns frontmatter for each .md file in fixes/', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-fixes-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
 
@@ -55,7 +55,7 @@ describe('listFixes', () => {
   });
 
   it('ignores non-.md files', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-fixes-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
 
@@ -73,7 +73,7 @@ describe('listFixes', () => {
 
 describe('listOpenFixes', () => {
   it('returns only open and in-progress fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-fixes-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
 
@@ -105,7 +105,7 @@ describe('listOpenFixes', () => {
   });
 
   it('returns empty when all fixes are resolved or wont-fix', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-fixes-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
 

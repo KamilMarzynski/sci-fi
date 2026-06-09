@@ -18,13 +18,13 @@ afterEach(async () => {
 
 describe('inspectFeatureLifecycle', () => {
   it('treats created plus spec.md as a draft awaiting acceptance', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-lifecycle-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
 
     await mkdir(featureRoot, { recursive: true });
     await writeFile(
-      join(featureRoot, '.specflow.json'),
+      join(featureRoot, '.scifi.json'),
       `${JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -46,14 +46,14 @@ describe('inspectFeatureLifecycle', () => {
   });
 
   it('counts .md files in tasks/ directory', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-lifecycle-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     const tasksDir = join(featureRoot, 'tasks');
 
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
-      join(featureRoot, '.specflow.json'),
+      join(featureRoot, '.scifi.json'),
       `${JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -74,13 +74,13 @@ describe('inspectFeatureLifecycle', () => {
   });
 
   it('throws when metadata file is invalid', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-lifecycle-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
 
     await mkdir(featureRoot, { recursive: true });
     await writeFile(
-      join(featureRoot, '.specflow.json'),
+      join(featureRoot, '.scifi.json'),
       `${JSON.stringify({ invalid: true })}\n`,
       'utf8',
     );

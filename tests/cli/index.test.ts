@@ -26,7 +26,7 @@ describe('buildProgram', () => {
 
   it('runs init against the current working directory', async () => {
     const program = buildProgram();
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-build-program-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-build-program-'));
     const originalWorkingDirectory = process.cwd();
 
     process.chdir(projectRoot);
@@ -34,7 +34,7 @@ describe('buildProgram', () => {
     try {
       const parsedProgram = await program.parseAsync([
         'node',
-        'specflow',
+        'scifi',
         'init',
         '--harness',
         'claude-code',
@@ -43,9 +43,9 @@ describe('buildProgram', () => {
 
       expect(parsedProgram).toBe(program);
 
-      expect(existsSync(join(projectRoot, 'docs', 'specflow', '.specflow'))).toBe(true);
-      expect(existsSync(join(projectRoot, 'docs', 'specflow', 'specs'))).toBe(true);
-      expect(existsSync(join(projectRoot, 'docs', 'specflow', 'bugs'))).toBe(true);
+      expect(existsSync(join(projectRoot, 'docs', 'scifi', '.scifi'))).toBe(true);
+      expect(existsSync(join(projectRoot, 'docs', 'scifi', 'specs'))).toBe(true);
+      expect(existsSync(join(projectRoot, 'docs', 'scifi', 'bugs'))).toBe(true);
     } finally {
       process.chdir(originalWorkingDirectory);
       rmSync(projectRoot, { force: true, recursive: true });
@@ -56,16 +56,16 @@ describe('buildProgram', () => {
 describe('isDirectExecution', () => {
   it('matches normalized filesystem paths', () => {
     expect(
-      isDirectExecution('file:///Users/mayk/Projects/private/spec-flow/dist/cli/index.js', [
+      isDirectExecution('file:///Users/mayk/Projects/private/sci-fi/dist/cli/index.js', [
         'node',
-        '/Users/mayk/Projects/private/spec-flow/dist/cli/../cli/index.js',
+        '/Users/mayk/Projects/private/sci-fi/dist/cli/../cli/index.js',
       ]),
     ).toBe(true);
   });
 
   it('returns false when no script path is provided', () => {
     expect(
-      isDirectExecution('file:///Users/mayk/Projects/private/spec-flow/dist/cli/index.js', [
+      isDirectExecution('file:///Users/mayk/Projects/private/sci-fi/dist/cli/index.js', [
         'node',
       ]),
     ).toBe(false);
@@ -74,7 +74,7 @@ describe('isDirectExecution', () => {
 
 describe('installed artifact cli', () => {
   it('initializes the project structure from the installed bin', () => {
-    const sandboxRoot = mkdtempSync(join(tmpdir(), 'specflow-installed-cli-'));
+    const sandboxRoot = mkdtempSync(join(tmpdir(), 'scifi-installed-cli-'));
     const packDirectory = join(sandboxRoot, 'pack');
     const installDirectory = join(sandboxRoot, 'install');
     const cacheDirectory = join(sandboxRoot, '.npm-cache');
@@ -152,7 +152,7 @@ describe('installed artifact cli', () => {
 
       writeFileSync(
         join(installDirectory, 'package.json'),
-        JSON.stringify({ name: 'specflow-cli-test', private: true }),
+        JSON.stringify({ name: 'scifi-cli-test', private: true }),
       );
 
       execFileSync(
@@ -175,7 +175,7 @@ describe('installed artifact cli', () => {
         },
       );
 
-      const installedBinPath = join(installDirectory, 'node_modules/.bin/specflow');
+      const installedBinPath = join(installDirectory, 'node_modules/.bin/scifi');
 
       const result = spawnSync(installedBinPath, ['init', '--harness', 'claude-code', '--yes'], {
         cwd: installDirectory,
@@ -184,9 +184,9 @@ describe('installed artifact cli', () => {
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
-      expect(existsSync(join(installDirectory, 'docs', 'specflow', '.specflow'))).toBe(true);
-      expect(existsSync(join(installDirectory, 'docs', 'specflow', 'specs'))).toBe(true);
-      expect(existsSync(join(installDirectory, 'docs', 'specflow', 'bugs'))).toBe(true);
+      expect(existsSync(join(installDirectory, 'docs', 'scifi', '.scifi'))).toBe(true);
+      expect(existsSync(join(installDirectory, 'docs', 'scifi', 'specs'))).toBe(true);
+      expect(existsSync(join(installDirectory, 'docs', 'scifi', 'bugs'))).toBe(true);
     } finally {
       rmSync(sandboxRoot, { force: true, recursive: true });
     }

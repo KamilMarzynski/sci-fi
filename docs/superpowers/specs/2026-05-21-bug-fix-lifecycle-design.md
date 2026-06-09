@@ -15,7 +15,7 @@ Two distinct concepts with full separation:
 bugs/
   BUG-0001-login-crash.md
 
-docs/specflow/specs/<slug>/
+docs/scifi/specs/<slug>/
   fixes/
     FIX-0001-token-expiry.md
 ```
@@ -51,17 +51,17 @@ created: 2026-05-21
 ## CLI
 
 ```
-specflow bug <description> [--related-feature <slug>] [--severity <level>]
-specflow fix <description> --feature <slug>
+scifi bug <description> [--related-feature <slug>] [--severity <level>]
+scifi fix <description> --feature <slug>
 ```
 
-- `specflow bug`: creates `bugs/BUG-NNNN-<slug>.md`, all flags optional
-- `specflow fix`: `--feature` required, hard error if missing or slug doesn't exist, creates `specs/<slug>/fixes/FIX-NNNN-<slug>.md`
+- `scifi bug`: creates `bugs/BUG-NNNN-<slug>.md`, all flags optional
+- `scifi fix`: `--feature` required, hard error if missing or slug doesn't exist, creates `specs/<slug>/fixes/FIX-NNNN-<slug>.md`
 - Both print created file path and ID on success
 
 ## `finish` Enforcement
 
-`specflow finish <slug>` scans `specs/<slug>/fixes/`, reads each file's frontmatter.
+`scifi finish <slug>` scans `specs/<slug>/fixes/`, reads each file's frontmatter.
 
 - `open` or `in-progress` → exit non-zero, print blocker list:
 
@@ -105,6 +105,6 @@ Approach C — shared infrastructure, separate domain modules:
 
 ## Out of Scope (Today)
 
-- `specflow list bugs` — standalone bug listing view
+- `scifi list bugs` — standalone bug listing view
 - Skill files (`/create-bug`, `/create-fix`) — next sub-project
 - Agent fuzzy matching — skill-level concern, CLI always requires explicit flags

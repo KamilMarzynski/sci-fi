@@ -16,14 +16,14 @@ afterEach(async () => {
 
 describe('spec-ready command', () => {
   it('transitions feature to spec-ready when spec.md exists', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-spec-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-spec-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -40,23 +40,23 @@ describe('spec-ready command', () => {
     );
     await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
 
-    await buildProgram().parseAsync(['node', 'specflow', 'spec-ready', 'user-auth']);
+    await buildProgram().parseAsync(['node', 'scifi', 'spec-ready', 'user-auth']);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, '.specflow.json'), 'utf8')) as {
+    const metadata = JSON.parse(await readFile(join(featureDir, '.scifi.json'), 'utf8')) as {
       status: string;
     };
     expect(metadata.status).toBe('spec-ready');
   });
 
   it('fails when spec.md is missing', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-spec-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-spec-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -79,14 +79,14 @@ describe('spec-ready command', () => {
   });
 
   it('emits structured JSON on success with --json', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-spec-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-spec-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,

@@ -18,113 +18,113 @@ describe('scaffoldInit', () => {
     temporaryDirectories.length = 0;
   });
 
-  it('creates the base specflow directories and bootstrap docs', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
+  it('creates the base scifi directories and bootstrap docs', async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
     await scaffoldInit({ projectRoot });
 
-    await expectDirectory(join(projectRoot, 'docs', 'specflow', '.specflow'));
-    await expectDirectory(join(projectRoot, 'docs', 'specflow', 'specs'));
-    await expectDirectory(join(projectRoot, 'docs', 'specflow', 'bugs'));
+    await expectDirectory(join(projectRoot, 'docs', 'scifi', '.scifi'));
+    await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
+    await expectDirectory(join(projectRoot, 'docs', 'scifi', 'bugs'));
 
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
       expectedEvaluationDocument,
     );
-    await expect(access(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'))).rejects.toMatchObject(
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject(
       { code: 'ENOENT' },
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), 'utf8')).toBe(
       expectedArchitectureDocument,
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'CONTEXT.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       expectedContextDocument,
     );
 
-    await expect(access(join(projectRoot, 'docs', 'specflow', 'TESTING.md'))).rejects.toMatchObject(
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'TESTING.md'))).rejects.toMatchObject(
       { code: 'ENOENT' },
     );
   });
 
   it('preserves existing docs when rerun', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'specflow'), { recursive: true });
+    await mkdir(join(projectRoot, 'docs', 'scifi'), { recursive: true });
     writeFileSync(
-      join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'),
+      join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'),
       '# Existing evaluation\nDo not replace.\n',
       'utf8',
     );
     writeFileSync(
-      join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'),
+      join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'),
       '# Existing architecture\n',
       'utf8',
     );
     writeFileSync(
-      join(projectRoot, 'docs', 'specflow', 'CONTEXT.md'),
+      join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'),
       '# Existing context\n',
       'utf8',
     );
 
     await scaffoldInit({ projectRoot });
 
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
       '# Existing evaluation\nDo not replace.\n',
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), 'utf8')).toBe(
       '# Existing architecture\n',
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'CONTEXT.md'), 'utf8')).toBe(
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       '# Existing context\n',
     );
   });
 
   it('fails when a doc path already exists as a directory', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'specflow', 'EVALUATION.md')}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')}: path exists and is not a regular file.`,
     });
   });
 
   it('does not create bootstrap directories when a doc path conflicts', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md')}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md')}: path exists and is not a regular file.`,
     });
 
-    await expect(access(join(projectRoot, 'docs', 'specflow', '.specflow'))).rejects.toMatchObject({
+    await expect(access(join(projectRoot, 'docs', 'scifi', '.scifi'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
   });
 
   it('fails without partial writes when a scaffold directory path conflicts', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'specflow'), { recursive: true });
-    writeFileSync(join(projectRoot, 'docs', 'specflow', 'specs'), 'conflict', 'utf8');
+    await mkdir(join(projectRoot, 'docs', 'scifi'), { recursive: true });
+    writeFileSync(join(projectRoot, 'docs', 'scifi', 'specs'), 'conflict', 'utf8');
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold directory at ${join(projectRoot, 'docs', 'specflow', 'specs')}: path exists and is not a directory.`,
+      message: `Cannot scaffold directory at ${join(projectRoot, 'docs', 'scifi', 'specs')}: path exists and is not a directory.`,
     });
 
-    const conflictingEntry = await stat(join(projectRoot, 'docs', 'specflow', 'specs'));
+    const conflictingEntry = await stat(join(projectRoot, 'docs', 'scifi', 'specs'));
     expect(conflictingEntry.isFile()).toBe(true);
     await expect(
-      access(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md')),
+      access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')),
     ).rejects.toMatchObject({ code: 'ENOENT' });
   });
 });

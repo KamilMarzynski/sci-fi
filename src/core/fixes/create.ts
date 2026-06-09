@@ -1,6 +1,6 @@
 import { mkdir, readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { SpecflowError } from '../output/errors.js';
+import { ScifiError } from '../output/errors.js';
 import { slugify } from '../slugify.js';
 import { buildFeatureDirectoryPath } from '../specs/paths.js';
 import { writeFixFile } from './frontmatter.js';
@@ -27,11 +27,11 @@ export async function createFix(options: CreateFixOptions): Promise<CreateFixRes
   const { projectRoot, description, featureSlug, now } = options;
 
   const featureDir = buildFeatureDirectoryPath(projectRoot, featureSlug);
-  const metadataPath = join(featureDir, '.specflow.json');
+  const metadataPath = join(featureDir, '.scifi.json');
   await stat(metadataPath).catch((error: unknown) => {
     if (isMissingPathError(error)) {
-      throw new SpecflowError('NOT_FOUND', `Feature "${featureSlug}" does not exist.`, {
-        hint: `Create it with \`specflow spec ${featureSlug}\`.`,
+      throw new ScifiError('NOT_FOUND', `Feature "${featureSlug}" does not exist.`, {
+        hint: `Create it with \`scifi spec ${featureSlug}\`.`,
       });
     }
     throw error;

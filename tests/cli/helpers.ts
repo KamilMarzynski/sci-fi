@@ -30,7 +30,7 @@ export async function runCli(args: readonly string[]): Promise<CliRun> {
   };
 
   try {
-    await buildProgram().parseAsync(['node', 'specflow', ...args]);
+    await buildProgram().parseAsync(['node', 'scifi', ...args]);
   } finally {
     process.stdout.write = originalOut;
     process.stderr.write = originalErr;

@@ -13,10 +13,10 @@ now against the codebase itself.
 Before planning, read:
 
 - `<path>/spec.md` — the approved spec. This is the contract you plan against.
-- `docs/specflow/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction.
-- `docs/specflow/CONTEXT.md` — glossary / domain terms.
+- `docs/scifi/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction.
+- `docs/scifi/CONTEXT.md` — glossary / domain terms.
 
-`<path>` is the feature directory (`docs/specflow/specs/<slug>/`). When the
+`<path>` is the feature directory (`docs/scifi/specs/<slug>/`). When the
 design introduces a new term or changes structure, propose updates to
 `ARCHITECTURE.md` / `CONTEXT.md` and apply them live once the user approves.
 
@@ -45,7 +45,7 @@ the existing seams, or does it quietly cut new ones?
 ### 1. Open the planning session
 
 ```
-specflow plan <slug> --json
+scifi plan <slug> --json
 ```
 
 Read the result:
@@ -116,7 +116,7 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
 - Only after the review passes, run:
 
   ```
-  specflow plan-ready <slug> --json
+  scifi plan-ready <slug> --json
   ```
 
   - This validates that `<path>/design.md` and at least one task file exist,
@@ -127,7 +127,7 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
 
 ## Hard rules
 
-- Never run `specflow plan-ready` before `sf-plan-review` passes.
+- Never run `scifi plan-ready` before `sf-plan-review` passes.
 - Never write `design.md` while any template section is unanswered.
 - Never leave an in-scope acceptance criterion without a task.
 - Never invent project facts — read the code and docs, or ask.

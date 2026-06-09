@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add 9 new CLI commands and supporting core modules to drive the specflow feature lifecycle from `created` through `done`, with per-task status tracking via YAML frontmatter in individual task `.md` files.
+**Goal:** Add 9 new CLI commands and supporting core modules to drive the scifi feature lifecycle from `created` through `done`, with per-task status tracking via YAML frontmatter in individual task `.md` files.
 
 **Architecture:** All new commands stay thin — argument parsing and stdout output only. Business logic lives in new `src/core/tasks/` and additions to `src/core/specs/`. Task status is stored as YAML frontmatter directly in each `tasks/<slug>.md` file. The `yaml` npm package (ESM-native) handles frontmatter parsing and serialization.
 
@@ -100,13 +100,13 @@ import { buildTaskFilePath, buildTasksDirectoryPath } from "../../../src/core/ta
 describe("task path helpers", () => {
   it("places tasks/ under the feature directory", () => {
     expect(buildTasksDirectoryPath("/repo", "user-auth")).toBe(
-      join("/repo", "docs", "specflow", "specs", "user-auth", "tasks"),
+      join("/repo", "docs", "scifi", "specs", "user-auth", "tasks"),
     );
   });
 
   it("builds task file path from task slug", () => {
     expect(buildTaskFilePath("/repo", "user-auth", "setup-database")).toBe(
-      join("/repo", "docs", "specflow", "specs", "user-auth", "tasks", "setup-database.md"),
+      join("/repo", "docs", "scifi", "specs", "user-auth", "tasks", "setup-database.md"),
     );
   });
 });
@@ -219,7 +219,7 @@ afterEach(async () => {
 
 describe("readTaskFile", () => {
   it("parses frontmatter and body from a task file", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "setup-database.md");
 
@@ -242,7 +242,7 @@ describe("readTaskFile", () => {
   });
 
   it("parses depends-on entries as dependsOn array", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "task.md");
 
@@ -257,7 +257,7 @@ describe("readTaskFile", () => {
   });
 
   it("throws when frontmatter is missing", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "task.md");
 
@@ -267,7 +267,7 @@ describe("readTaskFile", () => {
   });
 
   it("throws when frontmatter is invalid", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "task.md");
 
@@ -279,7 +279,7 @@ describe("readTaskFile", () => {
 
 describe("writeTaskFile", () => {
   it("writes frontmatter and body to file", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "task.md");
 
@@ -301,7 +301,7 @@ describe("writeTaskFile", () => {
   });
 
   it("round-trips depends-on through write and read", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-frontmatter-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-frontmatter-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "task.md");
 
@@ -475,9 +475,9 @@ function makeTaskContent(slug: string, status: string, parallel = false): string
 
 describe("listTasks", () => {
   it("returns empty array when tasks/ directory does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-tasks-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-tasks-"));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureRoot = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     await mkdir(featureRoot, { recursive: true });
 
     const tasks = await listTasks(projectRoot, "user-auth");
@@ -485,9 +485,9 @@ describe("listTasks", () => {
   });
 
   it("returns frontmatter for each .md file in tasks/", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-tasks-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-tasks-"));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, "docs", "specflow", "specs", "user-auth", "tasks");
+    const tasksDir = join(projectRoot, "docs", "scifi", "specs", "user-auth", "tasks");
     await mkdir(tasksDir, { recursive: true });
 
     await writeFile(join(tasksDir, "setup-database.md"), makeTaskContent("setup-database", "pending"), "utf8");
@@ -501,9 +501,9 @@ describe("listTasks", () => {
   });
 
   it("ignores non-.md files in tasks/", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-tasks-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-tasks-"));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, "docs", "specflow", "specs", "user-auth", "tasks");
+    const tasksDir = join(projectRoot, "docs", "scifi", "specs", "user-auth", "tasks");
     await mkdir(tasksDir, { recursive: true });
 
     await writeFile(join(tasksDir, "setup-database.md"), makeTaskContent("setup-database", "pending"), "utf8");
@@ -622,7 +622,7 @@ async function createTaskFile(
   taskSlug: string,
   status: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, "docs", "specflow", "specs", featureSlug, "tasks");
+  const tasksDir = join(projectRoot, "docs", "scifi", "specs", featureSlug, "tasks");
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -633,7 +633,7 @@ async function createTaskFile(
 
 describe("updateTaskStatus", () => {
   it("marks a pending task as in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-transition-"));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
 
@@ -645,7 +645,7 @@ describe("updateTaskStatus", () => {
   });
 
   it("marks an in-progress task as done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-transition-"));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, "user-auth", "setup-database", "in-progress");
 
@@ -657,9 +657,9 @@ describe("updateTaskStatus", () => {
   });
 
   it("preserves body content when updating status", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-transition-"));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, "docs", "specflow", "specs", "user-auth", "tasks");
+    const tasksDir = join(projectRoot, "docs", "scifi", "specs", "user-auth", "tasks");
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
       join(tasksDir, "setup-database.md"),
@@ -675,7 +675,7 @@ describe("updateTaskStatus", () => {
   });
 
   it("rejects marking a pending task as done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-transition-"));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
 
@@ -943,7 +943,7 @@ function makeMetadata(slug: string, id: string, status: string): string {
 
 describe("listFeatures", () => {
   it("returns empty array when specs directory does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-"));
     temporaryDirectories.push(projectRoot);
 
     const features = await listFeatures({ projectRoot });
@@ -951,14 +951,14 @@ describe("listFeatures", () => {
   });
 
   it("returns metadata for all feature directories", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-"));
     temporaryDirectories.push(projectRoot);
-    const specsDir = join(projectRoot, "docs", "specflow", "specs");
+    const specsDir = join(projectRoot, "docs", "scifi", "specs");
 
     await mkdir(join(specsDir, "user-auth"), { recursive: true });
     await mkdir(join(specsDir, "payment-flow"), { recursive: true });
-    await writeFile(join(specsDir, "user-auth", ".specflow.json"), makeMetadata("user-auth", "FEAT-0001", "created"), "utf8");
-    await writeFile(join(specsDir, "payment-flow", ".specflow.json"), makeMetadata("payment-flow", "FEAT-0002", "spec-ready"), "utf8");
+    await writeFile(join(specsDir, "user-auth", ".scifi.json"), makeMetadata("user-auth", "FEAT-0001", "created"), "utf8");
+    await writeFile(join(specsDir, "payment-flow", ".scifi.json"), makeMetadata("payment-flow", "FEAT-0002", "spec-ready"), "utf8");
 
     const features = await listFeatures({ projectRoot });
     expect(features).toHaveLength(2);
@@ -968,14 +968,14 @@ describe("listFeatures", () => {
   });
 
   it("filters features by status", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-"));
     temporaryDirectories.push(projectRoot);
-    const specsDir = join(projectRoot, "docs", "specflow", "specs");
+    const specsDir = join(projectRoot, "docs", "scifi", "specs");
 
     await mkdir(join(specsDir, "user-auth"), { recursive: true });
     await mkdir(join(specsDir, "payment-flow"), { recursive: true });
-    await writeFile(join(specsDir, "user-auth", ".specflow.json"), makeMetadata("user-auth", "FEAT-0001", "created"), "utf8");
-    await writeFile(join(specsDir, "payment-flow", ".specflow.json"), makeMetadata("payment-flow", "FEAT-0002", "spec-ready"), "utf8");
+    await writeFile(join(specsDir, "user-auth", ".scifi.json"), makeMetadata("user-auth", "FEAT-0001", "created"), "utf8");
+    await writeFile(join(specsDir, "payment-flow", ".scifi.json"), makeMetadata("payment-flow", "FEAT-0002", "spec-ready"), "utf8");
 
     const features = await listFeatures({ projectRoot, status: "spec-ready" });
     expect(features).toHaveLength(1);
@@ -1119,10 +1119,10 @@ async function createFeatureAt(
   slug: string,
   status: string,
 ): Promise<void> {
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", slug);
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify(
       { version: 1, id: "FEAT-0001", slug, status, createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" },
       null,
@@ -1133,15 +1133,15 @@ async function createFeatureAt(
 }
 
 async function writeSpecMd(projectRoot: string, slug: string): Promise<void> {
-  await writeFile(join(projectRoot, "docs", "specflow", "specs", slug, "spec.md"), "# Spec\n", "utf8");
+  await writeFile(join(projectRoot, "docs", "scifi", "specs", slug, "spec.md"), "# Spec\n", "utf8");
 }
 
 async function writeArchitectureMd(projectRoot: string, slug: string): Promise<void> {
-  await writeFile(join(projectRoot, "docs", "specflow", "specs", slug, "architecture.md"), "# Architecture\n", "utf8");
+  await writeFile(join(projectRoot, "docs", "scifi", "specs", slug, "architecture.md"), "# Architecture\n", "utf8");
 }
 
 async function writeTaskMd(projectRoot: string, slug: string, taskSlug: string, taskStatus: string): Promise<void> {
-  const tasksDir = join(projectRoot, "docs", "specflow", "specs", slug, "tasks");
+  const tasksDir = join(projectRoot, "docs", "scifi", "specs", slug, "tasks");
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -1152,7 +1152,7 @@ async function writeTaskMd(projectRoot: string, slug: string, taskSlug: string, 
 
 describe("updateFeatureStatus", () => {
   it("transitions created to spec-ready when spec.md exists", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "created");
     await writeSpecMd(projectRoot, "user-auth");
@@ -1160,14 +1160,14 @@ describe("updateFeatureStatus", () => {
     await updateFeatureStatus(projectRoot, "user-auth", "spec-ready", "2026-05-20T10:00:00Z");
 
     const metadata = JSON.parse(
-      await readFile(join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"), "utf8"),
+      await readFile(join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"), "utf8"),
     ) as { status: string; updatedAt: string };
     expect(metadata.status).toBe("spec-ready");
     expect(metadata.updatedAt).toBe("2026-05-20T10:00:00Z");
   });
 
   it("transitions plan-ready to in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "plan-ready");
     await writeSpecMd(projectRoot, "user-auth");
@@ -1177,13 +1177,13 @@ describe("updateFeatureStatus", () => {
     await updateFeatureStatus(projectRoot, "user-auth", "in-progress", "2026-05-20T10:00:00Z");
 
     const metadata = JSON.parse(
-      await readFile(join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"), "utf8"),
+      await readFile(join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"), "utf8"),
     ) as { status: string };
     expect(metadata.status).toBe("in-progress");
   });
 
   it("transitions in-progress to done when all tasks are done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "in-progress");
     await writeSpecMd(projectRoot, "user-auth");
@@ -1193,13 +1193,13 @@ describe("updateFeatureStatus", () => {
     await updateFeatureStatus(projectRoot, "user-auth", "done", "2026-05-20T10:00:00Z");
 
     const metadata = JSON.parse(
-      await readFile(join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"), "utf8"),
+      await readFile(join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"), "utf8"),
     ) as { status: string };
     expect(metadata.status).toBe("done");
   });
 
   it("rejects spec-ready when spec.md is missing", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "created");
 
@@ -1209,7 +1209,7 @@ describe("updateFeatureStatus", () => {
   });
 
   it("rejects in-progress when feature is not plan-ready", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "spec-ready");
     await writeSpecMd(projectRoot, "user-auth");
@@ -1220,7 +1220,7 @@ describe("updateFeatureStatus", () => {
   });
 
   it("rejects done when a task is not done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-transition-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-transition-"));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, "user-auth", "in-progress");
     await writeSpecMd(projectRoot, "user-auth");
@@ -1342,40 +1342,40 @@ afterEach(async () => {
 
 describe("spec-ready command", () => {
   it("transitions feature to spec-ready when spec.md exists", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-spec-ready-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-spec-ready-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, ".specflow.json"),
+      join(featureDir, ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "created", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
     await writeFile(join(featureDir, "spec.md"), "# Spec\n", "utf8");
 
-    await buildProgram().parseAsync(["node", "specflow", "spec-ready", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "spec-ready", "user-auth"]);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+    const metadata = JSON.parse(await readFile(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
     expect(metadata.status).toBe("spec-ready");
   });
 
   it("fails when spec.md is missing", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-spec-ready-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-spec-ready-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, ".specflow.json"),
+      join(featureDir, ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "created", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "spec-ready", "user-auth"]),
+      buildProgram().parseAsync(["node", "scifi", "spec-ready", "user-auth"]),
     ).rejects.toThrow("spec.md is missing");
   });
 });
@@ -1490,10 +1490,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string, status: string): Promise<string> {
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", slug);
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({ version: 1, id: "FEAT-0001", slug, status, createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
     "utf8",
   );
@@ -1502,7 +1502,7 @@ async function scaffoldFeature(projectRoot: string, slug: string, status: string
 
 describe("plan-ready command", () => {
   it("transitions feature to plan-ready when architecture.md and tasks exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-plan-ready-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-plan-ready-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -1517,14 +1517,14 @@ describe("plan-ready command", () => {
       "utf8",
     );
 
-    await buildProgram().parseAsync(["node", "specflow", "plan-ready", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "plan-ready", "user-auth"]);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+    const metadata = JSON.parse(await readFile(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
     expect(metadata.status).toBe("plan-ready");
   });
 
   it("fails when architecture.md is missing", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-plan-ready-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-plan-ready-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -1539,12 +1539,12 @@ describe("plan-ready command", () => {
     );
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "plan-ready", "user-auth"]),
+      buildProgram().parseAsync(["node", "scifi", "plan-ready", "user-auth"]),
     ).rejects.toThrow("architecture.md is missing");
   });
 
   it("fails when no task files exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-plan-ready-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-plan-ready-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -1553,7 +1553,7 @@ describe("plan-ready command", () => {
     await writeFile(join(featureDir, "architecture.md"), "# Architecture\n", "utf8");
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "plan-ready", "user-auth"]),
+      buildProgram().parseAsync(["node", "scifi", "plan-ready", "user-auth"]),
     ).rejects.toThrow("no task files were found");
   });
 });
@@ -1667,14 +1667,14 @@ afterEach(async () => {
 
 describe("start command", () => {
   it("transitions plan-ready feature to in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-start-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-start-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, ".specflow.json"),
+      join(featureDir, ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "plan-ready", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
@@ -1688,28 +1688,28 @@ describe("start command", () => {
       "utf8",
     );
 
-    await buildProgram().parseAsync(["node", "specflow", "start", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "start", "user-auth"]);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+    const metadata = JSON.parse(await readFile(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
     expect(metadata.status).toBe("in-progress");
   });
 
   it("fails when feature is not plan-ready", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-start-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-start-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, ".specflow.json"),
+      join(featureDir, ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "spec-ready", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
     await writeFile(join(featureDir, "spec.md"), "# Spec\n", "utf8");
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "start", "user-auth"]),
+      buildProgram().parseAsync(["node", "scifi", "start", "user-auth"]),
     ).rejects.toThrow("must be plan-ready");
   });
 });
@@ -1802,11 +1802,11 @@ afterEach(async () => {
 });
 
 async function scaffoldInProgressFeature(projectRoot: string): Promise<string> {
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
   const tasksDir = join(featureDir, "tasks");
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "in-progress", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
     "utf8",
   );
@@ -1817,7 +1817,7 @@ async function scaffoldInProgressFeature(projectRoot: string): Promise<string> {
 
 describe("finish command", () => {
   it("transitions in-progress feature to done when all tasks are done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-finish-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -1828,15 +1828,15 @@ describe("finish command", () => {
       "utf8",
     );
 
-    await buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "finish", "user-auth"]);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
-    const metadata = JSON.parse(await readFile(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
+    const metadata = JSON.parse(await readFile(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
     expect(metadata.status).toBe("done");
   });
 
   it("fails when a task is not done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-finish-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -1848,7 +1848,7 @@ describe("finish command", () => {
     );
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]),
+      buildProgram().parseAsync(["node", "scifi", "finish", "user-auth"]),
     ).rejects.toThrow("not all tasks are complete");
   });
 });
@@ -1942,20 +1942,20 @@ afterEach(async () => {
 
 describe("list command", () => {
   it("prints all features when no filter applied", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, "docs", "specflow", "specs");
+    const specsDir = join(projectRoot, "docs", "scifi", "specs");
     await mkdir(join(specsDir, "user-auth"), { recursive: true });
     await mkdir(join(specsDir, "payment-flow"), { recursive: true });
     await writeFile(
-      join(specsDir, "user-auth", ".specflow.json"),
+      join(specsDir, "user-auth", ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", title: "User Auth", status: "created", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
     await writeFile(
-      join(specsDir, "payment-flow", ".specflow.json"),
+      join(specsDir, "payment-flow", ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0002", slug: "payment-flow", status: "spec-ready", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
@@ -1968,7 +1968,7 @@ describe("list command", () => {
     };
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "list"]);
+      await buildProgram().parseAsync(["node", "scifi", "list"]);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -1981,20 +1981,20 @@ describe("list command", () => {
   });
 
   it("filters features by status", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const specsDir = join(projectRoot, "docs", "specflow", "specs");
+    const specsDir = join(projectRoot, "docs", "scifi", "specs");
     await mkdir(join(specsDir, "user-auth"), { recursive: true });
     await mkdir(join(specsDir, "payment-flow"), { recursive: true });
     await writeFile(
-      join(specsDir, "user-auth", ".specflow.json"),
+      join(specsDir, "user-auth", ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", status: "created", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
     await writeFile(
-      join(specsDir, "payment-flow", ".specflow.json"),
+      join(specsDir, "payment-flow", ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0002", slug: "payment-flow", status: "spec-ready", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
@@ -2007,7 +2007,7 @@ describe("list command", () => {
     };
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "list", "--status", "spec-ready"]);
+      await buildProgram().parseAsync(["node", "scifi", "list", "--status", "spec-ready"]);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -2115,15 +2115,15 @@ afterEach(async () => {
 
 describe("status command", () => {
   it("prints lifecycle snapshot for a feature", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-status-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-status-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
     const tasksDir = join(featureDir, "tasks");
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
-      join(featureDir, ".specflow.json"),
+      join(featureDir, ".scifi.json"),
       JSON.stringify({ version: 1, id: "FEAT-0001", slug: "user-auth", title: "User Auth", status: "in-progress", createdAt: "2026-05-20T00:00:00Z", updatedAt: "2026-05-20T00:00:00Z" }, null, 2) + "\n",
       "utf8",
     );
@@ -2143,7 +2143,7 @@ describe("status command", () => {
     };
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "status", "user-auth"]);
+      await buildProgram().parseAsync(["node", "scifi", "status", "user-auth"]);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -2269,7 +2269,7 @@ async function createTaskFile(
   taskSlug: string,
   status: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, "docs", "specflow", "specs", featureSlug, "tasks");
+  const tasksDir = join(projectRoot, "docs", "scifi", "specs", featureSlug, "tasks");
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -2280,7 +2280,7 @@ async function createTaskFile(
 
 describe("task list", () => {
   it("prints all tasks for a feature", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -2295,7 +2295,7 @@ describe("task list", () => {
     };
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "task", "list", "user-auth"]);
+      await buildProgram().parseAsync(["node", "scifi", "task", "list", "user-auth"]);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -2310,13 +2310,13 @@ describe("task list", () => {
 
 describe("task start", () => {
   it("marks a task as in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
 
-    await buildProgram().parseAsync(["node", "specflow", "task", "start", "user-auth", "setup-database"]);
+    await buildProgram().parseAsync(["node", "scifi", "task", "start", "user-auth", "setup-database"]);
 
     const filePath = buildTaskFilePath(projectRoot, "user-auth", "setup-database");
     const file = await readTaskFile(filePath);
@@ -2326,13 +2326,13 @@ describe("task start", () => {
 
 describe("task done", () => {
   it("marks an in-progress task as done", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await createTaskFile(projectRoot, "user-auth", "setup-database", "in-progress");
 
-    await buildProgram().parseAsync(["node", "specflow", "task", "done", "user-auth", "setup-database"]);
+    await buildProgram().parseAsync(["node", "scifi", "task", "done", "user-auth", "setup-database"]);
 
     const filePath = buildTaskFilePath(projectRoot, "user-auth", "setup-database");
     const file = await readTaskFile(filePath);
@@ -2340,14 +2340,14 @@ describe("task done", () => {
   });
 
   it("fails when task is not in-progress", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-task-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-task-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await createTaskFile(projectRoot, "user-auth", "setup-database", "pending");
 
     await expect(
-      buildProgram().parseAsync(["node", "specflow", "task", "done", "user-auth", "setup-database"]),
+      buildProgram().parseAsync(["node", "scifi", "task", "done", "user-auth", "setup-database"]),
     ).rejects.toThrow("task is not in-progress");
   });
 });
@@ -2462,8 +2462,8 @@ describe("installed build lifecycle verification", () => {
       let result = runInstalledCommand(dir, ["spec", "user-auth", "--title", "User Auth"]);
       expect(result.status).toBe(0);
 
-      const featureDir = join(dir, "docs", "specflow", "specs", "user-auth");
-      expect(existsSync(join(featureDir, ".specflow.json"))).toBe(true);
+      const featureDir = join(dir, "docs", "scifi", "specs", "user-auth");
+      expect(existsSync(join(featureDir, ".scifi.json"))).toBe(true);
 
       // Write spec.md then mark spec-ready
       writeFileSync(join(featureDir, "spec.md"), "# User Auth Spec\n", "utf8");
@@ -2471,7 +2471,7 @@ describe("installed build lifecycle verification", () => {
       expect(result.status).toBe(0);
       expect(result.stderr).toBe("");
 
-      let metadata = JSON.parse(readFileSync(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+      let metadata = JSON.parse(readFileSync(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
       expect(metadata.status).toBe("spec-ready");
 
       // Write architecture.md and a task, then mark plan-ready
@@ -2486,13 +2486,13 @@ describe("installed build lifecycle verification", () => {
 
       result = runInstalledCommand(dir, ["plan-ready", "user-auth"]);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+      metadata = JSON.parse(readFileSync(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
       expect(metadata.status).toBe("plan-ready");
 
       // Start implementation
       result = runInstalledCommand(dir, ["start", "user-auth"]);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+      metadata = JSON.parse(readFileSync(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
       expect(metadata.status).toBe("in-progress");
 
       // Start and complete the task
@@ -2505,7 +2505,7 @@ describe("installed build lifecycle verification", () => {
       // Finish the feature
       result = runInstalledCommand(dir, ["finish", "user-auth"]);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, ".specflow.json"), "utf8")) as { status: string };
+      metadata = JSON.parse(readFileSync(join(featureDir, ".scifi.json"), "utf8")) as { status: string };
       expect(metadata.status).toBe("done");
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);

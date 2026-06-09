@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the initial production-ready `specflow` CLI scaffold with strict TypeScript, Commander-based command wiring, Vitest test setup, repository quality docs, and the first foundation for `specflow init`.
+**Goal:** Build the initial production-ready `scifi` CLI scaffold with strict TypeScript, Commander-based command wiring, Vitest test setup, repository quality docs, and the first foundation for `scifi init`.
 
 **Architecture:** This remains a single publishable npm package with clear separation between CLI wiring and domain logic. Command registration lives in `src/cli`, scaffolding logic lives in `src/core`, templates live in `src/templates`, and verification is enforced through automated tests plus an installed-build sandbox workflow.
 
@@ -23,12 +23,12 @@ Package file must support a published CLI package:
 
 ```json
 {
-  "name": "specflow",
+  "name": "scifi",
   "version": "0.1.0",
   "description": "Specification-driven CLI scaffolding for agentic workflows",
   "type": "module",
   "bin": {
-    "specflow": "./dist/cli/index.js"
+    "scifi": "./dist/cli/index.js"
   },
   "files": [
     "dist",
@@ -141,7 +141,7 @@ export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name("specflow")
+    .name("scifi")
     .description("Specification-driven CLI scaffolding for agentic workflows")
     .version("0.1.0");
 
@@ -163,9 +163,9 @@ import { Command } from "commander";
 export function registerInitCommand(program: Command): void {
   program
     .command("init")
-    .description("Initialize specflow in the current repository")
+    .description("Initialize scifi in the current repository")
     .action(async () => {
-      process.stdout.write("specflow init is not implemented yet\n");
+      process.stdout.write("scifi init is not implemented yet\n");
     });
 }
 ```
@@ -280,13 +280,13 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { initializeSpecflow } from "../../../src/core/init/scaffold.js";
+import { initializeScifi } from "../../../src/core/init/scaffold.js";
 
-describe("initializeSpecflow", () => {
+describe("initializeScifi", () => {
   it("creates the base directories and docs", async () => {
-    const rootDir = mkdtempSync(join(tmpdir(), "specflow-init-"));
+    const rootDir = mkdtempSync(join(tmpdir(), "scifi-init-"));
 
-    await initializeSpecflow({ rootDir });
+    await initializeScifi({ rootDir });
 
     expect(readFileSync(join(rootDir, "AGENTS.md"), "utf8")).toContain("production-ready");
     expect(readFileSync(join(rootDir, "TESTING.md"), "utf8")).toContain("release gate");
@@ -305,7 +305,7 @@ Expected: FAIL because the scaffolding module does not exist.
 Create `src/core/init/types.ts`:
 
 ```ts
-export interface InitializeSpecflowOptions {
+export interface InitializeScifiOptions {
   rootDir: string;
 }
 ```
@@ -315,11 +315,11 @@ Create `src/core/init/scaffold.ts`:
 ```ts
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { InitializeSpecflowOptions } from "./types.js";
+import type { InitializeScifiOptions } from "./types.js";
 
 const AGENTS_CONTENT = `# AGENTS.md
 
-This repository is building \`specflow\` as a production-ready developer tool, not a throwaway prototype.
+This repository is building \`scifi\` as a production-ready developer tool, not a throwaway prototype.
 `;
 
 const TESTING_CONTENT = `# TESTING.md
@@ -334,10 +334,10 @@ const ROADMAP_CONTENT = `# Roadmap
 Current sub-project: \`Bootstrap CLI\`
 `;
 
-export async function initializeSpecflow(
-  options: InitializeSpecflowOptions
+export async function initializeScifi(
+  options: InitializeScifiOptions
 ): Promise<void> {
-  await mkdir(join(options.rootDir, ".specflow"), { recursive: true });
+  await mkdir(join(options.rootDir, ".scifi"), { recursive: true });
   await mkdir(join(options.rootDir, "specs"), { recursive: true });
   await mkdir(join(options.rootDir, "bugs"), { recursive: true });
 
@@ -359,7 +359,7 @@ git add src/core/init/types.ts src/core/init/scaffold.ts tests/core/init/scaffol
 git commit -m "feat: add base init scaffolding logic"
 ```
 
-### Task 5: Wire `specflow init` to Core Logic
+### Task 5: Wire `scifi init` to Core Logic
 
 **Files:**
 - Modify: `src/cli/commands/init.ts`
@@ -376,20 +376,20 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildProgram } from "../../src/cli/index.js";
 
-describe("specflow init", () => {
+describe("scifi init", () => {
   it("creates the base project structure", async () => {
-    const rootDir = mkdtempSync(join(tmpdir(), "specflow-cli-"));
+    const rootDir = mkdtempSync(join(tmpdir(), "scifi-cli-"));
     const originalCwd = process.cwd();
 
     process.chdir(rootDir);
 
     try {
-      await buildProgram().parseAsync(["node", "specflow", "init"]);
+      await buildProgram().parseAsync(["node", "scifi", "init"]);
     } finally {
       process.chdir(originalCwd);
     }
 
-    expect(existsSync(join(rootDir, ".specflow"))).toBe(true);
+    expect(existsSync(join(rootDir, ".scifi"))).toBe(true);
     expect(existsSync(join(rootDir, "specs"))).toBe(true);
     expect(existsSync(join(rootDir, "bugs"))).toBe(true);
   });
@@ -407,15 +407,15 @@ Update `src/cli/commands/init.ts`:
 
 ```ts
 import { Command } from "commander";
-import { initializeSpecflow } from "../../core/init/scaffold.js";
+import { initializeScifi } from "../../core/init/scaffold.js";
 
 export function registerInitCommand(program: Command): void {
   program
     .command("init")
-    .description("Initialize specflow in the current repository")
+    .description("Initialize scifi in the current repository")
     .action(async () => {
-      await initializeSpecflow({ rootDir: process.cwd() });
-      process.stdout.write("Initialized specflow in the current repository\n");
+      await initializeScifi({ rootDir: process.cwd() });
+      process.stdout.write("Initialized scifi in the current repository\n");
     });
 }
 ```
@@ -460,7 +460,7 @@ describe("installed build verification", () => {
       cwd: ".testing/sandboxes/installed-cli"
     });
 
-    expect(result.stdout).toContain("Initialized specflow");
+    expect(result.stdout).toContain("Initialized scifi");
   });
 });
 ```

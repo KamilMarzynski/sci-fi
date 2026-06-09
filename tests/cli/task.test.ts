@@ -22,7 +22,7 @@ async function createTaskFile(
   taskSlug: string,
   status: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', featureSlug, 'tasks');
+  const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', featureSlug, 'tasks');
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -33,7 +33,7 @@ async function createTaskFile(
 
 describe('task list', () => {
   it('prints all tasks for a feature', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -48,7 +48,7 @@ describe('task list', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'task', 'list', 'user-auth']);
+      await buildProgram().parseAsync(['node', 'scifi', 'task', 'list', 'user-auth']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -63,7 +63,7 @@ describe('task list', () => {
 
 describe('task start', () => {
   it('marks a task as in-progress', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -71,7 +71,7 @@ describe('task start', () => {
 
     await buildProgram().parseAsync([
       'node',
-      'specflow',
+      'scifi',
       'task',
       'start',
       'user-auth',
@@ -86,7 +86,7 @@ describe('task start', () => {
 
 describe('task done', () => {
   it('marks an in-progress task as done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -94,7 +94,7 @@ describe('task done', () => {
 
     await buildProgram().parseAsync([
       'node',
-      'specflow',
+      'scifi',
       'task',
       'done',
       'user-auth',
@@ -107,7 +107,7 @@ describe('task done', () => {
   });
 
   it('fails when task is not in-progress', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 

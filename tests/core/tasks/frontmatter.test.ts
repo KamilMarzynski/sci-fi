@@ -13,7 +13,7 @@ afterEach(async () => {
 
 describe('readTaskFile', () => {
   it('parses frontmatter and body from a task file', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'setup-database.md');
 
@@ -35,7 +35,7 @@ describe('readTaskFile', () => {
   });
 
   it('parses depends-on entries as dependsOn array', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 
@@ -50,7 +50,7 @@ describe('readTaskFile', () => {
   });
 
   it('throws when frontmatter is missing', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 
@@ -60,7 +60,7 @@ describe('readTaskFile', () => {
   });
 
   it('throws when frontmatter is invalid', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 
@@ -70,7 +70,7 @@ describe('readTaskFile', () => {
   });
 
   it('throws when frontmatter has unknown keys', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 
@@ -86,7 +86,7 @@ describe('readTaskFile', () => {
 
 describe('writeTaskFile', () => {
   it('writes frontmatter and body to file', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 
@@ -107,7 +107,7 @@ describe('writeTaskFile', () => {
   });
 
   it('round-trips depends-on through write and read', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-frontmatter-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-frontmatter-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'task.md');
 

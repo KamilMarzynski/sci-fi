@@ -13,7 +13,7 @@ afterEach(async () => {
 
 describe('writeFixFile / readFixFile', () => {
   it('round-trips a fix file', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-fix-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-fix-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'FIX-0001-token-expiry.md');
 
@@ -38,7 +38,7 @@ describe('writeFixFile / readFixFile', () => {
   });
 
   it('throws on missing frontmatter', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-fix-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-fix-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'bad.md');
     await writeFile(filePath, 'no frontmatter\n', 'utf8');
@@ -47,7 +47,7 @@ describe('writeFixFile / readFixFile', () => {
   });
 
   it('throws when frontmatter is invalid', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'specflow-fix-fm-'));
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-fix-fm-'));
     temporaryDirectories.push(dir);
     const filePath = join(dir, 'bad.md');
 

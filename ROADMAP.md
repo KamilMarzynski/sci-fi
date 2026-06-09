@@ -3,20 +3,20 @@
 ## Planned Sub-Projects
 
 1. Bootstrap CLI
-   Production-ready TypeScript CLI scaffold, package shape, config, base folders, and `specflow init` foundation.
+   Production-ready TypeScript CLI scaffold, package shape, config, base folders, and `scifi init` foundation.
 
 2. Spec Lifecycle
-   `specflow spec`, namespaced feature folders, CLI-managed feature metadata,
+   `scifi spec`, namespaced feature folders, CLI-managed feature metadata,
    slug-based feature identity, and lifecycle validation helpers.
 
 3. Bug Lifecycle
-   `specflow bug`, standalone vs spec-linked bugs, fuzzy lookup, and bug templates.
+   `scifi bug`, standalone vs spec-linked bugs, fuzzy lookup, and bug templates.
 
 4. Agent Install Targets
    Generated integration files for Claude Code, OpenCode, Codex, and fallback `AGENTS.md` behavior.
 
 5. Validation and Upgrade
-   `specflow validate`, schema/frontmatter checks, CI-friendly exits, and `specflow update`.
+   `scifi validate`, schema/frontmatter checks, CI-friendly exits, and `scifi update`.
 
 6. Polish
    README, onboarding flow, packaging refinements, and broader test coverage.
@@ -26,9 +26,9 @@
 `Bootstrap CLI` is in place:
 
 - TypeScript/Commander package scaffold is working.
-- `specflow init` scaffolds the baseline repository structure.
+- `scifi init` scaffolds the baseline repository structure.
 - `.testing/` is the standard installed-build verification workspace.
-- Installed-build end-to-end coverage exists for `specflow init`.
+- Installed-build end-to-end coverage exists for `scifi init`.
 
 ### Skills Init Bundle (2026-05-29)
 
@@ -40,8 +40,8 @@ Shipped:
 - `src/core/skills/` — `types`, `catalog`, `harness/{adapter,registry,claude-code,register-defaults}`.
 - `src/core/init/` additions — `prompt-harness`, `install-skills`, `config`.
 - Scaffold docs: `TESTING.md` replaced by `EVALUATION.md`; `ARCHITECTURE.md` and `CONTEXT.md` added.
-- CLI: `specflow init --harness <id> [--yes]`. Claude Code adapter writes `.claude/skills/<id>/SKILL.md`. Other harnesses defined in interface, throw `HarnessNotImplementedError` before any FS write.
-- `package.json` self-reference subpath `specflow/skill-types` for typed manifests.
+- CLI: `scifi init --harness <id> [--yes]`. Claude Code adapter writes `.claude/skills/<id>/SKILL.md`. Other harnesses defined in interface, throw `HarnessNotImplementedError` before any FS write.
+- `package.json` self-reference subpath `scifi/skill-types` for typed manifests.
 - 147/147 tests pass.
 
 ### Debt Sweep PR 1 (2026-05-30)
@@ -51,7 +51,7 @@ Shipped:
 - `findPackageRoot` walk-up replaces brittle `import.meta.url.includes("/dist/...")` checks in `src/cli/index.ts` and `src/cli/commands/init.ts`. Util lives at `src/core/package-root.ts`.
 - Zod schema is now the source of truth for `SkillManifest`. `src/core/skills/types.ts` defines `skillManifestSchema` (discriminated union on `kind`); `SkillManifest = z.infer<...>`. `loadCatalog` parses on import and throws structured errors on invalid manifests.
 - Review skills renamed with `sf-` prefix: `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`. Removes collision risk with user-authored skills that happen to use generic names.
-- README documents bundled-skill ownership policy: `.claude/skills/sf-*` is owned by `specflow` and overwritten by `init`. Users wanting customization should copy under a different id.
+- README documents bundled-skill ownership policy: `.claude/skills/sf-*` is owned by `scifi` and overwritten by `init`. Users wanting customization should copy under a different id.
 
 ### Debt Sweep PR 2 (2026-05-30)
 
@@ -74,7 +74,7 @@ By design (not debt):
 
 - All 11 skill bodies are stubs. Real prompt content lives in follow-up specs (one per skill, or grouped).
 - Only Claude Code adapter is implemented. OpenCode / Codex / Cursor / AGENTS.md fallback throw `HarnessNotImplementedError` until follow-up specs add them.
-- No `specflow update` command yet. Rerunning `init` overwrites `.claude/skills/sf-*` by design — documented in README. Custom user edits belong in separate skills, not in the bundled `sf-*` files.
+- No `scifi update` command yet. Rerunning `init` overwrites `.claude/skills/sf-*` by design — documented in README. Custom user edits belong in separate skills, not in the bundled `sf-*` files.
 
 ## Next Focus
 

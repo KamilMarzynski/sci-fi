@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { assertSafeSlug } from '../slugify.js';
 
 export function buildFeaturesRootPath(projectRoot: string): string {
-  return join(projectRoot, 'docs', 'specflow', 'specs');
+  return join(projectRoot, 'docs', 'scifi', 'specs');
 }
 
 export function buildFeatureDirectoryPath(projectRoot: string, slug: string): string {
@@ -11,5 +11,5 @@ export function buildFeatureDirectoryPath(projectRoot: string, slug: string): st
 }
 
 export function buildFeatureMetadataPath(projectRoot: string, slug: string): string {
-  return join(buildFeatureDirectoryPath(projectRoot, slug), '.specflow.json');
+  return join(buildFeatureDirectoryPath(projectRoot, slug), '.scifi.json');
 }

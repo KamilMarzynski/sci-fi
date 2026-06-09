@@ -19,7 +19,7 @@ async function createTaskFile(
   taskSlug: string,
   status: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', featureSlug, 'tasks');
+  const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', featureSlug, 'tasks');
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -30,7 +30,7 @@ async function createTaskFile(
 
 describe('updateTaskStatus', () => {
   it('marks a pending task as in-progress', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'pending');
 
@@ -42,7 +42,7 @@ describe('updateTaskStatus', () => {
   });
 
   it('marks an in-progress task as done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'in-progress');
 
@@ -54,9 +54,9 @@ describe('updateTaskStatus', () => {
   });
 
   it('preserves body content when updating status', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', 'tasks');
+    const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', 'tasks');
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
       join(tasksDir, 'setup-database.md'),
@@ -72,7 +72,7 @@ describe('updateTaskStatus', () => {
   });
 
   it('rejects marking a pending task as done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-task-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
     temporaryDirectories.push(projectRoot);
     await createTaskFile(projectRoot, 'user-auth', 'setup-database', 'pending');
 

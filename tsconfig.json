@@ -7,7 +7,7 @@
     "rootDirs": ["src", "skills"],
     "baseUrl": ".",
     "paths": {
-      "specflow/skill-types": ["src/core/skills/types.ts"]
+      "scifi/skill-types": ["src/core/skills/types.ts"]
     },
     "strict": true,
     "forceConsistentCasingInFileNames": true,

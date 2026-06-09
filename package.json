@@ -1,10 +1,10 @@
 {
-  "name": "specflow",
+  "name": "scifi",
   "version": "0.1.0",
   "description": "Specification-driven CLI scaffolding for agentic workflows",
   "type": "module",
   "bin": {
-    "specflow": "./dist/src/cli/index.js"
+    "scifi": "./dist/src/cli/index.js"
   },
   "exports": {
     ".": "./dist/src/cli/index.js",
@@ -38,12 +38,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KamilMarzynski/spec-flow.git"
+    "url": "git+https://github.com/KamilMarzynski/sci-fi.git"
   },
   "bugs": {
-    "url": "https://github.com/KamilMarzynski/spec-flow/issues"
+    "url": "https://github.com/KamilMarzynski/sci-fi/issues"
   },
-  "homepage": "https://github.com/KamilMarzynski/spec-flow",
+  "homepage": "https://github.com/KamilMarzynski/sci-fi",
   "engines": {
     "node": ">=20.0.0"
   },

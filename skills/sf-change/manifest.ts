@@ -1,4 +1,4 @@
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-change",

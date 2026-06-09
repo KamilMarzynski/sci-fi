@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add `specflow bug` and `specflow fix` CLI commands, enforce open-fix blocking in `specflow finish`, and surface fix counts in `specflow list` and `specflow status`.
+**Goal:** Add `scifi bug` and `scifi fix` CLI commands, enforce open-fix blocking in `scifi finish`, and surface fix counts in `scifi list` and `scifi status`.
 
 **Architecture:** Two separate core modules (`src/core/bugs/`, `src/core/fixes/`) share no code but follow identical patterns (types → paths → id → frontmatter → create). `finish` pre-checks `listOpenFixes` before calling `updateFeatureStatus`. `list` and `status` call `listFixes` per feature.
 
@@ -184,7 +184,7 @@ afterEach(async () => {
 
 describe("writeBugFile / readBugFile", () => {
   it("round-trips a bug file with all optional fields", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-bug-fm-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-bug-fm-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "BUG-0001-login-crash.md");
 
@@ -211,7 +211,7 @@ describe("writeBugFile / readBugFile", () => {
   });
 
   it("round-trips a bug file with only required fields", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-bug-fm-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-bug-fm-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "BUG-0002-null-ref.md");
 
@@ -231,7 +231,7 @@ describe("writeBugFile / readBugFile", () => {
   });
 
   it("throws on missing frontmatter", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-bug-fm-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-bug-fm-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "bad.md");
 
@@ -401,7 +401,7 @@ afterEach(async () => {
 
 describe("createBug", () => {
   it("creates bugs/ dir and writes a bug file", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-create-"));
     temporaryDirectories.push(projectRoot);
 
     const result = await createBug({
@@ -425,7 +425,7 @@ describe("createBug", () => {
   });
 
   it("creates a bug with optional severity and related-feature", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-create-"));
     temporaryDirectories.push(projectRoot);
 
     const result = await createBug({
@@ -442,7 +442,7 @@ describe("createBug", () => {
   });
 
   it("assigns sequential IDs based on existing file count", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-create-"));
     temporaryDirectories.push(projectRoot);
 
     const first = await createBug({
@@ -461,7 +461,7 @@ describe("createBug", () => {
   });
 
   it("creates bugs/ dir if it does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-create-"));
     temporaryDirectories.push(projectRoot);
 
     await createBug({
@@ -565,7 +565,7 @@ git commit -m "feat: add createBug core function"
 
 ---
 
-## Task 4: `specflow bug` CLI command
+## Task 4: `scifi bug` CLI command
 
 **Files:**
 - Create: `src/cli/commands/bug.ts`
@@ -597,7 +597,7 @@ afterEach(async () => {
 
 describe("bug command", () => {
   it("creates a standalone bug file and prints id and path", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -611,7 +611,7 @@ describe("bug command", () => {
     try {
       await buildProgram().parseAsync([
         "node",
-        "specflow",
+        "scifi",
         "bug",
         "login crash on mobile",
       ]);
@@ -629,13 +629,13 @@ describe("bug command", () => {
   });
 
   it("creates a bug with severity and related-feature flags", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-bug-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-bug-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await buildProgram().parseAsync([
       "node",
-      "specflow",
+      "scifi",
       "bug",
       "null ref in checkout",
       "--severity",
@@ -738,7 +738,7 @@ Expected: PASS
 
 ```bash
 git add src/cli/commands/bug.ts src/cli/index.ts tests/cli/bug.test.ts
-git commit -m "feat: add specflow bug command"
+git commit -m "feat: add scifi bug command"
 ```
 
 ---
@@ -888,7 +888,7 @@ afterEach(async () => {
 
 describe("writeFixFile / readFixFile", () => {
   it("round-trips a fix file", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-fix-fm-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-fix-fm-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "FIX-0001-token-expiry.md");
 
@@ -913,7 +913,7 @@ describe("writeFixFile / readFixFile", () => {
   });
 
   it("throws on missing frontmatter", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "specflow-fix-fm-"));
+    const dir = await mkdtemp(join(tmpdir(), "scifi-fix-fm-"));
     temporaryDirectories.push(dir);
     const filePath = join(dir, "bad.md");
     await writeFile(filePath, "no frontmatter\n", "utf8");
@@ -1056,10 +1056,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string): Promise<void> {
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", slug);
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -1074,7 +1074,7 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
 
 describe("createFix", () => {
   it("creates fixes/ dir and writes a fix file", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-create-"));
     temporaryDirectories.push(projectRoot);
     await scaffoldFeature(projectRoot, "auth-flow");
 
@@ -1090,7 +1090,7 @@ describe("createFix", () => {
       join(
         projectRoot,
         "docs",
-        "specflow",
+        "scifi",
         "specs",
         "auth-flow",
         "fixes",
@@ -1107,7 +1107,7 @@ describe("createFix", () => {
   });
 
   it("assigns per-feature sequential IDs", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-create-"));
     temporaryDirectories.push(projectRoot);
     await scaffoldFeature(projectRoot, "auth-flow");
     await scaffoldFeature(projectRoot, "payments");
@@ -1137,7 +1137,7 @@ describe("createFix", () => {
   });
 
   it("throws when the feature does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-create-"));
     temporaryDirectories.push(projectRoot);
 
     await expect(
@@ -1288,7 +1288,7 @@ async function scaffoldFixesDir(projectRoot: string, featureSlug: string): Promi
   const fixesDir = join(
     projectRoot,
     "docs",
-    "specflow",
+    "scifi",
     "specs",
     featureSlug,
     "fixes",
@@ -1299,9 +1299,9 @@ async function scaffoldFixesDir(projectRoot: string, featureSlug: string): Promi
 
 describe("listFixes", () => {
   it("returns empty array when fixes/ dir does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-fixes-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-fixes-"));
     temporaryDirectories.push(projectRoot);
-    const featureDir = join(projectRoot, "docs", "specflow", "specs", "auth-flow");
+    const featureDir = join(projectRoot, "docs", "scifi", "specs", "auth-flow");
     await mkdir(featureDir, { recursive: true });
 
     const fixes = await listFixes(projectRoot, "auth-flow");
@@ -1309,7 +1309,7 @@ describe("listFixes", () => {
   });
 
   it("returns frontmatter for each .md file in fixes/", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-fixes-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-fixes-"));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, "auth-flow");
 
@@ -1331,7 +1331,7 @@ describe("listFixes", () => {
   });
 
   it("ignores non-.md files", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-fixes-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-fixes-"));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, "auth-flow");
 
@@ -1349,7 +1349,7 @@ describe("listFixes", () => {
 
 describe("listOpenFixes", () => {
   it("returns only open and in-progress fixes", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-fixes-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-fixes-"));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, "auth-flow");
 
@@ -1381,7 +1381,7 @@ describe("listOpenFixes", () => {
   });
 
   it("returns empty when all fixes are resolved or wont-fix", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-fixes-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-fixes-"));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, "auth-flow");
 
@@ -1475,7 +1475,7 @@ git commit -m "feat: add listFixes and listOpenFixes core functions"
 
 ---
 
-## Task 9: `specflow fix` CLI command
+## Task 9: `scifi fix` CLI command
 
 **Files:**
 - Create: `src/cli/commands/fix.ts`
@@ -1506,10 +1506,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string): Promise<void> {
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", slug);
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -1524,7 +1524,7 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
 
 describe("fix command", () => {
   it("creates a fix file inside the feature's fixes/ dir and prints id and path", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
     await scaffoldFeature(projectRoot, "auth-flow");
@@ -1539,7 +1539,7 @@ describe("fix command", () => {
     try {
       await buildProgram().parseAsync([
         "node",
-        "specflow",
+        "scifi",
         "fix",
         "token expiry off by one",
         "--feature",
@@ -1556,7 +1556,7 @@ describe("fix command", () => {
     const fixPath = join(
       projectRoot,
       "docs",
-      "specflow",
+      "scifi",
       "specs",
       "auth-flow",
       "fixes",
@@ -1568,14 +1568,14 @@ describe("fix command", () => {
   });
 
   it("fails when --feature flag is omitted", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await expect(
       buildProgram().parseAsync([
         "node",
-        "specflow",
+        "scifi",
         "fix",
         "some description",
       ]),
@@ -1583,14 +1583,14 @@ describe("fix command", () => {
   });
 
   it("fails when the feature slug does not exist", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-fix-cmd-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-fix-cmd-"));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await expect(
       buildProgram().parseAsync([
         "node",
-        "specflow",
+        "scifi",
         "fix",
         "some description",
         "--feature",
@@ -1667,7 +1667,7 @@ Expected: PASS
 
 ```bash
 git add src/cli/commands/fix.ts src/cli/index.ts tests/cli/fix.test.ts
-git commit -m "feat: add specflow fix command"
+git commit -m "feat: add scifi fix command"
 ```
 
 ---
@@ -1684,7 +1684,7 @@ Add to `tests/cli/finish.test.ts` inside `describe("finish command")`:
 
 ```typescript
 it("fails when there are open fixes", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-finish-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
@@ -1698,7 +1698,7 @@ it("fails when there are open fixes", async () => {
   const fixesDir = join(
     projectRoot,
     "docs",
-    "specflow",
+    "scifi",
     "specs",
     "user-auth",
     "fixes",
@@ -1718,7 +1718,7 @@ it("fails when there are open fixes", async () => {
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "finish", "user-auth"]);
   } finally {
     process.stderr.write = originalStderrWrite;
   }
@@ -1734,7 +1734,7 @@ it("fails when there are open fixes", async () => {
 });
 
 it("succeeds when all fixes are resolved or wont-fix", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-finish-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-finish-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
@@ -1748,7 +1748,7 @@ it("succeeds when all fixes are resolved or wont-fix", async () => {
   const fixesDir = join(
     projectRoot,
     "docs",
-    "specflow",
+    "scifi",
     "specs",
     "user-auth",
     "fixes",
@@ -1760,12 +1760,12 @@ it("succeeds when all fixes are resolved or wont-fix", async () => {
     "utf8",
   );
 
-  await buildProgram().parseAsync(["node", "specflow", "finish", "user-auth"]);
+  await buildProgram().parseAsync(["node", "scifi", "finish", "user-auth"]);
 
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
   const { readFile } = await import("node:fs/promises");
   const metadata = JSON.parse(
-    await readFile(join(featureDir, ".specflow.json"), "utf8"),
+    await readFile(join(featureDir, ".scifi.json"), "utf8"),
   ) as { status: string };
   expect(metadata.status).toBe("done");
 });
@@ -1852,14 +1852,14 @@ Add to `tests/cli/list.test.ts` inside `describe("list command")`:
 
 ```typescript
 it("shows open fix count for features with fixes", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-cmd-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-cmd-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
-  const specsDir = join(projectRoot, "docs", "specflow", "specs");
+  const specsDir = join(projectRoot, "docs", "scifi", "specs");
   await mkdir(join(specsDir, "user-auth"), { recursive: true });
   await writeFile(
-    join(specsDir, "user-auth", ".specflow.json"),
+    join(specsDir, "user-auth", ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -1892,7 +1892,7 @@ it("shows open fix count for features with fixes", async () => {
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", "list"]);
+    await buildProgram().parseAsync(["node", "scifi", "list"]);
   } finally {
     process.stdout.write = originalWrite;
   }
@@ -1903,14 +1903,14 @@ it("shows open fix count for features with fixes", async () => {
 });
 
 it("shows dash for features with no open fixes", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-list-cmd-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-list-cmd-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
-  const specsDir = join(projectRoot, "docs", "specflow", "specs");
+  const specsDir = join(projectRoot, "docs", "scifi", "specs");
   await mkdir(join(specsDir, "user-auth"), { recursive: true });
   await writeFile(
-    join(specsDir, "user-auth", ".specflow.json"),
+    join(specsDir, "user-auth", ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -1930,7 +1930,7 @@ it("shows dash for features with no open fixes", async () => {
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", "list"]);
+    await buildProgram().parseAsync(["node", "scifi", "list"]);
   } finally {
     process.stdout.write = originalWrite;
   }
@@ -2006,7 +2006,7 @@ Expected: all PASS
 
 ```bash
 git add src/cli/commands/list.ts tests/cli/list.test.ts
-git commit -m "feat: show open fix count in specflow list"
+git commit -m "feat: show open fix count in scifi list"
 ```
 
 ---
@@ -2023,15 +2023,15 @@ Add to `tests/cli/status.test.ts` inside `describe("status command")`:
 
 ```typescript
 it("prints fixes block when feature has open fixes", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-status-cmd-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-status-cmd-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
   const fixesDir = join(featureDir, "fixes");
   await mkdir(fixesDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -2061,7 +2061,7 @@ it("prints fixes block when feature has open fixes", async () => {
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", "status", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "status", "user-auth"]);
   } finally {
     process.stdout.write = originalWrite;
   }
@@ -2075,14 +2075,14 @@ it("prints fixes block when feature has open fixes", async () => {
 });
 
 it("omits fixes block when feature has no fixes", async () => {
-  const projectRoot = await mkdtemp(join(tmpdir(), "specflow-status-cmd-"));
+  const projectRoot = await mkdtemp(join(tmpdir(), "scifi-status-cmd-"));
   temporaryDirectories.push(projectRoot);
   process.chdir(projectRoot);
 
-  const featureDir = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+  const featureDir = join(projectRoot, "docs", "scifi", "specs", "user-auth");
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, ".specflow.json"),
+    join(featureDir, ".scifi.json"),
     JSON.stringify({
       version: 1,
       id: "FEAT-0001",
@@ -2102,7 +2102,7 @@ it("omits fixes block when feature has no fixes", async () => {
   };
 
   try {
-    await buildProgram().parseAsync(["node", "specflow", "status", "user-auth"]);
+    await buildProgram().parseAsync(["node", "scifi", "status", "user-auth"]);
   } finally {
     process.stdout.write = originalWrite;
   }
@@ -2196,5 +2196,5 @@ Expected: all PASS
 
 ```bash
 git add src/cli/commands/status.ts tests/cli/status.test.ts
-git commit -m "feat: show fixes block in specflow status"
+git commit -m "feat: show fixes block in scifi status"
 ```

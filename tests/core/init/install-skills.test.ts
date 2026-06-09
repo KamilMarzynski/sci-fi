@@ -21,7 +21,7 @@ afterEach(async () => {
 
 describe('installSkills', () => {
   it('installs all 11 bundled skills to the claude-code targets', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-install-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-install-'));
     temporaryDirectories.push(projectRoot);
 
     await installSkills({
@@ -48,7 +48,7 @@ describe('installSkills', () => {
   });
 
   it('throws HarnessNotImplementedError for opencode without writing anything', async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-install-'));
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-install-'));
     temporaryDirectories.push(projectRoot);
 
     await expect(

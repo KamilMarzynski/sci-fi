@@ -17,9 +17,9 @@ function makeTaskContent(slug: string, status: string): string {
 
 describe('listTasks', () => {
   it('returns empty array when tasks/ directory does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-tasks-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-tasks-'));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureRoot, { recursive: true });
 
     const tasks = await listTasks(projectRoot, 'user-auth');
@@ -27,9 +27,9 @@ describe('listTasks', () => {
   });
 
   it('returns frontmatter for each .md file in tasks/', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-tasks-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-tasks-'));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', 'tasks');
+    const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', 'tasks');
     await mkdir(tasksDir, { recursive: true });
 
     await writeFile(
@@ -51,9 +51,9 @@ describe('listTasks', () => {
   });
 
   it('ignores non-.md files in tasks/', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-list-tasks-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-tasks-'));
     temporaryDirectories.push(projectRoot);
-    const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', 'tasks');
+    const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', 'tasks');
     await mkdir(tasksDir, { recursive: true });
 
     await writeFile(

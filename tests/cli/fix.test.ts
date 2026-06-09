@@ -16,10 +16,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string): Promise<void> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', slug);
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     JSON.stringify({
       version: 1,
       id: 'FEAT-0001',
@@ -34,7 +34,7 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
 
 describe('fix command', () => {
   it("creates a fix file inside the feature's fixes/ dir and prints id and path", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
     await scaffoldFeature(projectRoot, 'auth-flow');
@@ -49,7 +49,7 @@ describe('fix command', () => {
     try {
       await buildProgram().parseAsync([
         'node',
-        'specflow',
+        'scifi',
         'fix',
         'token expiry off by one',
         '--feature',
@@ -66,7 +66,7 @@ describe('fix command', () => {
     const fixPath = join(
       projectRoot,
       'docs',
-      'specflow',
+      'scifi',
       'specs',
       'auth-flow',
       'fixes',
@@ -78,17 +78,17 @@ describe('fix command', () => {
   });
 
   it('fails when --feature flag is omitted', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await expect(
-      buildProgram().parseAsync(['node', 'specflow', 'fix', 'some description']),
+      buildProgram().parseAsync(['node', 'scifi', 'fix', 'some description']),
     ).rejects.toThrow();
   });
 
   it('fails when the feature slug does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 

@@ -15,17 +15,17 @@ Before dispatching anything, read enough to brief subagents precisely:
 - `<path>/spec.md` — the contract the feature must satisfy.
 - `<path>/design.md` — the technical design: modules, seams, test strategy.
 - `<path>/tasks/*.md` — the tasks you will dispatch.
-- `docs/specflow/ARCHITECTURE.md` and `docs/specflow/CONTEXT.md` — referenced by
+- `docs/scifi/ARCHITECTURE.md` and `docs/scifi/CONTEXT.md` — referenced by
   subagents; know where they are so you can point to them.
 
-`<path>` is the feature directory (`docs/specflow/specs/<slug>/`).
+`<path>` is the feature directory (`docs/scifi/specs/<slug>/`).
 
 ## Flow
 
 ### 1. Start the feature
 
 ```
-specflow start <slug> --json
+scifi start <slug> --json
 ```
 
 Transitions `plan-ready → in-progress`. If it errors `PRECONDITION_FAILED`, the
@@ -34,7 +34,7 @@ feature is not plan-ready — stop and tell the user to finish `sf-plan` first.
 ### 2. Build the task order
 
 ```
-specflow task list <slug> --json
+scifi task list <slug> --json
 ```
 
 Each task reports `{ slug, status, dependsOn }`. Use `depends-on` to order the
@@ -53,7 +53,7 @@ For each runnable task, in order:
 1. **Mark in-progress.**
 
    ```
-   specflow task start <slug> <task>
+   scifi task start <slug> <task>
    ```
 
 2. **Dispatch the implementer.** Use `DISPATCH-IMPLEMENTER.md` (ships beside
@@ -80,7 +80,7 @@ For each runnable task, in order:
 5. **Mark done.**
 
    ```
-   specflow task done <slug> <task>
+   scifi task done <slug> <task>
    ```
 
    This unlocks dependents. Move to the next runnable task.
@@ -104,7 +104,7 @@ After every task is `done`:
 ### 5. Finish
 
 ```
-specflow finish <slug> --json
+scifi finish <slug> --json
 ```
 
 Transitions `in-progress → done`. This is the end of the implement stage.
@@ -115,6 +115,6 @@ Transitions `in-progress → done`. This is the end of the implement stage.
 - Never mark a task done before its code review verdict is **Pass**.
 - Never let a subagent read your session history — construct its context from
   the task and the reference files.
-- Never call `specflow finish` while a final-review or verification finding is
+- Never call `scifi finish` while a final-review or verification finding is
   open.
 - Never implement a task's feature code yourself — that is the subagent's job.

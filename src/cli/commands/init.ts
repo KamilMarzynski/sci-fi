@@ -10,7 +10,7 @@ import {
   emitSuccess,
   isInteractive,
   jsonMode,
-  SpecflowError,
+  ScifiError,
 } from '../../core/output/index.js';
 import { findPackageRoot } from '../../core/package-root.js';
 import {
@@ -32,7 +32,7 @@ const BOOTSTRAP_FILES = ['EVALUATION.md', 'ARCHITECTURE.md', 'CONTEXT.md'];
 export function registerInitCommand(program: Command): void {
   program
     .command('init')
-    .description('Initialize specflow in the current repository')
+    .description('Initialize scifi in the current repository')
     .option('--harness <id>', 'harness adapter to install skills for')
     .option('--yes', 'skip prompts and use defaults')
     .option('--json', 'output as structured JSON')
@@ -43,7 +43,7 @@ export function registerInitCommand(program: Command): void {
         const packageRoot = findPackageRoot(import.meta.url);
 
         if (options.harness === undefined && options.yes !== true && !isInteractive()) {
-          throw new SpecflowError(
+          throw new ScifiError(
             'INVALID_ARGUMENT',
             'harness selection requires --harness <id> when running non-interactively.',
             { hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.` },
@@ -66,21 +66,21 @@ export function registerInitCommand(program: Command): void {
         emitSuccess(
           {
             action: 'init',
-            root: 'docs/specflow',
+            root: 'docs/scifi',
             harness,
             files: BOOTSTRAP_FILES,
             skills,
           },
           json,
           [
-            `specflow initialized successfully.`,
-            `  Root:    docs/specflow`,
+            `scifi initialized successfully.`,
+            `  Root:    docs/scifi`,
             `  Harness: ${harness}`,
             `  Files:   ${BOOTSTRAP_FILES.join(', ')}`,
             `  Skills:  ${skills.join(', ')}`,
             ``,
-            `Next: read docs/specflow/CONTEXT.md and docs/specflow/ARCHITECTURE.md,`,
-            `then create a spec with \`specflow spec <slug> --title "Your Feature"\``,
+            `Next: read docs/scifi/CONTEXT.md and docs/scifi/ARCHITECTURE.md,`,
+            `then create a spec with \`scifi spec <slug> --title "Your Feature"\``,
           ],
         );
       } catch (error) {
@@ -91,7 +91,7 @@ export function registerInitCommand(program: Command): void {
 
 function normalizeInitError(error: unknown): unknown {
   if (error instanceof InvalidHarnessError || error instanceof HarnessNotImplementedError) {
-    return new SpecflowError('INVALID_ARGUMENT', error.message, {
+    return new ScifiError('INVALID_ARGUMENT', error.message, {
       hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.`,
       cause: error,
     });

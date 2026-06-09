@@ -18,8 +18,8 @@ describe('installed build lifecycle verification', () => {
       let result = runInstalledCommand(dir, ['spec', 'user-auth', '--title', 'User Auth']);
       expect(result.status).toBe(0);
 
-      const featureDir = join(dir, 'docs', 'specflow', 'specs', 'user-auth');
-      expect(existsSync(join(featureDir, '.specflow.json'))).toBe(true);
+      const featureDir = join(dir, 'docs', 'scifi', 'specs', 'user-auth');
+      expect(existsSync(join(featureDir, '.scifi.json'))).toBe(true);
 
       // Write spec.md then mark spec-ready
       writeFileSync(join(featureDir, 'spec.md'), '# User Auth Spec\n', 'utf8');
@@ -27,7 +27,7 @@ describe('installed build lifecycle verification', () => {
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
 
-      let metadata = JSON.parse(readFileSync(join(featureDir, '.specflow.json'), 'utf8')) as {
+      let metadata = JSON.parse(readFileSync(join(featureDir, '.scifi.json'), 'utf8')) as {
         status: string;
       };
       expect(metadata.status).toBe('spec-ready');
@@ -44,7 +44,7 @@ describe('installed build lifecycle verification', () => {
 
       result = runInstalledCommand(dir, ['plan-ready', 'user-auth']);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, '.specflow.json'), 'utf8')) as {
+      metadata = JSON.parse(readFileSync(join(featureDir, '.scifi.json'), 'utf8')) as {
         status: string;
       };
       expect(metadata.status).toBe('plan-ready');
@@ -52,7 +52,7 @@ describe('installed build lifecycle verification', () => {
       // Start implementation
       result = runInstalledCommand(dir, ['start', 'user-auth']);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, '.specflow.json'), 'utf8')) as {
+      metadata = JSON.parse(readFileSync(join(featureDir, '.scifi.json'), 'utf8')) as {
         status: string;
       };
       expect(metadata.status).toBe('in-progress');
@@ -67,7 +67,7 @@ describe('installed build lifecycle verification', () => {
       // Finish the feature
       result = runInstalledCommand(dir, ['finish', 'user-auth']);
       expect(result.status).toBe(0);
-      metadata = JSON.parse(readFileSync(join(featureDir, '.specflow.json'), 'utf8')) as {
+      metadata = JSON.parse(readFileSync(join(featureDir, '.scifi.json'), 'utf8')) as {
         status: string;
       };
       expect(metadata.status).toBe('done');

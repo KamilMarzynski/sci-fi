@@ -8,15 +8,15 @@ dispatched you.
 ## Inputs
 
 The dispatching agent gives you the feature directory (e.g.
-`docs/specflow/specs/<slug>`). If `design.md` is missing, say so and stop.
+`docs/scifi/specs/<slug>`). If `design.md` is missing, say so and stop.
 
 ## What to read
 
 - `<path>/design.md` — the technical design under review.
 - `<path>/spec.md` — the approved contract the design must satisfy.
 - `<path>/tasks/*.md` — the task breakdown.
-- `docs/specflow/ARCHITECTURE.md` — how the system is built and where it heads.
-- `docs/specflow/CONTEXT.md` — domain glossary.
+- `docs/scifi/ARCHITECTURE.md` — how the system is built and where it heads.
+- `docs/scifi/CONTEXT.md` — domain glossary.
 
 Read all of them before judging. Never invent project facts; if something is
 unknowable from these files, flag it as a question instead of assuming.

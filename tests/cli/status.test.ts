@@ -15,15 +15,15 @@ afterEach(async () => {
 
 describe('status command', () => {
   it('prints lifecycle snapshot for a feature', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-status-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     const tasksDir = join(featureDir, 'tasks');
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       `${JSON.stringify(
         {
           version: 1,
@@ -55,7 +55,7 @@ describe('status command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'status', 'user-auth']);
+      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -70,15 +70,15 @@ describe('status command', () => {
   });
 
   it('prints fixes block when feature has open fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-status-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     const fixesDir = join(featureDir, 'fixes');
     await mkdir(fixesDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -108,7 +108,7 @@ describe('status command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'status', 'user-auth']);
+      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -122,14 +122,14 @@ describe('status command', () => {
   });
 
   it('omits fixes block when feature has no fixes', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-status-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth');
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
     await mkdir(featureDir, { recursive: true });
     await writeFile(
-      join(featureDir, '.specflow.json'),
+      join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
         id: 'FEAT-0001',
@@ -149,7 +149,7 @@ describe('status command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'status', 'user-auth']);
+      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
     } finally {
       process.stdout.write = originalWrite;
     }

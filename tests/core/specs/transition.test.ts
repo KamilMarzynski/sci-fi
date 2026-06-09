@@ -12,10 +12,10 @@ afterEach(async () => {
 });
 
 async function createFeatureAt(projectRoot: string, slug: string, status: string): Promise<void> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', slug);
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     `${JSON.stringify(
       {
         version: 1,
@@ -34,7 +34,7 @@ async function createFeatureAt(projectRoot: string, slug: string, status: string
 
 async function writeSpecMd(projectRoot: string, slug: string): Promise<void> {
   await writeFile(
-    join(projectRoot, 'docs', 'specflow', 'specs', slug, 'spec.md'),
+    join(projectRoot, 'docs', 'scifi', 'specs', slug, 'spec.md'),
     '# Spec\n',
     'utf8',
   );
@@ -42,7 +42,7 @@ async function writeSpecMd(projectRoot: string, slug: string): Promise<void> {
 
 async function writeArchitectureMd(projectRoot: string, slug: string): Promise<void> {
   await writeFile(
-    join(projectRoot, 'docs', 'specflow', 'specs', slug, 'design.md'),
+    join(projectRoot, 'docs', 'scifi', 'specs', slug, 'design.md'),
     '# Design\n',
     'utf8',
   );
@@ -54,7 +54,7 @@ async function writeTaskMd(
   taskSlug: string,
   taskStatus: string,
 ): Promise<void> {
-  const tasksDir = join(projectRoot, 'docs', 'specflow', 'specs', slug, 'tasks');
+  const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', slug, 'tasks');
   await mkdir(tasksDir, { recursive: true });
   await writeFile(
     join(tasksDir, `${taskSlug}.md`),
@@ -65,7 +65,7 @@ async function writeTaskMd(
 
 describe('updateFeatureStatus', () => {
   it('transitions created to spec-ready when spec.md exists', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'created');
     await writeSpecMd(projectRoot, 'user-auth');
@@ -74,7 +74,7 @@ describe('updateFeatureStatus', () => {
 
     const metadata = JSON.parse(
       await readFile(
-        join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+        join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
         'utf8',
       ),
     ) as { status: string; updatedAt: string };
@@ -83,7 +83,7 @@ describe('updateFeatureStatus', () => {
   });
 
   it('transitions plan-ready to in-progress', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'plan-ready');
     await writeSpecMd(projectRoot, 'user-auth');
@@ -94,7 +94,7 @@ describe('updateFeatureStatus', () => {
 
     const metadata = JSON.parse(
       await readFile(
-        join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+        join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
         'utf8',
       ),
     ) as { status: string };
@@ -102,7 +102,7 @@ describe('updateFeatureStatus', () => {
   });
 
   it('transitions in-progress to done when all tasks are done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'in-progress');
     await writeSpecMd(projectRoot, 'user-auth');
@@ -113,7 +113,7 @@ describe('updateFeatureStatus', () => {
 
     const metadata = JSON.parse(
       await readFile(
-        join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+        join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
         'utf8',
       ),
     ) as { status: string };
@@ -121,7 +121,7 @@ describe('updateFeatureStatus', () => {
   });
 
   it('rejects spec-ready when spec.md is missing', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'created');
 
@@ -131,7 +131,7 @@ describe('updateFeatureStatus', () => {
   });
 
   it('rejects in-progress when feature is not plan-ready', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'spec-ready');
     await writeSpecMd(projectRoot, 'user-auth');
@@ -142,7 +142,7 @@ describe('updateFeatureStatus', () => {
   });
 
   it('rejects done when a task is not done', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-transition-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-transition-'));
     temporaryDirectories.push(projectRoot);
     await createFeatureAt(projectRoot, 'user-auth', 'in-progress');
     await writeSpecMd(projectRoot, 'user-auth');

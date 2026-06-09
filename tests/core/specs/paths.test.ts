@@ -8,18 +8,18 @@ import {
 
 describe('spec path helpers', () => {
   it('builds features root path', () => {
-    expect(buildFeaturesRootPath('/repo')).toBe(join('/repo', 'docs', 'specflow', 'specs'));
+    expect(buildFeaturesRootPath('/repo')).toBe(join('/repo', 'docs', 'scifi', 'specs'));
   });
 
   it('builds feature directory path', () => {
     expect(buildFeatureDirectoryPath('/repo', 'user-auth')).toBe(
-      join('/repo', 'docs', 'specflow', 'specs', 'user-auth'),
+      join('/repo', 'docs', 'scifi', 'specs', 'user-auth'),
     );
   });
 
   it('builds feature metadata path', () => {
     expect(buildFeatureMetadataPath('/repo', 'user-auth')).toBe(
-      join('/repo', 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+      join('/repo', 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
     );
   });
 

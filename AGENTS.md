@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository is building `specflow` as a production-ready developer tool, not a throwaway prototype.
+This repository is building `scifi` as a production-ready developer tool, not a throwaway prototype.
 
 ## Expectations
 

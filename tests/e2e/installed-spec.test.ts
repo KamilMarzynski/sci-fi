@@ -25,10 +25,10 @@ describe('installed build spec verification', () => {
       const metadataPath = join(
         installation.installDirectory,
         'docs',
-        'specflow',
+        'scifi',
         'specs',
         'user-auth',
-        '.specflow.json',
+        '.scifi.json',
       );
       expect(existsSync(metadataPath)).toBe(true);
 

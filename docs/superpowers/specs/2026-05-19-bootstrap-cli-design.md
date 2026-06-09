@@ -2,15 +2,15 @@
 
 **Date:** 2026-05-19
 **Status:** Draft for review
-**Scope:** First sub-project of `specflow`
+**Scope:** First sub-project of `scifi`
 
 ## Goal
 
-Create the initial production-shaped scaffold for `specflow`: a published-package-ready TypeScript CLI with a clean internal module layout, strict engineering standards, and the first foundation for `specflow init`.
+Create the initial production-shaped scaffold for `scifi`: a published-package-ready TypeScript CLI with a clean internal module layout, strict engineering standards, and the first foundation for `scifi init`.
 
 ## Why This First
 
-`specflow` depends on a stable CLI shell before any feature-specific commands make sense. The bootstrap layer establishes package shape, build/test conventions, internal boundaries, and repository rules that later specs can build on without rework.
+`scifi` depends on a stable CLI shell before any feature-specific commands make sense. The bootstrap layer establishes package shape, build/test conventions, internal boundaries, and repository rules that later specs can build on without rework.
 
 ## Decisions
 
@@ -38,7 +38,7 @@ This keeps install and publishing behavior conventional while still allowing con
 ## Proposed Structure
 
 ```text
-specflow/
+scifi/
 ├── package.json
 ├── tsconfig.json
 ├── AGENTS.md
@@ -70,11 +70,11 @@ This gives us monorepo-like separation without monorepo overhead.
 
 ## First Functional Slice
 
-The first implemented command in this sub-project should be `specflow init`.
+The first implemented command in this sub-project should be `scifi init`.
 
 Initial behavior for that command:
 
-- create a project config file under `.specflow/`
+- create a project config file under `.scifi/`
 - create base documentation files needed by later workflows
 - create empty `specs/` and `bugs/` directories
 - establish the installation/update pattern that future commands can extend
@@ -108,7 +108,7 @@ This sub-project is complete when the repository contains:
 - a `vitest` test setup
 - a stable internal folder structure
 - repository-level agent guidance in `AGENTS.md`
-- the initial foundation for `specflow init`
+- the initial foundation for `scifi init`
 
 ## Out of Scope
 

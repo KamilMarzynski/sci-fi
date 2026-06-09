@@ -1,6 +1,8 @@
-# specflow
+# scifi
 
-`specflow` is a TypeScript CLI for specification-driven repository scaffolding. The current bootstrap milestone provides the package/build foundation, the `specflow init` command, a dedicated `.testing/` verification workspace, and installed-build end-to-end coverage.
+`scifi` is a TypeScript CLI for specification-driven repository scaffolding. The current bootstrap milestone provides the package/build foundation, the `scifi init` command, a dedicated `.testing/` verification workspace, and installed-build end-to-end coverage.
+
+> **On the name:** this project was originally called `spec-flow` (`sf` for short). It was renamed to `scifi` — the same `sf` short form, now spelled out the fun way. The bundled skills keep their `sf-` prefix.
 
 ## Requirements
 
@@ -34,16 +36,16 @@ node dist/cli/index.js init
 ## Current Command Surface
 
 ```bash
-specflow init
-specflow spec <slug> [--title "..."]
+scifi init
+scifi spec <slug> [--title "..."]
 ```
 
-`specflow spec` creates a feature container under `docs/specflow/specs/<slug>/`
-and writes `.specflow.json` with the CLI-managed feature identifier and status.
+`scifi spec` creates a feature container under `docs/scifi/specs/<slug>/`
+and writes `.scifi.json` with the CLI-managed feature identifier and status.
 
-Running `specflow init` in a repository creates:
+Running `scifi init` in a repository creates:
 
-- `.specflow/`
+- `.scifi/`
 - `specs/`
 - `bugs/`
 - `AGENTS.md`
@@ -53,11 +55,11 @@ Existing bootstrap docs are preserved when the target path is already a regular 
 
 ## Bundled Skills
 
-`specflow init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
+`scifi init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
 
 All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills living in the same directories.
 
-**Ownership:** these files are owned by `specflow`. Rerunning `specflow init` overwrites them in place. If you want to customize behavior, copy the file under a different id (e.g. `my-code-review`) and edit that — your copy will not be touched on rerun.
+**Ownership:** these files are owned by `scifi`. Rerunning `scifi init` overwrites them in place. If you want to customize behavior, copy the file under a different id (e.g. `my-code-review`) and edit that — your copy will not be touched on rerun.
 
 ## Installed-Build Verification
 
@@ -76,7 +78,7 @@ The automated installed-build verification is covered by `tests/e2e/installed-in
 - packs the current package into `.testing/artifacts/`
 - creates a disposable install sandbox under `.testing/sandboxes/`
 - installs the packed artifact offline
-- runs the installed `specflow init` binary in that sandbox
+- runs the installed `scifi init` binary in that sandbox
 - removes the temporary verification directories after the run
 
 Run the full required verification set for the bootstrap milestone:

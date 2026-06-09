@@ -1,5 +1,5 @@
 import { stderr, stdout } from 'node:process';
-import { toSpecflowError } from './errors.js';
+import { toScifiError } from './errors.js';
 
 interface OptionReader {
   opts(): Record<string, unknown>;
@@ -45,7 +45,7 @@ export function emitList<T>(
 }
 
 export function emitError(error: unknown, json: boolean): void {
-  const sf = toSpecflowError(error);
+  const sf = toScifiError(error);
 
   if (json) {
     const payload = {

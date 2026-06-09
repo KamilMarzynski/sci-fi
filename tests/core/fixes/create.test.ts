@@ -13,10 +13,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string): Promise<void> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', slug);
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     JSON.stringify({
       version: 1,
       id: 'FEAT-0001',
@@ -31,7 +31,7 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
 
 describe('createFix', () => {
   it('creates fixes/ dir and writes a fix file', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-create-'));
     temporaryDirectories.push(projectRoot);
     await scaffoldFeature(projectRoot, 'auth-flow');
 
@@ -47,7 +47,7 @@ describe('createFix', () => {
       join(
         projectRoot,
         'docs',
-        'specflow',
+        'scifi',
         'specs',
         'auth-flow',
         'fixes',
@@ -64,7 +64,7 @@ describe('createFix', () => {
   });
 
   it('assigns per-feature sequential IDs', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-create-'));
     temporaryDirectories.push(projectRoot);
     await scaffoldFeature(projectRoot, 'auth-flow');
     await scaffoldFeature(projectRoot, 'payments');
@@ -94,7 +94,7 @@ describe('createFix', () => {
   });
 
   it('throws when the feature does not exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-fix-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-create-'));
     temporaryDirectories.push(projectRoot);
 
     await expect(

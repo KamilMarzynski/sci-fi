@@ -14,7 +14,7 @@ Task under review: {TASK_SLUG}  (feature: {FEATURE_PATH})
 Changes to review: {COMMIT_RANGE}
 
 Judge the change against {FEATURE_PATH}/design.md and the task's own
-acceptance/validation, with docs/specflow/ARCHITECTURE.md and
-docs/specflow/CONTEXT.md for context. Return your report and verdict exactly as
+acceptance/validation, with docs/scifi/ARCHITECTURE.md and
+docs/scifi/CONTEXT.md for context. Return your report and verdict exactly as
 the sf-code-review skill defines.
 ```

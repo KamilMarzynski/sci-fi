@@ -28,14 +28,14 @@ describe('createInitialFeatureMetadata', () => {
 });
 
 describe('feature path helpers', () => {
-  it('places specflow-managed features under docs/specflow/specs', () => {
+  it('places scifi-managed features under docs/scifi/specs', () => {
     const projectRoot = '/repo';
 
     expect(buildFeatureDirectoryPath(projectRoot, 'user-auth')).toBe(
-      join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth'),
+      join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth'),
     );
     expect(buildFeatureMetadataPath(projectRoot, 'user-auth')).toBe(
-      join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+      join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
     );
   });
 });

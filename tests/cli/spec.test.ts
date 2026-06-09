@@ -18,7 +18,7 @@ afterEach(async () => {
 
 describe('spec command', () => {
   it('creates a feature container in the current repository', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-cli-spec-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-cli-spec-'));
     temporaryDirectories.push(projectRoot);
     const testOriginalWorkingDirectory = process.cwd();
 
@@ -27,11 +27,11 @@ describe('spec command', () => {
     try {
       const program = buildProgram();
 
-      await program.parseAsync(['node', 'specflow', 'spec', 'user-auth', '--title', 'User Auth']);
+      await program.parseAsync(['node', 'scifi', 'spec', 'user-auth', '--title', 'User Auth']);
 
       const metadata = JSON.parse(
         await readFile(
-          join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+          join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
           'utf8',
         ),
       );
@@ -45,7 +45,7 @@ describe('spec command', () => {
   });
 
   it('creates a feature container without a title when --title is omitted', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-cli-spec-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-cli-spec-'));
     temporaryDirectories.push(projectRoot);
     const testOriginalWorkingDirectory = process.cwd();
 
@@ -54,11 +54,11 @@ describe('spec command', () => {
     try {
       const program = buildProgram();
 
-      await program.parseAsync(['node', 'specflow', 'spec', 'user-auth']);
+      await program.parseAsync(['node', 'scifi', 'spec', 'user-auth']);
 
       const metadata = JSON.parse(
         await readFile(
-          join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+          join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
           'utf8',
         ),
       );

@@ -15,10 +15,10 @@ afterEach(async () => {
 });
 
 async function scaffoldFeature(projectRoot: string, slug: string, status: string): Promise<string> {
-  const featureDir = join(projectRoot, 'docs', 'specflow', 'specs', slug);
+  const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', slug);
   await mkdir(featureDir, { recursive: true });
   await writeFile(
-    join(featureDir, '.specflow.json'),
+    join(featureDir, '.scifi.json'),
     `${JSON.stringify(
       {
         version: 1,
@@ -38,7 +38,7 @@ async function scaffoldFeature(projectRoot: string, slug: string, status: string
 
 describe('plan-ready command', () => {
   it('transitions feature to plan-ready when design.md and tasks exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-plan-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -53,16 +53,16 @@ describe('plan-ready command', () => {
       'utf8',
     );
 
-    await buildProgram().parseAsync(['node', 'specflow', 'plan-ready', 'user-auth']);
+    await buildProgram().parseAsync(['node', 'scifi', 'plan-ready', 'user-auth']);
 
-    const metadata = JSON.parse(await readFile(join(featureDir, '.specflow.json'), 'utf8')) as {
+    const metadata = JSON.parse(await readFile(join(featureDir, '.scifi.json'), 'utf8')) as {
       status: string;
     };
     expect(metadata.status).toBe('plan-ready');
   });
 
   it('fails when design.md is missing', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-plan-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -82,7 +82,7 @@ describe('plan-ready command', () => {
   });
 
   it('fails when no task files exist', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-ready-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-plan-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 

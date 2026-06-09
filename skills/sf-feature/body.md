@@ -11,8 +11,8 @@ until it is unambiguous, confronting it against what the project already is.
 
 Before grilling, read these (if present):
 
-- `docs/specflow/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction
-- `docs/specflow/CONTEXT.md` — glossary / domain terms
+- `docs/scifi/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction
+- `docs/scifi/CONTEXT.md` — glossary / domain terms
 
 Use them to push back on the user's idea and to keep new work coherent with
 the project. When the feature introduces a new term or touches structure,
@@ -29,7 +29,7 @@ propose updates to these files and apply them live once the user approves.
 - Create the container:
 
   ```
-  specflow spec <slug> --title "<human title>" --json
+  scifi spec <slug> --title "<human title>" --json
   ```
 
   - `<slug>` is the kebab-case folder name. `--title` is optional prose.
@@ -37,7 +37,7 @@ propose updates to these files and apply them live once the user approves.
     feature directory. Your spec goes at `<path>/spec.md`.
   - On success the status is `created`.
   - If it errors with `CONFLICT`, the slug already exists. Pick a different
-    slug or inspect the existing one with `specflow status <slug>`; do not
+    slug or inspect the existing one with `scifi status <slug>`; do not
     overwrite.
 - Tell the user the slug you picked and the path.
 
@@ -61,7 +61,7 @@ placeholder.
 ### 3. Write the spec
 
 - Copy `SPEC-TEMPLATE.md` (ships beside this skill) into `<path>/spec.md` —
-  where `<path>` is the directory returned by `specflow spec` — and fill every
+  where `<path>` is the directory returned by `scifi spec` — and fill every
   section from the grilling.
 - No `TBD` / `TODO` left behind. Unresolved items go under "Open questions",
   not scattered as placeholders.
@@ -79,7 +79,7 @@ placeholder.
 - Only after the review passes, run:
 
   ```
-  specflow spec-ready <slug> --json
+  scifi spec-ready <slug> --json
   ```
 
   - This validates that `<path>/spec.md` exists and transitions the feature
@@ -90,6 +90,6 @@ placeholder.
 
 ## Hard rules
 
-- Never run `specflow spec-ready` before `sf-spec-review` passes.
+- Never run `scifi spec-ready` before `sf-spec-review` passes.
 - Never write `spec.md` while any template section is still unanswered.
 - Never invent project facts — read the docs or ask.

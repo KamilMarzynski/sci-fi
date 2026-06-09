@@ -8,7 +8,7 @@ export interface WriteConfigOptions {
 }
 
 export async function writeConfig(options: WriteConfigOptions): Promise<void> {
-  const configPath = join(options.projectRoot, 'docs', 'specflow', '.specflow', 'config.json');
+  const configPath = join(options.projectRoot, 'docs', 'scifi', '.scifi', 'config.json');
 
   const document = JSON.stringify({ version: 1, harness: options.harness });
 

@@ -17,7 +17,7 @@ afterEach(async () => {
 
 describe('bug command', () => {
   it('creates a standalone bug file and prints id and path', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
@@ -29,7 +29,7 @@ describe('bug command', () => {
     };
 
     try {
-      await buildProgram().parseAsync(['node', 'specflow', 'bug', 'login crash on mobile']);
+      await buildProgram().parseAsync(['node', 'scifi', 'bug', 'login crash on mobile']);
     } finally {
       process.stdout.write = originalWrite;
     }
@@ -44,13 +44,13 @@ describe('bug command', () => {
   });
 
   it('creates a bug with severity and related-feature flags', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     await buildProgram().parseAsync([
       'node',
-      'specflow',
+      'scifi',
       'bug',
       'null ref in checkout',
       '--severity',
@@ -66,7 +66,7 @@ describe('bug command', () => {
   });
 
   it('rejects invalid severity values', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-bug-cmd-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-bug-cmd-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 

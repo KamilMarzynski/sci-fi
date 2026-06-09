@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command, CommanderError } from 'commander';
-import { SpecflowError } from '../core/output/errors.js';
+import { ScifiError } from '../core/output/errors.js';
 import { emitError } from '../core/output/index.js';
 import { findPackageRoot } from '../core/package-root.js';
 import { registerBugCommand } from './commands/bug.js';
@@ -39,7 +39,7 @@ export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name('specflow')
+    .name('scifi')
     .description('Specification-driven CLI scaffolding for agentic workflows')
     .version(readPackageVersion(packageJson))
     .exitOverride();
@@ -104,8 +104,8 @@ function handleCliError(error: unknown, argv: readonly string[]): void {
 
     const message = error.message.replace(/^error:\s*/i, '');
     emitError(
-      new SpecflowError('INVALID_ARGUMENT', message, {
-        hint: 'Run `specflow --help` (or `<command> --help`) for usage.',
+      new ScifiError('INVALID_ARGUMENT', message, {
+        hint: 'Run `scifi --help` (or `<command> --help`) for usage.',
         cause: error,
       }),
       json,

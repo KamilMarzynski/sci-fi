@@ -1,6 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { SpecflowError } from '../output/errors.js';
+import { ScifiError } from '../output/errors.js';
 import { buildFeatureDirectoryPath, buildFeatureMetadataPath } from './paths.js';
 import type { FeatureMetadata, FeatureStatus } from './types.js';
 
@@ -62,8 +62,8 @@ export async function inspectFeatureLifecycle(
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);
   const rawMetadata = await readFile(metadataPath, 'utf8').catch((error: unknown): never => {
     if (isMissingPathError(error)) {
-      throw new SpecflowError('NOT_FOUND', `Feature "${slug}" does not exist.`, {
-        hint: `Create it with \`specflow spec ${slug}\`.`,
+      throw new ScifiError('NOT_FOUND', `Feature "${slug}" does not exist.`, {
+        hint: `Create it with \`scifi spec ${slug}\`.`,
         cause: error,
       });
     }
@@ -72,7 +72,7 @@ export async function inspectFeatureLifecycle(
   const parsed = JSON.parse(rawMetadata);
 
   if (!isValidFeatureMetadata(parsed)) {
-    throw new SpecflowError('INTERNAL', `Invalid metadata file at ${metadataPath}`);
+    throw new ScifiError('INTERNAL', `Invalid metadata file at ${metadataPath}`);
   }
 
   const metadata = parsed;
@@ -112,7 +112,7 @@ export async function validateStatusTransition(
   context?: ValidationContext,
 ): Promise<void> {
   if (targetStatus === 'spec-ready' && !artifacts.specExists) {
-    throw new SpecflowError(
+    throw new ScifiError(
       'PRECONDITION_FAILED',
       'Cannot mark feature as spec-ready: spec.md is missing.',
       { hint: 'Write spec.md in the feature directory, then retry.' },
@@ -121,14 +121,14 @@ export async function validateStatusTransition(
 
   if (targetStatus === 'plan-ready') {
     if (!artifacts.designExists) {
-      throw new SpecflowError(
+      throw new ScifiError(
         'PRECONDITION_FAILED',
         'Cannot mark feature as plan-ready: design.md is missing.',
         { hint: 'Write design.md in the feature directory, then retry.' },
       );
     }
     if (artifacts.taskFileCount < 1) {
-      throw new SpecflowError(
+      throw new ScifiError(
         'PRECONDITION_FAILED',
         'Cannot mark feature as plan-ready: no task files were found.',
         { hint: "Add at least one task under the feature's tasks/ directory." },
@@ -141,18 +141,18 @@ export async function validateStatusTransition(
     context?.currentStatus !== undefined &&
     context.currentStatus !== 'plan-ready'
   ) {
-    throw new SpecflowError(
+    throw new ScifiError(
       'PRECONDITION_FAILED',
       'Cannot start feature: feature must be plan-ready before starting implementation.',
-      { hint: 'Run `specflow plan-ready <slug>` first.' },
+      { hint: 'Run `scifi plan-ready <slug>` first.' },
     );
   }
 
   if (targetStatus === 'done' && context?.allTasksDone === false) {
-    throw new SpecflowError(
+    throw new ScifiError(
       'PRECONDITION_FAILED',
       'Cannot mark feature as done: not all tasks are complete.',
-      { hint: 'Finish remaining tasks with `specflow task done <slug> <task>`.' },
+      { hint: 'Finish remaining tasks with `scifi task done <slug> <task>`.' },
     );
   }
 }

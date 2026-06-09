@@ -3,7 +3,7 @@ import { cwd } from 'node:process';
 import type { Command } from 'commander';
 import { createBug } from '../../core/bugs/create.js';
 import { BUG_SEVERITY_VALUES, type BugSeverity } from '../../core/bugs/types.js';
-import { emitError, emitSuccess, jsonMode, SpecflowError } from '../../core/output/index.js';
+import { emitError, emitSuccess, jsonMode, ScifiError } from '../../core/output/index.js';
 
 function createTimestamp(): string {
   return new Date().toISOString();
@@ -33,7 +33,7 @@ export function registerBugCommand(program: Command): void {
             options.severity !== undefined &&
             !(BUG_SEVERITY_VALUES as readonly string[]).includes(options.severity)
           ) {
-            throw new SpecflowError('INVALID_ARGUMENT', `Invalid severity "${options.severity}".`, {
+            throw new ScifiError('INVALID_ARGUMENT', `Invalid severity "${options.severity}".`, {
               hint: `Must be one of: ${BUG_SEVERITY_VALUES.join(', ')}.`,
             });
           }

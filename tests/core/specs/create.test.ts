@@ -16,8 +16,8 @@ afterEach(async () => {
 });
 
 describe('createFeature', () => {
-  it('creates a feature folder with only .specflow.json', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-create-'));
+  it('creates a feature folder with only .scifi.json', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-create-'));
     temporaryDirectories.push(projectRoot);
 
     const result = await createFeature({
@@ -28,10 +28,10 @@ describe('createFeature', () => {
     });
 
     expect(result.featureDirectoryPath).toBe(
-      join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth'),
+      join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth'),
     );
     expect(result.metadataPath).toBe(
-      join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth', '.specflow.json'),
+      join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth', '.scifi.json'),
     );
 
     const metadataContents = JSON.parse(await readFile(result.metadataPath, 'utf8'));
@@ -43,7 +43,7 @@ describe('createFeature', () => {
   });
 
   it('fails when the feature directory already exists', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-create-'));
     temporaryDirectories.push(projectRoot);
 
     await createFeature({
@@ -59,12 +59,12 @@ describe('createFeature', () => {
         now: '2026-05-20T06:30:55Z',
       }),
     ).rejects.toThrow(
-      `Cannot create feature user-auth: ${join(projectRoot, 'docs', 'specflow', 'specs', 'user-auth')} already exists.`,
+      `Cannot create feature user-auth: ${join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth')} already exists.`,
     );
   });
 
   it('assigns sequential ids', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-create-'));
     temporaryDirectories.push(projectRoot);
 
     const first = await createFeature({
@@ -84,7 +84,7 @@ describe('createFeature', () => {
   });
 
   it('omits title when not provided', async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-create-'));
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-create-'));
     temporaryDirectories.push(projectRoot);
 
     const result = await createFeature({

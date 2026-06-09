@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add the first `specflow` feature lifecycle primitive by implementing `specflow spec <slug> [--title]`, feature metadata under `docs/specflow/specs/<slug>/.specflow.json`, and reusable lifecycle validation helpers for later slash-command workflows.
+**Goal:** Add the first `scifi` feature lifecycle primitive by implementing `scifi spec <slug> [--title]`, feature metadata under `docs/scifi/specs/<slug>/.scifi.json`, and reusable lifecycle validation helpers for later slash-command workflows.
 
-**Architecture:** This stays aligned with the existing repository boundaries: CLI registration and output live in `src/cli`, feature lifecycle logic lives in a new focused `src/core/specs/` area, and verification covers pure core logic, source CLI behavior, and installed-build command behavior. Public CLI scope remains intentionally narrow for this milestone: only `specflow spec` is exposed, while status transition helpers are implemented in core for future commands to consume.
+**Architecture:** This stays aligned with the existing repository boundaries: CLI registration and output live in `src/cli`, feature lifecycle logic lives in a new focused `src/core/specs/` area, and verification covers pure core logic, source CLI behavior, and installed-build command behavior. Public CLI scope remains intentionally narrow for this milestone: only `scifi spec` is exposed, while status transition helpers are implemented in core for future commands to consume.
 
 **Tech Stack:** Node.js, TypeScript, Commander, Vitest, npm
 
@@ -53,14 +53,14 @@ describe("createInitialFeatureMetadata", () => {
 });
 
 describe("feature path helpers", () => {
-  it("places specflow-managed features under docs/specflow/specs", () => {
+  it("places scifi-managed features under docs/scifi/specs", () => {
     const projectRoot = "/repo";
 
     expect(buildFeatureDirectoryPath(projectRoot, "user-auth")).toBe(
-      join(projectRoot, "docs", "specflow", "specs", "user-auth"),
+      join(projectRoot, "docs", "scifi", "specs", "user-auth"),
     );
     expect(buildFeatureMetadataPath(projectRoot, "user-auth")).toBe(
-      join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"),
+      join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"),
     );
   });
 });
@@ -112,7 +112,7 @@ Create `src/core/specs/paths.ts`:
 import { join } from "node:path";
 
 export function buildFeaturesRootPath(projectRoot: string): string {
-  return join(projectRoot, "docs", "specflow", "specs");
+  return join(projectRoot, "docs", "scifi", "specs");
 }
 
 export function buildFeatureDirectoryPath(
@@ -126,7 +126,7 @@ export function buildFeatureMetadataPath(
   projectRoot: string,
   slug: string,
 ): string {
-  return join(buildFeatureDirectoryPath(projectRoot, slug), ".specflow.json");
+  return join(buildFeatureDirectoryPath(projectRoot, slug), ".scifi.json");
 }
 ```
 
@@ -205,8 +205,8 @@ afterEach(async () => {
 });
 
 describe("createFeature", () => {
-  it("creates a feature folder with only .specflow.json", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-create-"));
+  it("creates a feature folder with only .scifi.json", async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-create-"));
     temporaryDirectories.push(projectRoot);
 
     const result = await createFeature({
@@ -217,10 +217,10 @@ describe("createFeature", () => {
     });
 
     expect(result.featureDirectoryPath).toBe(
-      join(projectRoot, "docs", "specflow", "specs", "user-auth"),
+      join(projectRoot, "docs", "scifi", "specs", "user-auth"),
     );
     expect(result.metadataPath).toBe(
-      join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"),
+      join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"),
     );
 
     const metadataContents = JSON.parse(
@@ -234,7 +234,7 @@ describe("createFeature", () => {
   });
 
   it("fails when the feature directory already exists", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-create-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-create-"));
     temporaryDirectories.push(projectRoot);
 
     await createFeature({
@@ -250,7 +250,7 @@ describe("createFeature", () => {
         now: "2026-05-20T06:30:55Z",
       }),
     ).rejects.toThrow(
-      `Cannot create feature user-auth: ${join(projectRoot, "docs", "specflow", "specs", "user-auth")} already exists.`,
+      `Cannot create feature user-auth: ${join(projectRoot, "docs", "scifi", "specs", "user-auth")} already exists.`,
     );
   });
 });
@@ -351,7 +351,7 @@ git add src/core/specs/create.ts src/core/specs/id.ts tests/core/specs/create.te
 git commit -m "feat: add feature creation core logic"
 ```
 
-### Task 3: Wire the `specflow spec` CLI Command
+### Task 3: Wire the `scifi spec` CLI Command
 
 **Files:**
 - Create: `src/cli/commands/spec.ts`
@@ -384,17 +384,17 @@ afterEach(async () => {
 
 describe("spec command", () => {
   it("creates a feature container in the current repository", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-cli-spec-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-cli-spec-"));
     temporaryDirectories.push(projectRoot);
     vi.spyOn(process, "cwd").mockReturnValue(projectRoot);
 
     const program = buildProgram();
 
-    await program.parseAsync(["node", "specflow", "spec", "user-auth", "--title", "User Auth"]);
+    await program.parseAsync(["node", "scifi", "spec", "user-auth", "--title", "User Auth"]);
 
     const metadata = JSON.parse(
       await readFile(
-        join(projectRoot, "docs", "specflow", "specs", "user-auth", ".specflow.json"),
+        join(projectRoot, "docs", "scifi", "specs", "user-auth", ".scifi.json"),
         "utf8",
       ),
     );
@@ -433,7 +433,7 @@ function createTimestamp(): string {
 export function registerSpecCommand(program: Command): void {
   program
     .command("spec")
-    .description("Create a specflow-managed feature container")
+    .description("Create a scifi-managed feature container")
     .argument("<slug>", "feature folder slug")
     .option("--title <title>", "display title for the feature")
     .action(async (slug: string, options: { title?: string }) => {
@@ -458,7 +458,7 @@ export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name("specflow")
+    .name("scifi")
     .description("Specification-driven CLI scaffolding for agentic workflows")
     .version(readPackageVersion(packageJson));
 
@@ -520,13 +520,13 @@ afterEach(async () => {
 
 describe("inspectFeatureLifecycle", () => {
   it("treats created plus spec.md as a draft awaiting acceptance", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "specflow-lifecycle-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "scifi-lifecycle-"));
     temporaryDirectories.push(projectRoot);
-    const featureRoot = join(projectRoot, "docs", "specflow", "specs", "user-auth");
+    const featureRoot = join(projectRoot, "docs", "scifi", "specs", "user-auth");
 
     await mkdir(featureRoot, { recursive: true });
     await writeFile(
-      join(featureRoot, ".specflow.json"),
+      join(featureRoot, ".scifi.json"),
       JSON.stringify({
         version: 1,
         id: "FEAT-0001",
@@ -672,7 +672,7 @@ git commit -m "feat: add lifecycle validation helpers"
 - Create: `tests/e2e/installed-test-helpers.ts`
 - Test: `tests/e2e/installed-spec.test.ts`
 
-- [ ] **Step 1: Write the failing installed-build verification for `specflow spec`**
+- [ ] **Step 1: Write the failing installed-build verification for `scifi spec`**
 
 Create `tests/e2e/installed-spec.test.ts`:
 
@@ -687,7 +687,7 @@ import {
 } from "./installed-test-helpers.js";
 
 describe("installed build spec verification", () => {
-  it("creates a feature container in docs/specflow/specs from an installed package", () => {
+  it("creates a feature container in docs/scifi/specs from an installed package", () => {
     const installation = createInstalledPackageTestEnvironment();
 
     try {
@@ -704,10 +704,10 @@ describe("installed build spec verification", () => {
           join(
             installation.installDirectory,
             "docs",
-            "specflow",
+            "scifi",
             "specs",
             "user-auth",
-            ".specflow.json",
+            ".scifi.json",
           ),
         ),
       ).toBe(true);
@@ -717,10 +717,10 @@ describe("installed build spec verification", () => {
           join(
             installation.installDirectory,
             "docs",
-            "specflow",
+            "scifi",
             "specs",
             "user-auth",
-            ".specflow.json",
+            ".scifi.json",
           ),
           "utf8",
         ),
@@ -761,7 +761,7 @@ export function runInstalledCommand(
   args: readonly string[],
 ): InstalledCommandResult {
   const result = spawnSync(
-    join(installDirectory, "node_modules", ".bin", "specflow"),
+    join(installDirectory, "node_modules", ".bin", "scifi"),
     args,
     {
       cwd: installDirectory,
@@ -788,25 +788,25 @@ Suggested README content:
 ```text
 ## Current Command Surface
 
-specflow init
-specflow spec <slug> [--title "..."]
+scifi init
+scifi spec <slug> [--title "..."]
 
-`specflow spec` creates a feature container under `docs/specflow/specs/<slug>/`
-and writes `.specflow.json` with the CLI-managed feature identifier and status.
+`scifi spec` creates a feature container under `docs/scifi/specs/<slug>/`
+and writes `.scifi.json` with the CLI-managed feature identifier and status.
 ```
 
 Update `ROADMAP.md` Spec Lifecycle item so it no longer promises `plan.md` or initial template scaffolding:
 
 ```md
 2. Spec Lifecycle
-   `specflow spec`, namespaced feature folders, CLI-managed feature metadata,
+   `scifi spec`, namespaced feature folders, CLI-managed feature metadata,
    slug-based feature identity, and lifecycle validation helpers.
 ```
 
 Update `src/core/init/scaffold.ts` generated `AGENTS.md` text so bootstrap guidance no longer points contributors at repo-root `specs/`:
 
 ```ts
-- Capture specflow-managed feature work in `docs/specflow/specs/` before implementing.
+- Capture scifi-managed feature work in `docs/scifi/specs/` before implementing.
 ```
 
 - [ ] **Step 5: Run the full required verification set**
@@ -837,9 +837,9 @@ git commit -m "test: add installed spec lifecycle verification"
 
 ### Spec coverage
 
-- Feature path under `docs/specflow/specs/<slug>/`: covered by Tasks 1, 2, 3, and 5.
-- CLI-owned `.specflow.json`: covered by Tasks 1 and 2.
-- `specflow spec <slug> [--title]`: covered by Task 3 and Task 5.
+- Feature path under `docs/scifi/specs/<slug>/`: covered by Tasks 1, 2, 3, and 5.
+- CLI-owned `.scifi.json`: covered by Tasks 1 and 2.
+- `scifi spec <slug> [--title]`: covered by Task 3 and Task 5.
 - No eager creation of `spec.md`, `architecture.md`, or `tasks/`: covered by Task 2 tests.
 - Lifecycle states and strict transition rules: covered by Task 4.
 - Installed-build verification for user-facing CLI behavior: covered by Task 5.
@@ -852,5 +852,5 @@ No `TODO`, `TBD`, or “implement later” placeholders remain in the plan. Comm
 ### Type consistency
 
 - The plan uses one metadata model throughout: `FeatureMetadata`.
-- The only public CLI addition in this plan is `specflow spec`.
+- The only public CLI addition in this plan is `scifi spec`.
 - Lifecycle statuses are consistent across tasks: `created`, `spec-ready`, `plan-ready`, `in-progress`, `done`.

@@ -11,7 +11,7 @@ function createTimestamp(): string {
 export function registerSpecCommand(program: Command): void {
   program
     .command('spec')
-    .description('Create a specflow-managed feature container')
+    .description('Create a scifi-managed feature container')
     .argument('<slug>', 'feature folder slug')
     .option('--title <title>', 'display title for the feature')
     .option('--json', 'output as structured JSON')
@@ -45,7 +45,7 @@ export function registerSpecCommand(program: Command): void {
             `  Path:   ${path}`,
             `  Status: created`,
             ``,
-            `Next: write spec.md, then run \`specflow spec-ready ${slug}\``,
+            `Next: write spec.md, then run \`scifi spec-ready ${slug}\``,
           ],
         );
       } catch (error) {

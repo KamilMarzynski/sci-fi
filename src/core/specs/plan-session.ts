@@ -1,4 +1,4 @@
-import { SpecflowError } from '../output/errors.js';
+import { ScifiError } from '../output/errors.js';
 import { inspectFeatureLifecycle } from './lifecycle.js';
 import type { FeatureStatus } from './types.js';
 
@@ -25,10 +25,10 @@ export async function inspectPlanSession(projectRoot: string, slug: string): Pro
   const { metadata, artifacts } = await inspectFeatureLifecycle(projectRoot, slug);
 
   if (metadata.status === 'created') {
-    throw new SpecflowError(
+    throw new ScifiError(
       'PRECONDITION_FAILED',
       `Cannot plan "${slug}": feature is not spec-ready yet.`,
-      { hint: `Finish the spec and run \`specflow spec-ready ${slug}\` first.` },
+      { hint: `Finish the spec and run \`scifi spec-ready ${slug}\` first.` },
     );
   }
 

@@ -1,4 +1,4 @@
-import { SpecflowError } from '../output/errors.js';
+import { ScifiError } from '../output/errors.js';
 import { readTaskFile, writeTaskFile } from './frontmatter.js';
 import { buildTaskFilePath } from './paths.js';
 import type { TaskStatus } from './types.js';
@@ -23,20 +23,20 @@ export async function updateTaskStatus(
   const filePath = buildTaskFilePath(projectRoot, featureSlug, taskSlug);
   const file = await readTaskFile(filePath).catch((error: unknown): never => {
     if (isMissingPathError(error)) {
-      throw new SpecflowError(
+      throw new ScifiError(
         'NOT_FOUND',
         `Task "${taskSlug}" does not exist in feature "${featureSlug}".`,
-        { hint: 'Run `specflow task list <slug>` to see available tasks.' },
+        { hint: 'Run `scifi task list <slug>` to see available tasks.' },
       );
     }
     throw error;
   });
 
   if (targetStatus === 'done' && file.frontmatter.status !== 'in-progress') {
-    throw new SpecflowError(
+    throw new ScifiError(
       'PRECONDITION_FAILED',
       `Cannot mark task ${taskSlug} as done: task is not in-progress (current status: ${file.frontmatter.status}).`,
-      { hint: 'Start it first with `specflow task start <slug> <task>`.' },
+      { hint: 'Start it first with `scifi task start <slug> <task>`.' },
     );
   }
 

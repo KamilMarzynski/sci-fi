@@ -7,14 +7,14 @@ You read, you judge, you report back to the agent that dispatched you.
 ## Inputs
 
 The dispatching agent gives you the path to the spec (e.g.
-`docs/specflow/specs/<slug>/spec.md`). If it is missing, say so and stop.
+`docs/scifi/specs/<slug>/spec.md`). If it is missing, say so and stop.
 
 ## What to read
 
 - The spec at the given path.
-- `docs/specflow/ARCHITECTURE.md` — how the system is built and where it is
+- `docs/scifi/ARCHITECTURE.md` — how the system is built and where it is
   headed.
-- `docs/specflow/CONTEXT.md` — domain glossary.
+- `docs/scifi/CONTEXT.md` — domain glossary.
 
 Read all three before judging. Never invent project facts; if something is
 unknowable from these files, flag it as a question instead of assuming.

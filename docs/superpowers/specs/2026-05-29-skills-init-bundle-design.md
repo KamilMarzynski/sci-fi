@@ -2,11 +2,11 @@
 
 - **Date:** 2026-05-29
 - **Status:** draft
-- **Topic:** Bundle agent skills/subagents in the `specflow` package and install them per-harness during `specflow init`.
+- **Topic:** Bundle agent skills/subagents in the `scifi` package and install them per-harness during `scifi init`.
 
 ## Problem
 
-`specflow init` today scaffolds directories and two bootstrap docs (`TESTING.md`, `ROADMAP.md`). It does not install any agent files. The product needs a workflow library — a set of user-callable skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`) plus internal subagents (`spec-review`, `plan-review`, `code-review`, `verification`, `tdd`) — distributed to the user's harness on init. The user must be able to pick their harness (Claude Code first; others follow later).
+`scifi init` today scaffolds directories and two bootstrap docs (`TESTING.md`, `ROADMAP.md`). It does not install any agent files. The product needs a workflow library — a set of user-callable skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-implement`) plus internal subagents (`spec-review`, `plan-review`, `code-review`, `verification`, `tdd`) — distributed to the user's harness on init. The user must be able to pick their harness (Claude Code first; others follow later).
 
 A single skill body must update every harness output at once. Editing prose in multiple shapes is unmaintainable.
 
@@ -14,23 +14,23 @@ A single skill body must update every harness output at once. Editing prose in m
 
 - Real prompt content for any skill (stubs only here; bodies land in per-skill follow-up specs).
 - Harness adapters other than Claude Code (interface defined; OpenCode / Codex / Cursor / AGENTS.md fallback throw `not implemented`).
-- `specflow update` command for regenerating skills (later).
+- `scifi update` command for regenerating skills (later).
 - CLI argument flags beyond `--harness`.
 
 ## Success criteria
 
-- `specflow init` (default or `--harness claude-code`) installs all 10 skill files under `.claude/skills/` and `.claude/agents/` of the target project.
+- `scifi init` (default or `--harness claude-code`) installs all 10 skill files under `.claude/skills/` and `.claude/agents/` of the target project.
 - Picking any non-Claude-Code harness exits non-zero with a clear "not implemented" message before any filesystem write.
 - Editing `skills/<name>/body.md` once changes the output for every implemented adapter.
 - New scaffold docs (`ARCHITECTURE.md`, `CONTEXT.md`, `EVALUATION.md`) ship; `TESTING.md` no longer written by init.
-- `.specflow/config.json` records the chosen harness.
+- `.scifi/config.json` records the chosen harness.
 
 ## Architecture
 
 ### Repository layout
 
 ```
-spec-flow/
+sci-fi/
 ├── skills/                              ← single source of truth (new)
 │   ├── sf-feature/{body.md, manifest.ts}
 │   ├── sf-plan/{body.md, manifest.ts}
@@ -89,7 +89,7 @@ export interface SkillBundle {
 `skills/<id>/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-feature",
@@ -101,7 +101,7 @@ export const manifest: SkillManifest = {
 };
 ```
 
-The type-only import is via a self-referencing subpath (`specflow/skill-types`) exposed by `package.json` `exports`. That keeps the same import path valid in source (`skills/<id>/manifest.ts`) and in the compiled output (`dist/skills/<id>/manifest.js`), so we do not have to fight `rootDir` or relative depth.
+The type-only import is via a self-referencing subpath (`scifi/skill-types`) exposed by `package.json` `exports`. That keeps the same import path valid in source (`skills/<id>/manifest.ts`) and in the compiled output (`dist/skills/<id>/manifest.js`), so we do not have to fight `rootDir` or relative depth.
 
 ### Catalog loader
 
@@ -161,7 +161,7 @@ model: <model>                            # omit when undefined
 
 Followed by a blank line, then the body verbatim.
 
-Idempotency mirrors current `scaffold.ts`: validate target path (must be directory/file or missing), then write. Init writes fresh (no merge); a future `specflow update` will handle re-writes.
+Idempotency mirrors current `scaffold.ts`: validate target path (must be directory/file or missing), then write. Init writes fresh (no merge); a future `scifi update` will handle re-writes.
 
 ### Init flow
 
@@ -190,7 +190,7 @@ await writeConfig({ projectRoot, harness });
 2. Resolve adapter from registry; if `not implemented`, throw `HarnessNotImplementedError` listing the harness id and a tracker pointer. No FS writes.
 3. `adapter.install(bundles, projectRoot)`.
 
-`writeConfig` (`config.ts`) writes `<projectRoot>/docs/specflow/.specflow/config.json`:
+`writeConfig` (`config.ts`) writes `<projectRoot>/docs/scifi/.scifi/config.json`:
 
 ```json
 { "version": 1, "harness": "claude-code" }
@@ -254,8 +254,8 @@ Subagent (`kind: "subagent"`):
 - `tests/core/skills/harness/claude-code.test.ts` — given fake `SkillBundle[]` and tmp `projectRoot`, asserts files written at correct paths with correct frontmatter and bodies. Parses YAML, compares field-by-field. Covers both `user` and `subagent`.
 - `tests/core/init/prompt-harness.test.ts` — flag validation, default, invalid id rejection. Pure logic; UI tested separately if needed.
 - `tests/core/init/scaffold.test.ts` (existing) — extend for `ARCHITECTURE.md`, `CONTEXT.md`, `EVALUATION.md`; assert `TESTING.md` no longer written.
-- `tests/e2e/init.test.ts` (installed build) — `specflow init --harness claude-code` on tmp dir. Assert `.claude/skills/sf-feature/SKILL.md` exists and parses; `.claude/agents/code-review.md` exists and parses; new scaffold docs present; `.specflow/config.json` records `claude-code`.
-- Negative e2e — `specflow init --harness opencode` exits non-zero, error mentions `opencode`, no `.claude/` or scaffold writes occur.
+- `tests/e2e/init.test.ts` (installed build) — `scifi init --harness claude-code` on tmp dir. Assert `.claude/skills/sf-feature/SKILL.md` exists and parses; `.claude/agents/code-review.md` exists and parses; new scaffold docs present; `.scifi/config.json` records `claude-code`.
+- Negative e2e — `scifi init --harness opencode` exits non-zero, error mentions `opencode`, no `.claude/` or scaffold writes occur.
 
 ## Package shape
 
@@ -269,7 +269,7 @@ Subagent (`kind: "subagent"`):
 }
 ```
 
-`tsconfig.json` adds `skills` as an additional root (`rootDirs: ["src", "skills"]`) and `include` extends to `skills/**/manifest.ts`. Compiled output: `dist/core/skills/types.js` (from `src/`) and `dist/skills/<id>/manifest.js` (from `skills/`). The `specflow/skill-types` self-reference resolves identically in source and in `dist/`. At runtime the catalog resolves the package `skills/` directory (for `body.md`) and `dist/skills/<id>/manifest.js` (for the typed manifest) relative to the CLI module via `import.meta.url`.
+`tsconfig.json` adds `skills` as an additional root (`rootDirs: ["src", "skills"]`) and `include` extends to `skills/**/manifest.ts`. Compiled output: `dist/core/skills/types.js` (from `src/`) and `dist/skills/<id>/manifest.js` (from `skills/`). The `scifi/skill-types` self-reference resolves identically in source and in `dist/`. At runtime the catalog resolves the package `skills/` directory (for `body.md`) and `dist/skills/<id>/manifest.js` (for the typed manifest) relative to the CLI module via `import.meta.url`.
 
 ## Implementation order
 

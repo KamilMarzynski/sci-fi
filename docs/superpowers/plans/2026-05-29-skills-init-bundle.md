@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Bundle the `sf-*` user skills and `*-review`/`tdd`/`verification` subagents inside the `specflow` package and install them per-harness during `specflow init`.
+**Goal:** Bundle the `sf-*` user skills and `*-review`/`tdd`/`verification` subagents inside the `scifi` package and install them per-harness during `scifi init`.
 
 **Architecture:** Author each skill as a `skills/<id>/{body.md, manifest.ts}` pair (single source of truth). At init time, a catalog loader reads the bundle and a harness adapter composes per-harness output (frontmatter + path). Only Claude Code is implemented in scope; the registry throws `HarnessNotImplementedError` for the rest. Scaffolded docs grow from 2 to 4 (`EVALUATION.md` replaces `TESTING.md`; `ARCHITECTURE.md` and `CONTEXT.md` are new).
 
@@ -90,7 +90,7 @@ git commit -m "feat(skills): add SkillManifest and SkillBundle types"
 - Modify: `package.json`
 - Modify: `tsconfig.json`
 
-This task wires the `specflow/skill-types` subpath so authored manifests can `import type { SkillManifest } from "specflow/skill-types"` in both source (via tsconfig `paths`) and compiled output (via `package.json` `exports`).
+This task wires the `scifi/skill-types` subpath so authored manifests can `import type { SkillManifest } from "scifi/skill-types"` in both source (via tsconfig `paths`) and compiled output (via `package.json` `exports`).
 
 - [ ] **Step 1: Update `package.json`**
 
@@ -98,7 +98,7 @@ Replace the `"files"` entry and add `"exports"` immediately after `"bin"`:
 
 ```json
   "bin": {
-    "specflow": "./dist/cli/index.js"
+    "scifi": "./dist/cli/index.js"
   },
   "exports": {
     ".": "./dist/cli/index.js",
@@ -127,7 +127,7 @@ Replace the file contents with:
     "rootDirs": ["src", "skills"],
     "baseUrl": ".",
     "paths": {
-      "specflow/skill-types": ["src/core/skills/types.ts"]
+      "scifi/skill-types": ["src/core/skills/types.ts"]
     },
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -160,7 +160,7 @@ Expected: both files exist.
 
 ```bash
 git add package.json tsconfig.json
-git commit -m "chore(skills): add specflow/skill-types subpath export and skills rootDir"
+git commit -m "chore(skills): add scifi/skill-types subpath export and skills rootDir"
 ```
 
 ---
@@ -214,7 +214,7 @@ export class InvalidHarnessError extends Error {
 export class HarnessNotImplementedError extends Error {
   constructor(public readonly harness: HarnessId) {
     super(
-      `Harness "${harness}" is not implemented yet. Track progress at https://github.com/${"<owner>/specflow"}/issues.`,
+      `Harness "${harness}" is not implemented yet. Track progress at https://github.com/${"<owner>/scifi"}/issues.`,
     );
     this.name = "HarnessNotImplementedError";
   }
@@ -387,7 +387,7 @@ afterEach(async () => {
 });
 
 function createProjectRoot(): string {
-  const projectRoot = mkdtempSync(join(tmpdir(), "specflow-cc-adapter-"));
+  const projectRoot = mkdtempSync(join(tmpdir(), "scifi-cc-adapter-"));
   temporaryDirectories.push(projectRoot);
   return projectRoot;
 }
@@ -985,7 +985,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/sf-feature/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-feature",
@@ -1008,7 +1008,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/sf-plan/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-plan",
@@ -1031,7 +1031,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/sf-fix/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-fix",
@@ -1053,7 +1053,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/sf-bug/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-bug",
@@ -1075,7 +1075,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/sf-implement/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "sf-implement",
@@ -1100,7 +1100,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/spec-review/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "spec-review",
@@ -1121,7 +1121,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/plan-review/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "plan-review",
@@ -1142,7 +1142,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/code-review/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "code-review",
@@ -1163,7 +1163,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/verification/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "verification",
@@ -1184,7 +1184,7 @@ TODO: prompt content in follow-up spec.
 Write `skills/tdd/manifest.ts`:
 
 ```ts
-import type { SkillManifest } from "specflow/skill-types";
+import type { SkillManifest } from "scifi/skill-types";
 
 export const manifest: SkillManifest = {
   id: "tdd",
@@ -1314,56 +1314,56 @@ describe("scaffoldInit", () => {
     temporaryDirectories.length = 0;
   });
 
-  it("creates the base specflow directories and bootstrap docs", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-init-core-"));
+  it("creates the base scifi directories and bootstrap docs", async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-init-core-"));
     temporaryDirectories.push(projectRoot);
 
     await scaffoldInit({ projectRoot });
 
-    await expectDirectory(join(projectRoot, "docs", "specflow", ".specflow"));
-    await expectDirectory(join(projectRoot, "docs", "specflow", "specs"));
-    await expectDirectory(join(projectRoot, "docs", "specflow", "bugs"));
+    await expectDirectory(join(projectRoot, "docs", "scifi", ".scifi"));
+    await expectDirectory(join(projectRoot, "docs", "scifi", "specs"));
+    await expectDirectory(join(projectRoot, "docs", "scifi", "bugs"));
 
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "EVALUATION.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "EVALUATION.md"), "utf8"),
     ).toBe(expectedEvaluationDocument);
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "ROADMAP.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "ROADMAP.md"), "utf8"),
     ).toBe(expectedRoadmapDocument);
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "ARCHITECTURE.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "ARCHITECTURE.md"), "utf8"),
     ).toBe(expectedArchitectureDocument);
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "CONTEXT.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "CONTEXT.md"), "utf8"),
     ).toBe(expectedContextDocument);
 
     await expect(
-      access(join(projectRoot, "docs", "specflow", "TESTING.md")),
+      access(join(projectRoot, "docs", "scifi", "TESTING.md")),
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("preserves existing docs when rerun", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-init-core-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-init-core-"));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, "docs", "specflow"), { recursive: true });
+    await mkdir(join(projectRoot, "docs", "scifi"), { recursive: true });
     writeFileSync(
-      join(projectRoot, "docs", "specflow", "EVALUATION.md"),
+      join(projectRoot, "docs", "scifi", "EVALUATION.md"),
       "# Existing evaluation\nDo not replace.\n",
       "utf8",
     );
     writeFileSync(
-      join(projectRoot, "docs", "specflow", "ROADMAP.md"),
+      join(projectRoot, "docs", "scifi", "ROADMAP.md"),
       "# Existing roadmap\nKeep this plan.\n",
       "utf8",
     );
     writeFileSync(
-      join(projectRoot, "docs", "specflow", "ARCHITECTURE.md"),
+      join(projectRoot, "docs", "scifi", "ARCHITECTURE.md"),
       "# Existing architecture\n",
       "utf8",
     );
     writeFileSync(
-      join(projectRoot, "docs", "specflow", "CONTEXT.md"),
+      join(projectRoot, "docs", "scifi", "CONTEXT.md"),
       "# Existing context\n",
       "utf8",
     );
@@ -1371,70 +1371,70 @@ describe("scaffoldInit", () => {
     await scaffoldInit({ projectRoot });
 
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "EVALUATION.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "EVALUATION.md"), "utf8"),
     ).toBe("# Existing evaluation\nDo not replace.\n");
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "ROADMAP.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "ROADMAP.md"), "utf8"),
     ).toBe("# Existing roadmap\nKeep this plan.\n");
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "ARCHITECTURE.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "ARCHITECTURE.md"), "utf8"),
     ).toBe("# Existing architecture\n");
     expect(
-      readFileSync(join(projectRoot, "docs", "specflow", "CONTEXT.md"), "utf8"),
+      readFileSync(join(projectRoot, "docs", "scifi", "CONTEXT.md"), "utf8"),
     ).toBe("# Existing context\n");
   });
 
   it("fails when a doc path already exists as a directory", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-init-core-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-init-core-"));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, "docs", "specflow", "EVALUATION.md"), {
+    await mkdir(join(projectRoot, "docs", "scifi", "EVALUATION.md"), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, "docs", "specflow", "EVALUATION.md")}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, "docs", "scifi", "EVALUATION.md")}: path exists and is not a regular file.`,
     });
   });
 
   it("does not create bootstrap directories when a doc path conflicts", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-init-core-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-init-core-"));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, "docs", "specflow", "ROADMAP.md"), {
+    await mkdir(join(projectRoot, "docs", "scifi", "ROADMAP.md"), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, "docs", "specflow", "ROADMAP.md")}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, "docs", "scifi", "ROADMAP.md")}: path exists and is not a regular file.`,
     });
 
     await expect(
-      access(join(projectRoot, "docs", "specflow", ".specflow")),
+      access(join(projectRoot, "docs", "scifi", ".scifi")),
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("fails without partial writes when a scaffold directory path conflicts", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-init-core-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-init-core-"));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, "docs", "specflow"), { recursive: true });
+    await mkdir(join(projectRoot, "docs", "scifi"), { recursive: true });
     writeFileSync(
-      join(projectRoot, "docs", "specflow", "specs"),
+      join(projectRoot, "docs", "scifi", "specs"),
       "conflict",
       "utf8",
     );
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold directory at ${join(projectRoot, "docs", "specflow", "specs")}: path exists and is not a directory.`,
+      message: `Cannot scaffold directory at ${join(projectRoot, "docs", "scifi", "specs")}: path exists and is not a directory.`,
     });
 
     const conflictingEntry = await stat(
-      join(projectRoot, "docs", "specflow", "specs"),
+      join(projectRoot, "docs", "scifi", "specs"),
     );
     expect(conflictingEntry.isFile()).toBe(true);
     await expect(
-      access(join(projectRoot, "docs", "specflow", "EVALUATION.md")),
+      access(join(projectRoot, "docs", "scifi", "EVALUATION.md")),
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 });
@@ -1662,7 +1662,7 @@ git commit -m "feat(init): replace TESTING with EVALUATION; add ARCHITECTURE and
 - Create: `src/core/init/config.ts`
 - Create: `tests/core/init/config.test.ts`
 
-`.specflow/config.json` records the chosen harness.
+`.scifi/config.json` records the chosen harness.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1690,9 +1690,9 @@ afterEach(async () => {
 
 describe("writeConfig", () => {
   it("writes config.json with the chosen harness", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-config-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-config-"));
     temporaryDirectories.push(projectRoot);
-    await mkdir(join(projectRoot, "docs", "specflow", ".specflow"), {
+    await mkdir(join(projectRoot, "docs", "scifi", ".scifi"), {
       recursive: true,
     });
 
@@ -1700,7 +1700,7 @@ describe("writeConfig", () => {
 
     const written = JSON.parse(
       readFileSync(
-        join(projectRoot, "docs", "specflow", ".specflow", "config.json"),
+        join(projectRoot, "docs", "scifi", ".scifi", "config.json"),
         "utf8",
       ),
     );
@@ -1709,17 +1709,17 @@ describe("writeConfig", () => {
   });
 
   it("preserves existing config.json on rerun", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-config-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-config-"));
     temporaryDirectories.push(projectRoot);
-    await mkdir(join(projectRoot, "docs", "specflow", ".specflow"), {
+    await mkdir(join(projectRoot, "docs", "scifi", ".scifi"), {
       recursive: true,
     });
     const { writeFile } = await import("node:fs/promises");
     const configPath = join(
       projectRoot,
       "docs",
-      "specflow",
-      ".specflow",
+      "scifi",
+      ".scifi",
       "config.json",
     );
     await writeFile(configPath, '{"version":1,"harness":"opencode"}', "utf8");
@@ -1756,8 +1756,8 @@ export async function writeConfig(options: WriteConfigOptions): Promise<void> {
   const configPath = join(
     options.projectRoot,
     "docs",
-    "specflow",
-    ".specflow",
+    "scifi",
+    ".scifi",
     "config.json",
   );
 
@@ -1789,7 +1789,7 @@ Expected: PASS — both cases.
 
 ```bash
 git add src/core/init/config.ts tests/core/init/config.test.ts
-git commit -m "feat(init): write .specflow/config.json with chosen harness"
+git commit -m "feat(init): write .scifi/config.json with chosen harness"
 ```
 
 ---
@@ -1983,7 +1983,7 @@ afterEach(async () => {
 
 describe("installSkills", () => {
   it("installs all 10 bundled skills to the claude-code targets", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-install-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-install-"));
     temporaryDirectories.push(projectRoot);
 
     await installSkills({
@@ -2018,7 +2018,7 @@ describe("installSkills", () => {
   });
 
   it("throws HarnessNotImplementedError for opencode without writing anything", async () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), "specflow-install-"));
+    const projectRoot = mkdtempSync(join(tmpdir(), "scifi-install-"));
     temporaryDirectories.push(projectRoot);
 
     await expect(
@@ -2128,7 +2128,7 @@ interface InitCommandOptions {
 export function registerInitCommand(program: Command): void {
   program
     .command("init")
-    .description("Initialize specflow in the current repository")
+    .description("Initialize scifi in the current repository")
     .option("--harness <id>", "harness adapter to install skills for")
     .option("--yes", "skip prompts and use defaults")
     .action(async (options: InitCommandOptions) => {
@@ -2244,8 +2244,8 @@ const config = JSON.parse(
     join(
       installation.installDirectory,
       "docs",
-      "specflow",
-      ".specflow",
+      "scifi",
+      ".scifi",
       "config.json",
     ),
     "utf8",
@@ -2279,7 +2279,7 @@ it("returns a stable non-zero exit when the chosen harness is not implemented", 
     );
     expect(
       existsSync(
-        join(installation.installDirectory, "docs", "specflow", "EVALUATION.md"),
+        join(installation.installDirectory, "docs", "scifi", "EVALUATION.md"),
       ),
     ).toBe(false);
   } finally {

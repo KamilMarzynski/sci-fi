@@ -5,13 +5,13 @@ import { buildTaskFilePath, buildTasksDirectoryPath } from '../../../src/core/ta
 describe('task path helpers', () => {
   it('places tasks/ under the feature directory', () => {
     expect(buildTasksDirectoryPath('/repo', 'user-auth')).toBe(
-      join('/repo', 'docs', 'specflow', 'specs', 'user-auth', 'tasks'),
+      join('/repo', 'docs', 'scifi', 'specs', 'user-auth', 'tasks'),
     );
   });
 
   it('builds task file path from task slug', () => {
     expect(buildTaskFilePath('/repo', 'user-auth', 'setup-database')).toBe(
-      join('/repo', 'docs', 'specflow', 'specs', 'user-auth', 'tasks', 'setup-database.md'),
+      join('/repo', 'docs', 'scifi', 'specs', 'user-auth', 'tasks', 'setup-database.md'),
     );
   });
 

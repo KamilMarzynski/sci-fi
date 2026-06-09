@@ -18,7 +18,7 @@ export function registerPlanCommand(program: Command): void {
           session.state === 'ready-to-plan'
             ? [
                 'No design.md or tasks yet — start the plan from scratch.',
-                `Next: write design.md and tasks/, then run \`specflow plan-ready ${session.slug}\`.`,
+                `Next: write design.md and tasks/, then run \`scifi plan-ready ${session.slug}\`.`,
               ]
             : session.state === 'in-progress'
               ? [

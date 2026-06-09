@@ -3,28 +3,28 @@ Now I have exactly what I need — the OpenSpec architecture, the Claude Code sk
 
 ***
 
-## Full implementation plan: `specflow`
+## Full implementation plan: `scifi`
 
-This is a self-contained TypeScript CLI + skill package that installs in seconds, works across Claude Code, OpenCode, and Codex, and ships all the slash commands, skill files, and folder scaffolding out of the box. The shape is intentionally modeled on OpenSpec's install pattern — `npm install -g`, then `specflow init` in your repo, done.[1][2]
+This is a self-contained TypeScript CLI + skill package that installs in seconds, works across Claude Code, OpenCode, and Codex, and ships all the slash commands, skill files, and folder scaffolding out of the box. The shape is intentionally modeled on OpenSpec's install pattern — `npm install -g`, then `scifi init` in your repo, done.[1][2]
 
 ***
 
 ## Repository structure
 
 ```
-specflow/
+scifi/
 ├── package.json
 ├── tsconfig.json
 ├── src/
 │   ├── cli/
 │   │   ├── index.ts              ← main entry, registers all commands
 │   │   ├── commands/
-│   │   │   ├── init.ts           ← specflow init
-│   │   │   ├── new-spec.ts       ← specflow spec <id> [--title]
-│   │   │   ├── new-bug.ts        ← specflow bug <description> [--task <id>]
-│   │   │   ├── list.ts           ← specflow list [specs|bugs]
-│   │   │   ├── validate.ts       ← specflow validate [<id>]
-│   │   │   └── update.ts         ← specflow update (regenerate agent files)
+│   │   │   ├── init.ts           ← scifi init
+│   │   │   ├── new-spec.ts       ← scifi spec <id> [--title]
+│   │   │   ├── new-bug.ts        ← scifi bug <description> [--task <id>]
+│   │   │   ├── list.ts           ← scifi list [specs|bugs]
+│   │   │   ├── validate.ts       ← scifi validate [<id>]
+│   │   │   └── update.ts         ← scifi update (regenerate agent files)
 │   ├── scaffold/
 │   │   ├── templates/
 │   │   │   ├── CONTEXT.md        ← glossary template
@@ -66,7 +66,7 @@ specflow/
 
 ## Phase 1 — CLI core
 
-### `specflow init`
+### `scifi init`
 
 This is the most critical command. It mirrors `openspec init` in feel.[1]
 
@@ -80,12 +80,12 @@ This is the most critical command. It mirrors `openspec init` in feel.[1]
    - OpenCode → `.opencode/commands/spec-session.md`, `.opencode/commands/plan.md`, `.opencode/commands/tasks.md`, `.opencode/commands/create-bug.md`
    - Codex → `~/.codex/prompts/spec-session.md` etc. [global, like OpenSpec does it](1)
 5. Writes `AGENTS.md` at repo root (fallback for any tool).[1]
-6. Writes a `.specflow/config.json` with selected tools and version.
+6. Writes a `.scifi/config.json` with selected tools and version.
 7. Prints the onboarding prompt: *"Read CONTEXT.md and architecture.md, then ask me what we're building."*
 
 **Implementation note:** Tool detection can also be automatic. Check for `.claude/` → add Claude Code. Check for `.opencode/` → add OpenCode. Check for `~/.codex/` → add Codex. Prompt to confirm.
 
-### `specflow spec <id> [--title "..."]`
+### `scifi spec <id> [--title "..."]`
 
 Scaffolds a new feature spec folder.
 
@@ -100,7 +100,7 @@ specs/
 
 The ID is auto-generated as `FEAT-NNNN` based on existing folder count, or the user can supply it. The slug is derived from `--title` or prompted.
 
-### `specflow bug <description> [--task <id|name>]`
+### `scifi bug <description> [--task <id|name>]`
 
 This implements the find-or-create logic discussed earlier.
 
@@ -139,17 +139,17 @@ async function createBug(description: string, taskRef?: string) {
 
 The bug file is pre-filled with: ID, status (`open`), severity (prompted or defaulted to `medium`), parent spec link if task-nested, AC-item field (blank, to be filled), repro steps template, expected vs actual template.
 
-### `specflow list [specs|bugs]`
+### `scifi list [specs|bugs]`
 
 - Without argument: shows all specs (ID, title, status, open bug count) and all standalone bugs.
 - `specs`: tabular view of all spec folders with their status from YAML frontmatter.
 - `bugs`: all bugs, grouped by parent spec or "standalone."
 
-### `specflow validate [<id>]`
+### `scifi validate [<id>]`
 
 Validates the YAML frontmatter and required sections of spec/plan/tasks files. Uses Zod schemas. Reports missing required fields (title, AC items, status). Exits non-zero for use in CI hooks.[1]
 
-### `specflow update`
+### `scifi update`
 
 Regenerates all agent files from the bundled templates without touching `CONTEXT.md`, `architecture.md`, `constitution.md`, `lessons.md`, or any specs. Used after upgrading the package, same pattern as `openspec update`.[1]
 
@@ -444,14 +444,14 @@ Key instructions:
 description: Create a bug report. If a task or spec ID is given, nests the bug inside that spec's bugs/ folder and links it to the violated AC item. Otherwise creates a standalone bug in bugs/.
 disable-model-invocation: true
 argument-hint: "[description] [--task <spec-id>]"
-allowed-tools: Read Write Bash(specflow bug *)
+allowed-tools: Read Write Bash(scifi bug *)
 ---
 ```
 
 This skill just invokes the CLI under the hood:
 
 ```markdown
-Run: `specflow bug "$ARGUMENTS"`
+Run: `scifi bug "$ARGUMENTS"`
 
 The CLI handles the find-or-create logic:
 - If --task is present: finds the spec folder, creates bugs/ inside it, links to AC.
@@ -498,7 +498,7 @@ The AGENTS.md fallback explains the full workflow in prose so any agent that rea
 
 ## Phase 5 — Validation and CI
 
-`specflow validate` checks:
+`scifi validate` checks:
 
 - Spec frontmatter has `id`, `title`, `status`, `created`.
 - At least one AC item in WHEN/THEN format.
@@ -509,9 +509,9 @@ The AGENTS.md fallback explains the full workflow in prose so any agent that rea
 Add to your CI pipeline:
 
 ```yaml
-# .github/workflows/specflow.yml
+# .github/workflows/scifi.yml
 - name: Validate specs
-  run: specflow validate
+  run: scifi validate
 ```
 
 Exits non-zero on failures, so broken specs block PRs.
@@ -524,13 +524,13 @@ The package should be:
 
 ```json
 {
-  "name": "@yourname/specflow",
-  "bin": { "specflow": "./dist/cli/index.js" },
+  "name": "@yourname/scifi",
+  "bin": { "scifi": "./dist/cli/index.js" },
   "files": ["dist/", "skills/", "templates/"]
 }
 ```
 
-The `skills/` directory at the package root holds the raw SKILL.md source files so Claude Code can also install them via `npx skills@latest add yourname/specflow/<skill-name>` when the agent skills open standard matures.[3][2]
+The `skills/` directory at the package root holds the raw SKILL.md source files so Claude Code can also install them via `npx skills@latest add yourname/scifi/<skill-name>` when the agent skills open standard matures.[3][2]
 
 ***
 
@@ -542,15 +542,15 @@ Tell your agent to implement in this sequence:
 2. **Templates** — all markdown templates under `src/scaffold/templates/`.
 3. **Scaffolder utility** — reads templates, performs variable substitution, writes files.
 4. **ID and find-spec utilities** — ID generation, fuzzy spec search.
-5. **`specflow init`** — prompts, creates root files, copies agent files.
-6. **`specflow spec`** — scaffolds feature folder from templates.
-7. **`specflow bug`** — find-or-create logic, writes bug file.
-8. **`specflow list`** and **`specflow validate`** — read and report.
-9. **`specflow update`** — regenerate agent files only.
+5. **`scifi init`** — prompts, creates root files, copies agent files.
+6. **`scifi spec`** — scaffolds feature folder from templates.
+7. **`scifi bug`** — find-or-create logic, writes bug file.
+8. **`scifi list`** and **`scifi validate`** — read and report.
+9. **`scifi update`** — regenerate agent files only.
 10. **Skill files** — write all five `SKILL.md` files with full prompt content.
 11. **Agent file distribution** — generate per-tool variants of each skill on `init`/`update`.
 12. **AGENTS.md** — prose fallback covering the full workflow.
-13. **CI example** — `.github/workflows/specflow.yml` template.
+13. **CI example** — `.github/workflows/scifi.yml` template.
 14. **README** — install, init, first spec session, first bug.
 
 Each step is independently testable, no step depends on incomplete earlier steps, and the prompt engineering for the skill files (which you said you'll work on separately) is isolated to the `SKILL.md` files themselves — they can be iterated without touching the CLI.[2][1]

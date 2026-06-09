@@ -12,11 +12,11 @@ type ScaffoldDirectory = {
 };
 
 /**
- * Create the baseline specflow directories and bootstrap documents.
+ * Create the baseline scifi directories and bootstrap documents.
  */
 export async function scaffoldInit(options: InitOptions): Promise<void> {
   const { projectRoot } = options;
-  const specsRoot = join(projectRoot, 'docs', 'specflow');
+  const specsRoot = join(projectRoot, 'docs', 'scifi');
   const scaffoldDirectories = buildScaffoldDirectories(specsRoot);
   const bootstrapDocuments = buildBootstrapDocuments(specsRoot);
 
@@ -34,7 +34,7 @@ export async function scaffoldInit(options: InitOptions): Promise<void> {
 
 function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
   return [
-    { path: join(specsRoot, '.specflow') },
+    { path: join(specsRoot, '.scifi') },
     { path: join(specsRoot, 'specs') },
     { path: join(specsRoot, 'bugs') },
   ];
