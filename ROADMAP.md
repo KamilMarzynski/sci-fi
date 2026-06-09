@@ -39,7 +39,7 @@ Shipped:
 - `skills/<id>/{body.md,manifest.ts}` single source of truth for 11 stub skills (all `sf-*` user skills).
 - `src/core/skills/` — `types`, `catalog`, `harness/{adapter,registry,claude-code,register-defaults}`.
 - `src/core/init/` additions — `prompt-harness`, `install-skills`, `config`.
-- Scaffold docs: `TESTING.md` replaced by `EVALUATION.md`; `ARCHITECTURE.md` and `CONTEXT.md` added.
+- Scaffold docs: `TESTING.md` replaced by `EVALUATION.md`; `CONTEXT.md` added. Architecture decisions are captured lazily in `docs/scifi/adr/` — there is no generated `ARCHITECTURE.md`.
 - CLI: `scifi init --harness <id> [--yes]`. Claude Code adapter writes `.claude/skills/<id>/SKILL.md`. Other harnesses defined in interface, throw `HarnessNotImplementedError` before any FS write.
 - `package.json` self-reference subpath `scifi/skill-types` for typed manifests.
 - 147/147 tests pass.

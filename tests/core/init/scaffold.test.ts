@@ -31,22 +31,22 @@ describe('scaffoldInit', () => {
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
       expectedEvaluationDocument,
     );
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
     await expect(
       access(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md')),
     ).rejects.toMatchObject({ code: 'ENOENT' });
-    await expect(
-      access(join(projectRoot, 'docs', 'scifi', 'adr')),
-    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'adr'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       expectedContextDocument,
     );
 
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'TESTING.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'TESTING.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 
   it('preserves existing docs when rerun', async () => {
@@ -59,11 +59,7 @@ describe('scaffoldInit', () => {
       '# Existing evaluation\nDo not replace.\n',
       'utf8',
     );
-    writeFileSync(
-      join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'),
-      '# Existing context\n',
-      'utf8',
-    );
+    writeFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), '# Existing context\n', 'utf8');
 
     await scaffoldInit({ projectRoot });
 
@@ -118,9 +114,9 @@ describe('scaffoldInit', () => {
 
     const conflictingEntry = await stat(join(projectRoot, 'docs', 'scifi', 'specs'));
     expect(conflictingEntry.isFile()).toBe(true);
-    await expect(
-      access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')),
-    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
+    );
   });
 });
 
