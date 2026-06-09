@@ -33,6 +33,7 @@ describe('claudeCodeAdapter', () => {
         allowedTools: ['Read', 'Write'],
       },
       body: '# sf-feature\n\nstub body\n',
+      assets: [],
     };
 
     await claudeCodeAdapter.install([bundle], projectRoot);
@@ -53,6 +54,26 @@ describe('claudeCodeAdapter', () => {
     expect(bodyLines.join('\n')).toBe('# sf-feature\n\nstub body\n');
   });
 
+  it('writes companion assets beside SKILL.md', async () => {
+    const projectRoot = createProjectRoot();
+    const bundle: SkillBundle = {
+      manifest: {
+        id: 'sf-feature',
+        description: 'Start grilling session for a new feature.',
+      },
+      body: '# sf-feature\n',
+      assets: [{ name: 'SPEC-TEMPLATE.md', contents: '# Spec: <title>\n' }],
+    };
+
+    await claudeCodeAdapter.install([bundle], projectRoot);
+
+    const written = readFileSync(
+      join(projectRoot, '.claude', 'skills', 'sf-feature', 'SPEC-TEMPLATE.md'),
+      'utf8',
+    );
+    expect(written).toBe('# Spec: <title>\n');
+  });
+
   it('omits optional frontmatter keys when not provided', async () => {
     const projectRoot = createProjectRoot();
     const bundle: SkillBundle = {
@@ -61,6 +82,7 @@ describe('claudeCodeAdapter', () => {
         description: 'Create a bug report.',
       },
       body: '# sf-bug\n',
+      assets: [],
     };
 
     await claudeCodeAdapter.install([bundle], projectRoot);

@@ -10,7 +10,13 @@ const skillManifestSchema = z.object({
 export { skillManifestSchema };
 export type SkillManifest = z.infer<typeof skillManifestSchema>;
 
+export interface SkillAsset {
+  readonly name: string;
+  readonly contents: string;
+}
+
 export interface SkillBundle {
   readonly manifest: SkillManifest;
   readonly body: string;
+  readonly assets: readonly SkillAsset[];
 }

@@ -8,11 +8,16 @@ export const claudeCodeAdapter: HarnessAdapter = {
   id: 'claude-code',
   async install(bundles, projectRoot) {
     for (const bundle of bundles) {
-      const targetPath = join(projectRoot, '.claude', 'skills', bundle.manifest.id, 'SKILL.md');
+      const skillDirectory = join(projectRoot, '.claude', 'skills', bundle.manifest.id);
+      const targetPath = join(skillDirectory, 'SKILL.md');
       const document = renderDocument(bundle);
 
-      await mkdir(dirname(targetPath), { recursive: true });
+      await mkdir(skillDirectory, { recursive: true });
       await writeFile(targetPath, document, { encoding: 'utf8' });
+
+      for (const asset of bundle.assets) {
+        await writeFile(join(skillDirectory, asset.name), asset.contents, { encoding: 'utf8' });
+      }
     }
   },
 };

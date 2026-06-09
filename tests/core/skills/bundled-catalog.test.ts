@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageRoot = join(__dirname, '..', '..', '..');
 
 describe('bundled skill catalog', () => {
-  it('loads exactly 12 skills with matching ids', async () => {
+  it('loads exactly 13 skills with matching ids', async () => {
     const bundles = await loadCatalog({
       bodiesRoot: join(packageRoot, 'skills'),
       manifestsRoot: join(packageRoot, 'dist', 'skills'),
@@ -25,6 +25,7 @@ describe('bundled skill catalog', () => {
       'sf-implement',
       'sf-plan',
       'sf-plan-review',
+      'sf-receiving-review',
       'sf-spec-review',
       'sf-tdd',
       'sf-verification',

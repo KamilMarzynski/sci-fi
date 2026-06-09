@@ -1,7 +1,14 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { type SkillBundle, type SkillManifest, skillManifestSchema } from './types.js';
+import {
+  type SkillAsset,
+  type SkillBundle,
+  type SkillManifest,
+  skillManifestSchema,
+} from './types.js';
+
+const NON_ASSET_FILES = new Set(['body.md', 'manifest.ts', 'manifest.js']);
 
 export interface LoadCatalogOptions {
   readonly bodiesRoot: string;
@@ -35,10 +42,28 @@ export async function loadCatalog(options: LoadCatalogOptions): Promise<SkillBun
     await assertFileExists(bodyPath);
     const body = await readFile(bodyPath, { encoding: 'utf8' });
 
-    bundles.push({ manifest, body });
+    const assets = await loadAssets(join(options.bodiesRoot, folder));
+
+    bundles.push({ manifest, body, assets });
   }
 
   return bundles;
+}
+
+async function loadAssets(skillDirectory: string): Promise<SkillAsset[]> {
+  const entries = await readdir(skillDirectory, { withFileTypes: true });
+  const assetNames = entries
+    .filter((entry) => entry.isFile() && !NON_ASSET_FILES.has(entry.name))
+    .map((entry) => entry.name)
+    .sort();
+
+  const assets: SkillAsset[] = [];
+  for (const name of assetNames) {
+    const contents = await readFile(join(skillDirectory, name), { encoding: 'utf8' });
+    assets.push({ name, contents });
+  }
+
+  return assets;
 }
 
 async function loadManifest(modulePath: string): Promise<SkillManifest> {

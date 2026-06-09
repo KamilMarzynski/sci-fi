@@ -19,9 +19,13 @@ describe('loadCatalog', () => {
     const feature = bundles.find((bundle) => bundle.manifest.id === 'sf-feature');
     expect(feature?.manifest.description).toBe('Start grilling session for a new feature.');
     expect(feature?.body).toBe('# sf-feature\n\nstub body\n');
+    expect(feature?.assets).toEqual([
+      { name: 'SPEC-TEMPLATE.md', contents: '# Spec: <title>\n\nstub template\n' },
+    ]);
 
     const review = bundles.find((bundle) => bundle.manifest.id === 'sf-spec-review');
     expect(review?.manifest.description).toBe('Critic pass on a spec.');
+    expect(review?.assets).toEqual([]);
   });
 
   it('throws when manifest.id does not match the folder name', async () => {
