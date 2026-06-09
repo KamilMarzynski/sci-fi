@@ -32,8 +32,8 @@ describe('installed build lifecycle verification', () => {
       };
       expect(metadata.status).toBe('spec-ready');
 
-      // Write architecture.md and a task, then mark plan-ready
-      writeFileSync(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+      // Write design.md and a task, then mark plan-ready
+      writeFileSync(join(featureDir, 'design.md'), '# Design\n', 'utf8');
       const tasksDir = join(featureDir, 'tasks');
       mkdirSync(tasksDir, { recursive: true });
       writeFileSync(

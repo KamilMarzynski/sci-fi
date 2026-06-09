@@ -41,8 +41,8 @@ describe('specflow init', () => {
     expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), 'utf8')).toBe(
       expectedEvaluationDocument,
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'), 'utf8')).toBe(
-      expectedRoadmapDocument,
+    await expect(access(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
     );
   });
 
@@ -119,21 +119,6 @@ Evaluation is a release gate for this repository.
 - Prefer deterministic tests over mocks for file generation.
 - Inspect generated files for meaningful content, not only existence.
 - Record any skipped verification so the gap is explicit.
-`;
-
-const expectedRoadmapDocument = `# ROADMAP.md
-
-## Milestones
-
-1. Define the workflows and templates this repository needs.
-2. Implement core logic with reusable modules and test coverage.
-3. Add CLI commands that exercise the core behavior safely.
-
-## Near-Term Focus
-
-- Keep generated project conventions clear and easy to maintain.
-- Expand verification as more commands become user-facing.
-- Use this roadmap to track the next approved increments.
 `;
 
 async function expectDirectory(directoryPath: string): Promise<void> {

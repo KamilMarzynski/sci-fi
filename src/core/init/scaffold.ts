@@ -47,10 +47,6 @@ function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
       contents: buildEvaluationDocument(),
     },
     {
-      path: join(specsRoot, 'ROADMAP.md'),
-      contents: buildRoadmapDocument(),
-    },
-    {
       path: join(specsRoot, 'ARCHITECTURE.md'),
       contents: buildArchitectureDocument(),
     },
@@ -154,23 +150,6 @@ Evaluation is a release gate for this repository.
 - Prefer deterministic tests over mocks for file generation.
 - Inspect generated files for meaningful content, not only existence.
 - Record any skipped verification so the gap is explicit.
-`;
-}
-
-function buildRoadmapDocument(): string {
-  return `# ROADMAP.md
-
-## Milestones
-
-1. Define the workflows and templates this repository needs.
-2. Implement core logic with reusable modules and test coverage.
-3. Add CLI commands that exercise the core behavior safely.
-
-## Near-Term Focus
-
-- Keep generated project conventions clear and easy to maintain.
-- Expand verification as more commands become user-facing.
-- Use this roadmap to track the next approved increments.
 `;
 }
 

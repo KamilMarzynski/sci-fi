@@ -6,7 +6,7 @@ import type { FeatureMetadata, FeatureStatus } from './types.js';
 
 export interface FeatureArtifacts {
   specExists: boolean;
-  architectureExists: boolean;
+  designExists: boolean;
   taskFileCount: number;
 }
 
@@ -78,7 +78,7 @@ export async function inspectFeatureLifecycle(
   const metadata = parsed;
 
   const specExists = await pathIsRegularFile(join(featureRoot, 'spec.md'));
-  const architectureExists = await pathIsRegularFile(join(featureRoot, 'architecture.md'));
+  const designExists = await pathIsRegularFile(join(featureRoot, 'design.md'));
   const taskEntries = await readdir(join(featureRoot, 'tasks'), {
     withFileTypes: true,
   }).catch((error: unknown) => {
@@ -95,7 +95,7 @@ export async function inspectFeatureLifecycle(
     metadata,
     artifacts: {
       specExists,
-      architectureExists,
+      designExists,
       taskFileCount,
     },
   };
@@ -120,11 +120,11 @@ export async function validateStatusTransition(
   }
 
   if (targetStatus === 'plan-ready') {
-    if (!artifacts.architectureExists) {
+    if (!artifacts.designExists) {
       throw new SpecflowError(
         'PRECONDITION_FAILED',
-        'Cannot mark feature as plan-ready: architecture.md is missing.',
-        { hint: 'Write architecture.md in the feature directory, then retry.' },
+        'Cannot mark feature as plan-ready: design.md is missing.',
+        { hint: 'Write design.md in the feature directory, then retry.' },
       );
     }
     if (artifacts.taskFileCount < 1) {

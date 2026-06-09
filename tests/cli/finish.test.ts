@@ -36,7 +36,7 @@ async function scaffoldInProgressFeature(projectRoot: string): Promise<string> {
     'utf8',
   );
   await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
-  await writeFile(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+  await writeFile(join(featureDir, 'design.md'), '# Design\n', 'utf8');
   return tasksDir;
 }
 

@@ -32,8 +32,8 @@ describe('installed build init verification', () => {
         ),
       ).toBe(expectedEvaluationDocument);
       expect(
-        readFileSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md'), 'utf8'),
-      ).toBe(expectedRoadmapDocument);
+        existsSync(join(installation.installDirectory, 'docs', 'specflow', 'ROADMAP.md')),
+      ).toBe(false);
 
       expect(
         existsSync(
@@ -73,7 +73,6 @@ describe('installed build init verification', () => {
 
       const specflowRoot = join(installation.installDirectory, 'docs', 'specflow');
       const evaluationPath = join(specflowRoot, 'EVALUATION.md');
-      const roadmapPath = join(specflowRoot, 'ROADMAP.md');
       const specPath = join(specflowRoot, 'specs', 'existing-spec.md');
       const bugPath = join(specflowRoot, 'bugs', 'existing-bug.md');
       const statePath = join(specflowRoot, '.specflow', 'state.json');
@@ -93,7 +92,6 @@ describe('installed build init verification', () => {
       );
 
       writeFileSync(evaluationPath, preservedEvaluationDocument, 'utf8');
-      writeFileSync(roadmapPath, preservedRoadmapDocument, 'utf8');
       writeFileSync(specPath, preservedSpecDocument, 'utf8');
       writeFileSync(bugPath, preservedBugDocument, 'utf8');
       writeFileSync(statePath, preservedStateDocument, 'utf8');
@@ -112,7 +110,6 @@ describe('installed build init verification', () => {
       expect(rerun.status).toBe(0);
       expect(rerun.stderr).toBe('');
       expect(readFileSync(evaluationPath, 'utf8')).toBe(preservedEvaluationDocument);
-      expect(readFileSync(roadmapPath, 'utf8')).toBe(preservedRoadmapDocument);
       expect(readFileSync(specPath, 'utf8')).toBe(preservedSpecDocument);
       expect(readFileSync(bugPath, 'utf8')).toBe(preservedBugDocument);
       expect(readFileSync(statePath, 'utf8')).toBe(preservedStateDocument);
@@ -208,29 +205,9 @@ Evaluation is a release gate for this repository.
 - Record any skipped verification so the gap is explicit.
 `;
 
-const expectedRoadmapDocument = `# ROADMAP.md
-
-## Milestones
-
-1. Define the workflows and templates this repository needs.
-2. Implement core logic with reusable modules and test coverage.
-3. Add CLI commands that exercise the core behavior safely.
-
-## Near-Term Focus
-
-- Keep generated project conventions clear and easy to maintain.
-- Expand verification as more commands become user-facing.
-- Use this roadmap to track the next approved increments.
-`;
-
 const preservedEvaluationDocument = `# EVALUATION.md
 
 Preserve this custom evaluation note on rerun.
-`;
-
-const preservedRoadmapDocument = `# ROADMAP.md
-
-Preserve this custom roadmap note on rerun.
 `;
 
 const preservedSpecDocument = `# Existing Spec

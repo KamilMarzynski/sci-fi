@@ -48,7 +48,6 @@ Running `specflow init` in a repository creates:
 - `bugs/`
 - `AGENTS.md`
 - `TESTING.md`
-- `ROADMAP.md`
 
 Existing bootstrap docs are preserved when the target path is already a regular file. The command fails if one of those doc paths already exists as a non-file entry such as a directory.
 

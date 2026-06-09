@@ -11,6 +11,7 @@ import { registerFinishCommand } from './commands/finish.js';
 import { registerFixCommand } from './commands/fix.js';
 import { registerInitCommand } from './commands/init.js';
 import { registerListCommand } from './commands/list.js';
+import { registerPlanCommand } from './commands/plan.js';
 import { registerPlanReadyCommand } from './commands/plan-ready.js';
 import { registerSpecCommand } from './commands/spec.js';
 import { registerSpecReadyCommand } from './commands/spec-ready.js';
@@ -46,6 +47,7 @@ export function buildProgram(): Command {
   registerInitCommand(program);
   registerSpecCommand(program);
   registerSpecReadyCommand(program);
+  registerPlanCommand(program);
   registerPlanReadyCommand(program);
   registerStartCommand(program);
   registerFinishCommand(program);

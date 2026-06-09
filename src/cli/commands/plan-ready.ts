@@ -10,7 +10,7 @@ function createTimestamp(): string {
 export function registerPlanReadyCommand(program: Command): void {
   program
     .command('plan-ready')
-    .description('Mark a feature as plan-ready (validates architecture.md and tasks/ exist)')
+    .description('Mark a feature as plan-ready (validates design.md and tasks/ exist)')
     .argument('<slug>', 'feature folder slug')
     .option('--json', 'output as structured JSON')
     .action(async (slug: string, _options: unknown, command: Command) => {

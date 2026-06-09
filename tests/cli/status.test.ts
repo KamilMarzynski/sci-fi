@@ -40,7 +40,7 @@ describe('status command', () => {
       'utf8',
     );
     await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
-    await writeFile(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+    await writeFile(join(featureDir, 'design.md'), '# Design\n', 'utf8');
     await writeFile(
       join(tasksDir, 'setup-db.md'),
       '---\nid: TASK-001\nslug: setup-db\nstatus: done\ndepends-on: []\n---\n# Setup DB\n',
@@ -64,7 +64,7 @@ describe('status command', () => {
     expect(combined).toContain('user-auth');
     expect(combined).toContain('in-progress');
     expect(combined).toContain('spec.md');
-    expect(combined).toContain('architecture.md');
+    expect(combined).toContain('design.md');
     expect(combined).toContain('setup-db');
     expect(combined).toContain('done');
   });

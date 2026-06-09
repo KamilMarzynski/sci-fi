@@ -38,7 +38,7 @@ describe('createFeature', () => {
 
     expect(metadataContents.status).toBe('created');
     await expect(stat(join(result.featureDirectoryPath, 'spec.md'))).rejects.toThrow();
-    await expect(stat(join(result.featureDirectoryPath, 'architecture.md'))).rejects.toThrow();
+    await expect(stat(join(result.featureDirectoryPath, 'design.md'))).rejects.toThrow();
     await expect(stat(join(result.featureDirectoryPath, 'tasks'))).rejects.toThrow();
   });
 

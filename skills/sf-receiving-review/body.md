@@ -4,10 +4,13 @@ You just got a review back — from an `sf-*-review` subagent or from a human.
 This skill is how you act on it. Review is technical evaluation, not a social
 ritual. Verify before you implement; push back when the reviewer is wrong.
 
-The dispatcher tells you the **review type** (spec or code). It sets the lens:
+The dispatcher tells you the **review type** (spec, plan, or code). It sets the
+lens:
 
 - **spec review** — you are fixing `spec.md`: ambiguity, acceptance criteria,
   scope, architecture/context conflicts. You edit the spec, not source.
+- **plan review** — you are fixing `design.md` and the task files: module depth,
+  seams, spec coverage, task ordering/validation. You edit the plan, not source.
 - **code review** — you are fixing the implementation: bugs, tests, structure.
 
 ## The pattern

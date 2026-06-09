@@ -37,14 +37,14 @@ async function scaffoldFeature(projectRoot: string, slug: string, status: string
 }
 
 describe('plan-ready command', () => {
-  it('transitions feature to plan-ready when architecture.md and tasks exist', async () => {
+  it('transitions feature to plan-ready when design.md and tasks exist', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     const featureDir = await scaffoldFeature(projectRoot, 'user-auth', 'spec-ready');
     await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
-    await writeFile(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+    await writeFile(join(featureDir, 'design.md'), '# Design\n', 'utf8');
     const tasksDir = join(featureDir, 'tasks');
     await mkdir(tasksDir, { recursive: true });
     await writeFile(
@@ -61,7 +61,7 @@ describe('plan-ready command', () => {
     expect(metadata.status).toBe('plan-ready');
   });
 
-  it('fails when architecture.md is missing', async () => {
+  it('fails when design.md is missing', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'specflow-plan-ready-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
@@ -78,7 +78,7 @@ describe('plan-ready command', () => {
 
     const run = await runCli(['plan-ready', 'user-auth']);
     expect(run.exitCode).toBe(4);
-    expect(run.stderr).toContain('architecture.md is missing');
+    expect(run.stderr).toContain('design.md is missing');
   });
 
   it('fails when no task files exist', async () => {
@@ -88,7 +88,7 @@ describe('plan-ready command', () => {
 
     const featureDir = await scaffoldFeature(projectRoot, 'user-auth', 'spec-ready');
     await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
-    await writeFile(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+    await writeFile(join(featureDir, 'design.md'), '# Design\n', 'utf8');
 
     const run = await runCli(['plan-ready', 'user-auth']);
     expect(run.exitCode).toBe(4);

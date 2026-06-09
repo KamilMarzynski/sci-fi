@@ -41,7 +41,7 @@ describe('inspectFeatureLifecycle', () => {
 
     expect(lifecycle.metadata.status).toBe('created');
     expect(lifecycle.artifacts.specExists).toBe(true);
-    expect(lifecycle.artifacts.architectureExists).toBe(false);
+    expect(lifecycle.artifacts.designExists).toBe(false);
     expect(lifecycle.artifacts.taskFileCount).toBe(0);
   });
 
@@ -97,7 +97,7 @@ describe('validateStatusTransition', () => {
       validateStatusTransition(
         {
           specExists: false,
-          architectureExists: true,
+          designExists: true,
           taskFileCount: 1,
         },
         'spec-ready',
@@ -105,17 +105,17 @@ describe('validateStatusTransition', () => {
     ).rejects.toThrow('Cannot mark feature as spec-ready: spec.md is missing.');
   });
 
-  it('rejects plan-ready when architecture.md is missing', async () => {
+  it('rejects plan-ready when design.md is missing', async () => {
     await expect(
       validateStatusTransition(
         {
           specExists: true,
-          architectureExists: false,
+          designExists: false,
           taskFileCount: 1,
         },
         'plan-ready',
       ),
-    ).rejects.toThrow('Cannot mark feature as plan-ready: architecture.md is missing.');
+    ).rejects.toThrow('Cannot mark feature as plan-ready: design.md is missing.');
   });
 
   it('rejects plan-ready when task files are missing', async () => {
@@ -123,7 +123,7 @@ describe('validateStatusTransition', () => {
       validateStatusTransition(
         {
           specExists: true,
-          architectureExists: true,
+          designExists: true,
           taskFileCount: 0,
         },
         'plan-ready',
@@ -136,7 +136,7 @@ describe('validateStatusTransition', () => {
       validateStatusTransition(
         {
           specExists: true,
-          architectureExists: false,
+          designExists: false,
           taskFileCount: 0,
         },
         'spec-ready',
@@ -149,7 +149,7 @@ describe('validateStatusTransition', () => {
       validateStatusTransition(
         {
           specExists: true,
-          architectureExists: true,
+          designExists: true,
           taskFileCount: 1,
         },
         'plan-ready',
@@ -160,7 +160,7 @@ describe('validateStatusTransition', () => {
   it('does not throw for statuses with no rules', async () => {
     const artifacts = {
       specExists: false,
-      architectureExists: false,
+      designExists: false,
       taskFileCount: 0,
     };
 
@@ -174,7 +174,7 @@ describe('validateStatusTransition with context', () => {
   it('rejects in-progress when current status is not plan-ready', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        { specExists: true, designExists: true, taskFileCount: 1 },
         'in-progress',
         { currentStatus: 'spec-ready' },
       ),
@@ -186,7 +186,7 @@ describe('validateStatusTransition with context', () => {
   it('accepts in-progress when current status is plan-ready', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        { specExists: true, designExists: true, taskFileCount: 1 },
         'in-progress',
         { currentStatus: 'plan-ready' },
       ),
@@ -196,7 +196,7 @@ describe('validateStatusTransition with context', () => {
   it('rejects done when allTasksDone is false', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        { specExists: true, designExists: true, taskFileCount: 1 },
         'done',
         { allTasksDone: false },
       ),
@@ -206,7 +206,7 @@ describe('validateStatusTransition with context', () => {
   it('accepts done when allTasksDone is true', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: true, architectureExists: true, taskFileCount: 1 },
+        { specExists: true, designExists: true, taskFileCount: 1 },
         'done',
         { allTasksDone: true },
       ),
@@ -216,7 +216,7 @@ describe('validateStatusTransition with context', () => {
   it('does not apply in-progress rule when context is absent', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: false, architectureExists: false, taskFileCount: 0 },
+        { specExists: false, designExists: false, taskFileCount: 0 },
         'in-progress',
       ),
     ).resolves.toBeUndefined();
@@ -225,7 +225,7 @@ describe('validateStatusTransition with context', () => {
   it('does not apply done rule when context is absent', async () => {
     await expect(
       validateStatusTransition(
-        { specExists: false, architectureExists: false, taskFileCount: 0 },
+        { specExists: false, designExists: false, taskFileCount: 0 },
         'done',
       ),
     ).resolves.toBeUndefined();

@@ -39,7 +39,7 @@ describe('start command', () => {
       'utf8',
     );
     await writeFile(join(featureDir, 'spec.md'), '# Spec\n', 'utf8');
-    await writeFile(join(featureDir, 'architecture.md'), '# Architecture\n', 'utf8');
+    await writeFile(join(featureDir, 'design.md'), '# Design\n', 'utf8');
     const tasksDir = join(featureDir, 'tasks');
     await mkdir(tasksDir, { recursive: true });
     await writeFile(

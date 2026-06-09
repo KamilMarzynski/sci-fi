@@ -28,7 +28,7 @@ export function registerStatusCommand(program: Command): void {
           status: metadata.status,
           artifacts: {
             spec: artifacts.specExists,
-            architecture: artifacts.architectureExists,
+            design: artifacts.designExists,
             taskCount: artifacts.taskFileCount,
           },
           tasks: tasks.map((task) => ({ slug: task.slug, status: task.status })),
@@ -45,9 +45,9 @@ export function registerStatusCommand(program: Command): void {
           `id:      ${metadata.id}`,
           `status:  ${metadata.status}`,
           ``,
-          `spec.md:          ${artifacts.specExists ? 'present' : 'missing'}`,
-          `architecture.md:  ${artifacts.architectureExists ? 'present' : 'missing'}`,
-          `tasks:            ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? '' : 's'}`,
+          `spec.md:    ${artifacts.specExists ? 'present' : 'missing'}`,
+          `design.md:  ${artifacts.designExists ? 'present' : 'missing'}`,
+          `tasks:      ${artifacts.taskFileCount} file${artifacts.taskFileCount === 1 ? '' : 's'}`,
           ...(tasks.length > 0
             ? ['', ...tasks.map((task) => `  ${task.slug}\t${task.status}`)]
             : []),

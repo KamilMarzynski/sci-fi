@@ -31,8 +31,8 @@ describe('scaffoldInit', () => {
     expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), 'utf8')).toBe(
       expectedEvaluationDocument,
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'), 'utf8')).toBe(
-      expectedRoadmapDocument,
+    await expect(access(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
     );
     expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), 'utf8')).toBe(
       expectedArchitectureDocument,
@@ -57,11 +57,6 @@ describe('scaffoldInit', () => {
       'utf8',
     );
     writeFileSync(
-      join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'),
-      '# Existing roadmap\nKeep this plan.\n',
-      'utf8',
-    );
-    writeFileSync(
       join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'),
       '# Existing architecture\n',
       'utf8',
@@ -76,9 +71,6 @@ describe('scaffoldInit', () => {
 
     expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'EVALUATION.md'), 'utf8')).toBe(
       '# Existing evaluation\nDo not replace.\n',
-    );
-    expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'), 'utf8')).toBe(
-      '# Existing roadmap\nKeep this plan.\n',
     );
     expect(readFileSync(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), 'utf8')).toBe(
       '# Existing architecture\n',
@@ -105,12 +97,12 @@ describe('scaffoldInit', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'specflow-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'specflow', 'ROADMAP.md'), {
+    await mkdir(join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md'), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'specflow', 'ROADMAP.md')}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'specflow', 'ARCHITECTURE.md')}: path exists and is not a regular file.`,
     });
 
     await expect(access(join(projectRoot, 'docs', 'specflow', '.specflow'))).rejects.toMatchObject({
@@ -152,21 +144,6 @@ Evaluation is a release gate for this repository.
 - Prefer deterministic tests over mocks for file generation.
 - Inspect generated files for meaningful content, not only existence.
 - Record any skipped verification so the gap is explicit.
-`;
-
-const expectedRoadmapDocument = `# ROADMAP.md
-
-## Milestones
-
-1. Define the workflows and templates this repository needs.
-2. Implement core logic with reusable modules and test coverage.
-3. Add CLI commands that exercise the core behavior safely.
-
-## Near-Term Focus
-
-- Keep generated project conventions clear and easy to maintain.
-- Expand verification as more commands become user-facing.
-- Use this roadmap to track the next approved increments.
 `;
 
 const expectedArchitectureDocument = `# ARCHITECTURE.md

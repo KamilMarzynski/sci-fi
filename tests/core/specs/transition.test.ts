@@ -42,8 +42,8 @@ async function writeSpecMd(projectRoot: string, slug: string): Promise<void> {
 
 async function writeArchitectureMd(projectRoot: string, slug: string): Promise<void> {
   await writeFile(
-    join(projectRoot, 'docs', 'specflow', 'specs', slug, 'architecture.md'),
-    '# Architecture\n',
+    join(projectRoot, 'docs', 'specflow', 'specs', slug, 'design.md'),
+    '# Design\n',
     'utf8',
   );
 }

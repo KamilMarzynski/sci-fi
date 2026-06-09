@@ -27,7 +27,7 @@ interface InitCommandOptions {
   readonly json?: boolean;
 }
 
-const BOOTSTRAP_FILES = ['EVALUATION.md', 'ROADMAP.md', 'ARCHITECTURE.md', 'CONTEXT.md'];
+const BOOTSTRAP_FILES = ['EVALUATION.md', 'ARCHITECTURE.md', 'CONTEXT.md'];
 
 export function registerInitCommand(program: Command): void {
   program
