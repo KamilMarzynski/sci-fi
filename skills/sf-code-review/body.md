@@ -28,8 +28,8 @@ not exist.
 - `{FEATURE_PATH}/design.md` — the technical contract the change must satisfy.
 - The task file under `{FEATURE_PATH}/tasks/` for `{TASK_SLUG}` — its **Tests
   first**, **Acceptance**, and **Validation** sections.
-- `docs/scifi/ARCHITECTURE.md` — how the system is built and where it heads.
-- `docs/scifi/CONTEXT.md` — domain glossary.
+- `docs/scifi/CONTEXT.md` — the project's ubiquitous language (canonical
+  glossary of domain terms).
 
 Read all of them before judging. Never invent project facts; if something is
 unknowable from these files, flag it as a question instead of assuming.
@@ -52,9 +52,9 @@ finding by its real impact on the change.
   *scatter* it (inline it)? Flag shallow seams — pass-through wrappers, a class
   that only forwards calls, a "utils" dumping ground, a function extracted solely
   so a test can reach it.
-- **Architecture fit** — the change does not contradict `ARCHITECTURE.md` or a
-  planned direction stated there. New seams (a new boundary, dependency, or
-  communication pattern) are declared in the design, not introduced silently.
+- **Seam declaration** — new seams (a new boundary, dependency, or
+  communication pattern) are declared in `design.md`, not introduced silently.
+  Judge against the design, not an external architecture doc.
 - **Simplification (code judo)** — is there a reframing that deletes a whole
   branch, mode, flag, or conditional rather than adding to it? Flag incidental
   complexity the change preserves when a clearly simpler shape exists. Do not
@@ -64,8 +64,9 @@ finding by its real impact on the change.
   surrounding code harder to reason about; unjustified casts, optionality, or
   loosely-shaped objects that obscure the real invariant. Prefer explicit typed
   boundaries.
-- **Glossary** — domain terms used in the code or tests that are not in
-  `CONTEXT.md` and were not proposed for it.
+- **Naming / glossary** — domain terms used in the code or tests that are not in
+  `CONTEXT.md` (ubiquitous language) and were not proposed for it. A
+  naming-consistency check, not structural.
 - **Placeholders** — any `TBD` / `TODO` / stubbed body / empty implementation
   presented as finished work.
 
@@ -114,12 +115,12 @@ right lens: **`Code review of <task>`**. Then use this exact shape:
 Calibration:
 
 - **Pass** — acceptance met, design matched, tests cover every behavior, modules
-  are deep, no architecture conflict, no non-negotiable triggered, no
+  are deep, new seams declared, no non-negotiable triggered, no
   placeholders. No Critical or Important issues.
 - **With fixes** — only Minor issues remain; the change is sound enough to land
   once they are addressed.
 - **Fail** — any Critical or Important issue. An uncovered acceptance item,
-  untested production code, a triggered non-negotiable, an architecture conflict,
+  untested production code, a triggered non-negotiable, an undeclared new seam,
   or a placeholder is always at least Important.
 
 Be specific — quote the line, name the file. The receiving agent acts on your

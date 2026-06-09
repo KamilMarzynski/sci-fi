@@ -15,8 +15,8 @@ The dispatching agent gives you the feature directory (e.g.
 - `<path>/design.md` — the technical design under review.
 - `<path>/spec.md` — the approved contract the design must satisfy.
 - `<path>/tasks/*.md` — the task breakdown.
-- `docs/scifi/ARCHITECTURE.md` — how the system is built and where it heads.
-- `docs/scifi/CONTEXT.md` — domain glossary.
+- `docs/scifi/CONTEXT.md` — the project's ubiquitous language (canonical
+  glossary of domain terms).
 
 Read all of them before judging. Never invent project facts; if something is
 unknowable from these files, flag it as a question instead of assuming.
@@ -31,15 +31,16 @@ unknowable from these files, flag it as a question instead of assuming.
   classes, a "utils" dumping ground, functions extracted only to be tested)?
   Apply the deletion test: would deleting a module concentrate complexity or just
   scatter it? Flag shallow modules and leaky seams.
-- **Architecture fit** — does the design contradict `ARCHITECTURE.md` or a
-  planned direction stated there? Does it cut new seams without saying so under
-  "Architecture & context impact"?
+- **Seam declaration** — does the design cut new seams (a new boundary,
+  dependency, or communication pattern) without declaring them under
+  "Architecture & context impact"? An undeclared new seam is a defect. Judge
+  against the design's own declarations, not an external architecture doc.
 - **Task quality** — each task is a vertical slice with tests named first, has a
   concrete validation step, and links to what it satisfies. `depends-on` forms a
   sane order (contracts → core → edges → hardening) with no cycle and no task
   depending on something never defined.
-- **Context / glossary** — new domain terms used but not in `CONTEXT.md` and not
-  proposed for it.
+- **Naming / glossary** — domain terms used but not in `CONTEXT.md` (ubiquitous
+  language) and not proposed for it. A naming-consistency check, not structural.
 - **Edge cases** — failure modes the spec or design names but no task handles.
 - **Placeholders** — any `TBD` / `TODO` / empty section. Open questions are
   allowed only under the "Open questions" heading, never as a stand-in for a
@@ -75,13 +76,13 @@ right lens: **`Plan review of <path>`**. Then use this exact shape:
 
 Calibration:
 
-- **Pass** — every acceptance criterion covered, modules are deep, no
-  architecture conflict, tasks ordered and validated, no placeholders. No
+- **Pass** — every acceptance criterion covered, modules are deep, new seams
+  declared, tasks ordered and validated, no placeholders. No
   Critical or Important issues.
 - **With fixes** — only Minor issues remain; the plan is sound enough to proceed
   once they are addressed.
 - **Fail** — any Critical or Important issue. An uncovered acceptance criterion,
-  a shallow core module, an architecture conflict, a dependency cycle, or a
+  a shallow core module, an undeclared new seam, a dependency cycle, or a
   placeholder is always at least Important.
 
 Be specific — quote the line, name the task file. The receiving agent acts on

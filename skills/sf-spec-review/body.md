@@ -12,11 +12,10 @@ The dispatching agent gives you the path to the spec (e.g.
 ## What to read
 
 - The spec at the given path.
-- `docs/scifi/ARCHITECTURE.md` — how the system is built and where it is
-  headed.
-- `docs/scifi/CONTEXT.md` — domain glossary.
+- `docs/scifi/CONTEXT.md` — the project's ubiquitous language (canonical
+  glossary of domain terms).
 
-Read all three before judging. Never invent project facts; if something is
+Read both before judging. Never invent project facts; if something is
 unknowable from these files, flag it as a question instead of assuming.
 
 ## What to check
@@ -30,11 +29,12 @@ Go section by section. Look for:
   defect. Missing criteria for an in-scope behavior is a defect.
 - **Scope coherence** — is "out of scope" explicit, and does "in scope" match
   the problem statement? Flag scope creep and silent gaps.
-- **Architecture conflict** — does the spec contradict `ARCHITECTURE.md` or a
-  planned direction stated there? Does it touch structure without saying so in
-  "Architecture & Context impact"?
-- **Context / glossary** — new domain terms used but not in `CONTEXT.md` and not
-  proposed for it.
+- **Structure impact** — if the spec touches structure, does it say so in
+  "Architecture & Context impact"? A silent structural change is a defect.
+  (Judge against the spec's own section, not an external architecture doc.)
+- **Naming / glossary** — domain terms used but not in `CONTEXT.md` (ubiquitous
+  language) and not proposed for it. This is a naming-consistency check, not a
+  structural one.
 - **Edge cases** — obvious error states, boundaries, or failure modes the spec
   ignores.
 - **Placeholders** — any `TBD` / `TODO` / empty section. Open questions are
@@ -71,13 +71,12 @@ right lens: **`Spec review of <path>`**. Then use this exact shape:
 
 Calibration:
 
-- **Pass** — unambiguous, criteria testable and complete, no conflicts, no
+- **Pass** — unambiguous, criteria testable and complete, no silent structural changes, no
   placeholders. No Critical or Important issues.
 - **With fixes** — only Minor issues remain; the spec is sound enough to
   proceed once they are addressed.
 - **Fail** — any Critical or Important issue. A placeholder, a missing
-  acceptance criterion, or an architecture conflict is always at least
-  Important.
+  acceptance criterion is always at least Important.
 
 Be specific — quote the line, name the section. The receiving agent acts on
 your list directly, so vague feedback wastes a round trip. Do not mark nitpicks
