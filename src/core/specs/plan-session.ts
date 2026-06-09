@@ -21,10 +21,7 @@ export interface PlanSession {
   taskFileCount: number;
 }
 
-export async function inspectPlanSession(
-  projectRoot: string,
-  slug: string,
-): Promise<PlanSession> {
+export async function inspectPlanSession(projectRoot: string, slug: string): Promise<PlanSession> {
   const { metadata, artifacts } = await inspectFeatureLifecycle(projectRoot, slug);
 
   if (metadata.status === 'created') {
@@ -37,8 +34,7 @@ export async function inspectPlanSession(
 
   let state: PlanSessionState;
   if (metadata.status === 'spec-ready') {
-    state =
-      artifacts.designExists || artifacts.taskFileCount > 0 ? 'in-progress' : 'ready-to-plan';
+    state = artifacts.designExists || artifacts.taskFileCount > 0 ? 'in-progress' : 'ready-to-plan';
   } else {
     state = 'already-planned';
   }

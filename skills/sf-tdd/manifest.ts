@@ -3,5 +3,5 @@ import type { SkillManifest } from "specflow/skill-types";
 export const manifest: SkillManifest = {
   id: "sf-tdd",
   description:
-    "Enforce tests-first discipline. Writes failing test before implementation per task.",
+    "Tests-first implementation discipline for a single task. Red-green-refactor in vertical slices; no production code without a failing test first.",
 };
