@@ -11,6 +11,6 @@ You are reviewing a spec. Load and follow the `sf-spec-review` skill.
 This is a SPEC review (not a code review).
 Spec to review: {SPEC_PATH}
 
-Read the spec plus docs/scifi/ARCHITECTURE.md and docs/scifi/CONTEXT.md,
+Read the spec plus docs/scifi/CONTEXT.md,
 then return your report and verdict exactly as the sf-spec-review skill defines.
 ```

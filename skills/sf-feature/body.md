@@ -7,16 +7,33 @@ plan, no code.
 The skill is inspired by hard, friendly grilling: you interrogate the idea
 until it is unambiguous, confronting it against what the project already is.
 
-## Long-term memory you must read
+## Long-term memory
 
-Before grilling, read these (if present):
+Before grilling, read `docs/scifi/CONTEXT.md` (if present) — the project's
+ubiquitous language: the canonical glossary of domain terms. Use it to keep
+naming consistent. When the feature introduces a new domain term, define it in
+`CONTEXT.md` and apply the edit live once the user approves.
 
-- `docs/scifi/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction
-- `docs/scifi/CONTEXT.md` — glossary / domain terms
+For prior architectural decisions, see "Architecture Decision Records" below —
+grep them on demand rather than reading one big doc up front.
 
-Use them to push back on the user's idea and to keep new work coherent with
-the project. When the feature introduces a new term or touches structure,
-propose updates to these files and apply them live once the user approves.
+## Architecture Decision Records
+
+Decisions live in `docs/scifi/adr/` as numbered records `NNNN-slug.md`. The
+directory is lazy — it does not exist until the first record.
+
+- **Read on demand.** When the feature touches an area that may already carry a
+  recorded decision, grep `docs/scifi/adr/` for relevant keywords — the same
+  instinct as grepping the codebase while grilling. Do not contradict a recorded
+  decision without surfacing it to the user.
+- **Write sparingly.** Record an ADR only when ALL THREE hold:
+  1. Difficult reversal — meaningful cost to changing course later.
+  2. Non-obvious rationale — a future reader will question the choice.
+  3. Genuine trade-offs — real alternatives existed; one was chosen deliberately.
+  A routine, obvious, or easily-reversed choice gets no ADR.
+- **Numbering.** Run `ls docs/scifi/adr/` and take `max + 1`, zero-padded (e.g.
+  `0007`). If the directory is absent, start at `0001` and create it. Copy
+  `ADR-TEMPLATE.md` (ships beside this skill) into the new file and fill it.
 
 ## Flow
 
@@ -47,13 +64,15 @@ Interrogate until you can fill EVERY section of the spec template with no
 gaps. Do not write the spec before then.
 
 - One question at a time. Prefer concrete either/or questions.
-- Confront the idea against `ARCHITECTURE.md` and `CONTEXT.md`. If the idea
-  contradicts existing structure or a planned direction, surface it.
+- Confront the idea against the codebase and any relevant ADRs (grep
+  `docs/scifi/adr/`). If it contradicts a recorded decision or existing
+  structure, surface it.
 - Drive toward: the real problem, what is explicitly out of scope, testable
   acceptance criteria, the edge cases that will bite, and which modules the
   work touches.
-- When you hit a new domain term or a structural change, propose the
-  `CONTEXT.md` / `ARCHITECTURE.md` edit and apply it once the user agrees.
+- When you hit a new domain term, propose the `CONTEXT.md` edit and apply it
+  once the user agrees. When the grilling settles a hard, non-obvious
+  architectural decision, record an ADR (see above).
 
 You are convinced when every template section below has a real answer, not a
 placeholder.

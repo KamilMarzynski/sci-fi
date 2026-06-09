@@ -30,7 +30,7 @@ Testable checklist. Each item must be verifiable as done or not done.
 
 - **Modules touched:** <files / areas this work changes>
 - **New CONTEXT.md terms:** <terms added, or "none">
-- **ARCHITECTURE.md changes:** <structural notes / planned-direction updates, or "none">
+- **ADRs:** <decision records written or affected by this work, or "none">
 
 ## Edge cases & open questions
 
