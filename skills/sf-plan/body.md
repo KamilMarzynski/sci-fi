@@ -8,17 +8,36 @@ Where `sf-feature` grilled *what* to build, you grill *how* to build it: the
 module shape, the seams, the order of work. Same hard, friendly interrogation —
 now against the codebase itself.
 
-## Long-term memory you must read
+## Long-term memory
 
 Before planning, read:
 
 - `<path>/spec.md` — the approved spec. This is the contract you plan against.
-- `docs/scifi/ARCHITECTURE.md` — how the system is built + planned-but-unbuilt direction.
-- `docs/scifi/CONTEXT.md` — glossary / domain terms.
+- `docs/scifi/CONTEXT.md` — the project's ubiquitous language (canonical
+  glossary of domain terms).
 
-`<path>` is the feature directory (`docs/scifi/specs/<slug>/`). When the
-design introduces a new term or changes structure, propose updates to
-`ARCHITECTURE.md` / `CONTEXT.md` and apply them live once the user approves.
+`<path>` is the feature directory (`docs/scifi/specs/<slug>/`). When the design
+introduces a new domain term, define it in `CONTEXT.md` and apply the edit live
+once the user approves. For prior architectural decisions, grep
+`docs/scifi/adr/` on demand — see "Architecture Decision Records" below.
+
+## Architecture Decision Records
+
+Decisions live in `docs/scifi/adr/` as numbered records `NNNN-slug.md`. The
+directory is lazy — it does not exist until the first record.
+
+- **Read on demand.** When the design touches an area that may already carry a
+  recorded decision, grep `docs/scifi/adr/` for relevant keywords — the same
+  instinct as walking the code before asking. Do not contradict a recorded
+  decision without surfacing it to the user.
+- **Write sparingly.** Record an ADR only when ALL THREE hold:
+  1. Difficult reversal — meaningful cost to changing course later.
+  2. Non-obvious rationale — a future reader will question the choice.
+  3. Genuine trade-offs — real alternatives existed; one was chosen deliberately.
+  A routine, obvious, or easily-reversed choice gets no ADR.
+- **Numbering.** Run `ls docs/scifi/adr/` and take `max + 1`, zero-padded (e.g.
+  `0007`). If the directory is absent, start at `0001` and create it. Copy
+  `ADR-TEMPLATE.md` (ships beside this skill) into the new file and fill it.
 
 ## Design for depth
 
@@ -37,8 +56,9 @@ Keep this lens through the whole session:
 
 Prefer fewer, deeper modules over many shallow ones. Distrust a "utils" grab
 bag, a pure function extracted only so a test can reach it, or a class that
-just forwards calls. Confront the design against `ARCHITECTURE.md`: does it fit
-the existing seams, or does it quietly cut new ones?
+just forwards calls. Confront the design against the codebase and relevant ADRs
+(grep `docs/scifi/adr/`): does it fit the existing seams, or does it quietly cut
+new ones?
 
 ## Flow
 
@@ -68,10 +88,11 @@ time, concrete either/or where possible.
   are, what data flows across them, the failure modes, and what stays out.
 - Apply the depth lens above to every proposed module. Name shallow modules and
   propose deeper alternatives.
-- Confront the design against `ARCHITECTURE.md` and the spec's acceptance
-  criteria. Every criterion must be satisfiable by the design.
-- When a new term or a structural change appears, propose the
-  `CONTEXT.md` / `ARCHITECTURE.md` edit and apply it once the user agrees.
+- Confront the design against the spec's acceptance criteria and any relevant
+  ADRs. Every criterion must be satisfiable by the design.
+- When a new domain term appears, propose the `CONTEXT.md` edit and apply it
+  once the user agrees. When planning settles a hard, non-obvious architectural
+  decision, record an ADR (see above).
 
 You are convinced when every section of the design template has a real answer
 and every acceptance criterion maps to part of the design.

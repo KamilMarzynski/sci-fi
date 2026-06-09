@@ -12,7 +12,6 @@ This is a PLAN review (not a spec review, not a code review).
 Feature to review: {FEATURE_PATH}
 
 Read {FEATURE_PATH}/design.md, {FEATURE_PATH}/spec.md, every file under
-{FEATURE_PATH}/tasks/, plus docs/scifi/ARCHITECTURE.md and
-docs/scifi/CONTEXT.md, then return your report and verdict exactly as the
-sf-plan-review skill defines.
+{FEATURE_PATH}/tasks/, plus docs/scifi/CONTEXT.md, then return your report and
+verdict exactly as the sf-plan-review skill defines.
 ```

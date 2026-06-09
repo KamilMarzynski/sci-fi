@@ -28,7 +28,7 @@ A small diagram or numbered flow is fine. -->
 
 - **Modules touched:** <!-- existing code this changes -->
 - **New seams introduced:** <!-- new interfaces / boundaries, if any -->
-- **ARCHITECTURE.md changes:** <!-- what you updated or propose to update; "none" if none -->
+- **ADRs:** <!-- decision records written or affected by this work; "none" if none -->
 - **New CONTEXT.md terms:** <!-- terms added to the glossary; "none" if none -->
 
 ## Acceptance criteria coverage
