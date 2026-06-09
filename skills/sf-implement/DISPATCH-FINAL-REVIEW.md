@@ -15,8 +15,8 @@ Feature: {FEATURE_PATH}
 Changes to review: {COMMIT_RANGE}
 
 Read {FEATURE_PATH}/spec.md and {FEATURE_PATH}/design.md as the contract, plus
-docs/scifi/ARCHITECTURE.md and docs/scifi/CONTEXT.md. Focus on what only
-shows up across the whole change: integration between tasks, cross-cutting
+docs/scifi/CONTEXT.md. Focus on what only shows up across the whole change:
+integration between tasks, cross-cutting
 consistency, spec criteria that no single task fully owns, leaky seams. Return
 your report and verdict exactly as the sf-code-review skill defines.
 ```

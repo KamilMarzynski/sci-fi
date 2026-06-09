@@ -15,8 +15,8 @@ Before dispatching anything, read enough to brief subagents precisely:
 - `<path>/spec.md` — the contract the feature must satisfy.
 - `<path>/design.md` — the technical design: modules, seams, test strategy.
 - `<path>/tasks/*.md` — the tasks you will dispatch.
-- `docs/scifi/ARCHITECTURE.md` and `docs/scifi/CONTEXT.md` — referenced by
-  subagents; know where they are so you can point to them.
+- `docs/scifi/CONTEXT.md` — the ubiquitous-language glossary; referenced by
+  subagents, so know where it is to point them at it.
 
 `<path>` is the feature directory (`docs/scifi/specs/<slug>/`).
 
@@ -59,7 +59,7 @@ For each runnable task, in order:
 2. **Dispatch the implementer.** Use `DISPATCH-IMPLEMENTER.md` (ships beside
    this skill). Inline the full task body into the prompt — do **not** make the
    subagent hunt for it — and give it the reference paths (spec, design,
-   architecture, context). The implementer loads `sf-tdd` and builds the task
+   context). The implementer loads `sf-tdd` and builds the task
    test-first.
 
 3. **Handle the implementer's status:**

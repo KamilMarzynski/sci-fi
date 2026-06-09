@@ -19,7 +19,7 @@ Task: {TASK_SLUG}  (feature: {FEATURE_PATH})
 Reference only as needed (do not implement anything outside this task):
 - {FEATURE_PATH}/spec.md      — the contract.
 - {FEATURE_PATH}/design.md    — modules, seams, test strategy.
-- docs/scifi/ARCHITECTURE.md, docs/scifi/CONTEXT.md — system + glossary.
+- docs/scifi/CONTEXT.md — glossary (ubiquitous language).
 
 Build exactly this task, test-first per sf-tdd. Stay inside the task's scope —
 no extra features, no unrelated refactors. Run the task's Validation step and
