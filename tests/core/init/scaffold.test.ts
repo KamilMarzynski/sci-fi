@@ -34,9 +34,12 @@ describe('scaffoldInit', () => {
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject(
       { code: 'ENOENT' },
     );
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), 'utf8')).toBe(
-      expectedArchitectureDocument,
-    );
+    await expect(
+      access(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(
+      access(join(projectRoot, 'docs', 'scifi', 'adr')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       expectedContextDocument,
     );
@@ -57,11 +60,6 @@ describe('scaffoldInit', () => {
       'utf8',
     );
     writeFileSync(
-      join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'),
-      '# Existing architecture\n',
-      'utf8',
-    );
-    writeFileSync(
       join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'),
       '# Existing context\n',
       'utf8',
@@ -71,9 +69,6 @@ describe('scaffoldInit', () => {
 
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
       '# Existing evaluation\nDo not replace.\n',
-    );
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), 'utf8')).toBe(
-      '# Existing architecture\n',
     );
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       '# Existing context\n',
@@ -97,12 +92,12 @@ describe('scaffoldInit', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'ARCHITECTURE.md')}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'CONTEXT.md')}: path exists and is not a regular file.`,
     });
 
     await expect(access(join(projectRoot, 'docs', 'scifi', '.scifi'))).rejects.toMatchObject({
@@ -146,40 +141,6 @@ Evaluation is a release gate for this repository.
 - Record any skipped verification so the gap is explicit.
 `;
 
-const expectedArchitectureDocument = `# ARCHITECTURE.md
-
-> Read this before starting any spec or plan session.
-> Update this when structural decisions are made during grilling or planning.
-
-## System Overview
-
-<!-- One paragraph. What does this system do and for whom. -->
-
-## Services and Boundaries
-
-<!-- List services, what they own, what they do NOT own. -->
-
-## Communication Patterns
-
-<!-- REST, events, queues, shared DB — what is allowed and what is banned. -->
-
-## Persistence
-
-<!-- Databases, stores, cache layers. Who owns what data. -->
-
-## Tech Stack
-
-<!-- Language, frameworks, runtimes, infra. -->
-
-## Constraints
-
-<!-- Hard limits: latency budgets, data residency, security requirements. -->
-
-## Open Decisions
-
-<!-- Things not yet resolved. Remove when resolved; move to relevant section above. -->
-`;
-
 const expectedContextDocument = `# CONTEXT.md
 
 > Project glossary. Every term used in specs must be defined here.
@@ -191,7 +152,7 @@ const expectedContextDocument = `# CONTEXT.md
 ### TermName
 **Definition:** One clear sentence.
 **Distinct from:** Other terms it might be confused with.
-**Used in:** Links to specs or architecture sections where it appears.
+**Used in:** Links to specs where it appears.
 -->
 `;
 

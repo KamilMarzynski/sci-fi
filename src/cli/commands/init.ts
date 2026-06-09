@@ -27,7 +27,7 @@ interface InitCommandOptions {
   readonly json?: boolean;
 }
 
-const BOOTSTRAP_FILES = ['EVALUATION.md', 'ARCHITECTURE.md', 'CONTEXT.md'];
+const BOOTSTRAP_FILES = ['EVALUATION.md', 'CONTEXT.md'];
 
 export function registerInitCommand(program: Command): void {
   program
@@ -79,7 +79,7 @@ export function registerInitCommand(program: Command): void {
             `  Files:   ${BOOTSTRAP_FILES.join(', ')}`,
             `  Skills:  ${skills.join(', ')}`,
             ``,
-            `Next: read docs/scifi/CONTEXT.md and docs/scifi/ARCHITECTURE.md,`,
+            `Next: read docs/scifi/CONTEXT.md,`,
             `then create a spec with \`scifi spec <slug> --title "Your Feature"\``,
           ],
         );

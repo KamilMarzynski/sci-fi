@@ -47,10 +47,6 @@ function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
       contents: buildEvaluationDocument(),
     },
     {
-      path: join(specsRoot, 'ARCHITECTURE.md'),
-      contents: buildArchitectureDocument(),
-    },
-    {
       path: join(specsRoot, 'CONTEXT.md'),
       contents: buildContextDocument(),
     },
@@ -153,42 +149,6 @@ Evaluation is a release gate for this repository.
 `;
 }
 
-function buildArchitectureDocument(): string {
-  return `# ARCHITECTURE.md
-
-> Read this before starting any spec or plan session.
-> Update this when structural decisions are made during grilling or planning.
-
-## System Overview
-
-<!-- One paragraph. What does this system do and for whom. -->
-
-## Services and Boundaries
-
-<!-- List services, what they own, what they do NOT own. -->
-
-## Communication Patterns
-
-<!-- REST, events, queues, shared DB — what is allowed and what is banned. -->
-
-## Persistence
-
-<!-- Databases, stores, cache layers. Who owns what data. -->
-
-## Tech Stack
-
-<!-- Language, frameworks, runtimes, infra. -->
-
-## Constraints
-
-<!-- Hard limits: latency budgets, data residency, security requirements. -->
-
-## Open Decisions
-
-<!-- Things not yet resolved. Remove when resolved; move to relevant section above. -->
-`;
-}
-
 function buildContextDocument(): string {
   return `# CONTEXT.md
 
@@ -201,7 +161,7 @@ function buildContextDocument(): string {
 ### TermName
 **Definition:** One clear sentence.
 **Distinct from:** Other terms it might be confused with.
-**Used in:** Links to specs or architecture sections where it appears.
+**Used in:** Links to specs where it appears.
 -->
 `;
 }
