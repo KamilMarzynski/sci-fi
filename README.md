@@ -59,11 +59,25 @@ Existing bootstrap docs are preserved when the target path is already a regular 
 
 ## Bundled Skills
 
-`scifi init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-verification`, `sf-tdd`).
+`scifi init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-handover`, `sf-tdd`).
 
 All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills living in the same directories.
 
 **Ownership:** these files are owned by `scifi`. Rerunning `scifi init` overwrites them in place. If you want to customize behavior, copy the file under a different id (e.g. `my-code-review`) and edit that — your copy will not be touched on rerun.
+
+## Handover (optional HANDOVER.md)
+
+When `sf-implement` finishes a feature, it dispatches the `sf-handover` subagent
+to verify the completed work against the feature's `spec.md` and `design.md` and
+run a final quality check. This always runs; nothing configures it.
+
+You can optionally add `docs/scifi/HANDOVER.md` to define finishing actions the
+orchestrator runs after handover verification passes and before `scifi finish` —
+for example smoke tests, opening a pull request, or invoking a skill that
+describes your release process. The file is not scaffolded by `scifi init`;
+create it yourself when you want it. List the actions in the order they should
+run; point to any skills by name. If the file is absent, the feature finishes
+with no extra actions.
 
 ## Installed-Build Verification
 
