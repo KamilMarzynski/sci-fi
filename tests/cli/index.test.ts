@@ -65,9 +65,7 @@ describe('isDirectExecution', () => {
 
   it('returns false when no script path is provided', () => {
     expect(
-      isDirectExecution('file:///Users/mayk/Projects/private/sci-fi/dist/cli/index.js', [
-        'node',
-      ]),
+      isDirectExecution('file:///Users/mayk/Projects/private/sci-fi/dist/cli/index.js', ['node']),
     ).toBe(false);
   });
 });

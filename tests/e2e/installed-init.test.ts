@@ -16,24 +16,15 @@ describe('installed build init verification', () => {
 
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(
-        true,
-      );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(
-        true,
-      );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'))).toBe(
-        true,
-      );
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(true);
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(true);
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'))).toBe(true);
       expect(
-        readFileSync(
-          join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md'),
-          'utf8',
-        ),
+        readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md'), 'utf8'),
       ).toBe(expectedEvaluationDocument);
-      expect(
-        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md')),
-      ).toBe(false);
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
+        false,
+      );
 
       expect(
         existsSync(
@@ -151,18 +142,16 @@ describe('installed build init verification', () => {
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(
         false,
       );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(
-        false,
-      );
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(false);
       expect(
         readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'), 'utf8'),
       ).toBe('conflict');
       expect(
         existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
       ).toBe(false);
-      expect(
-        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md')),
-      ).toBe(false);
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
+        false,
+      );
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);

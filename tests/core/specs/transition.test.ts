@@ -33,11 +33,7 @@ async function createFeatureAt(projectRoot: string, slug: string, status: string
 }
 
 async function writeSpecMd(projectRoot: string, slug: string): Promise<void> {
-  await writeFile(
-    join(projectRoot, 'docs', 'scifi', 'specs', slug, 'spec.md'),
-    '# Spec\n',
-    'utf8',
-  );
+  await writeFile(join(projectRoot, 'docs', 'scifi', 'specs', slug, 'spec.md'), '# Spec\n', 'utf8');
 }
 
 async function writeArchitectureMd(projectRoot: string, slug: string): Promise<void> {

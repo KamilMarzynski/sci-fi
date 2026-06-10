@@ -26,14 +26,7 @@ describe('scifi init', () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await buildProgram().parseAsync([
-      'node',
-      'scifi',
-      'init',
-      '--harness',
-      'claude-code',
-      '--yes',
-    ]);
+    await buildProgram().parseAsync(['node', 'scifi', 'init', '--harness', 'claude-code', '--yes']);
 
     await expectDirectory(join(projectRoot, 'docs', 'scifi', '.scifi'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
@@ -41,9 +34,9 @@ describe('scifi init', () => {
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
       expectedEvaluationDocument,
     );
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 
   it('fails without partial writes when a bootstrap doc path conflicts', async () => {
@@ -86,21 +79,19 @@ describe('scifi init', () => {
       `${join('docs', 'scifi', '.scifi')}: path exists and is not a directory.`,
     );
 
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi'), 'utf8')).toBe(
-      'conflict',
-    );
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi'), 'utf8')).toBe('conflict');
     await expect(access(join(projectRoot, 'docs', 'scifi', 'specs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
     await expect(access(join(projectRoot, 'docs', 'scifi', 'bugs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    await expect(
-      access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')),
-    ).rejects.toMatchObject({ code: 'ENOENT' });
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject(
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
       { code: 'ENOENT' },
     );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 });
 

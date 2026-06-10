@@ -195,21 +195,17 @@ describe('validateStatusTransition with context', () => {
 
   it('rejects done when allTasksDone is false', async () => {
     await expect(
-      validateStatusTransition(
-        { specExists: true, designExists: true, taskFileCount: 1 },
-        'done',
-        { allTasksDone: false },
-      ),
+      validateStatusTransition({ specExists: true, designExists: true, taskFileCount: 1 }, 'done', {
+        allTasksDone: false,
+      }),
     ).rejects.toThrow('Cannot mark feature as done: not all tasks are complete.');
   });
 
   it('accepts done when allTasksDone is true', async () => {
     await expect(
-      validateStatusTransition(
-        { specExists: true, designExists: true, taskFileCount: 1 },
-        'done',
-        { allTasksDone: true },
-      ),
+      validateStatusTransition({ specExists: true, designExists: true, taskFileCount: 1 }, 'done', {
+        allTasksDone: true,
+      }),
     ).resolves.toBeUndefined();
   });
 
