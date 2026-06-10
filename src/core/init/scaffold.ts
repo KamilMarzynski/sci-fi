@@ -33,11 +33,7 @@ export async function scaffoldInit(options: InitOptions): Promise<void> {
 }
 
 function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
-  return [
-    { path: join(specsRoot, '.scifi') },
-    { path: join(specsRoot, 'specs') },
-    { path: join(specsRoot, 'bugs') },
-  ];
+  return [{ path: join(specsRoot, '.scifi') }, { path: join(specsRoot, 'specs') }];
 }
 
 function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {

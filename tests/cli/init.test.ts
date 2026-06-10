@@ -30,7 +30,6 @@ describe('scifi init', () => {
 
     await expectDirectory(join(projectRoot, 'docs', 'scifi', '.scifi'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
-    await expectDirectory(join(projectRoot, 'docs', 'scifi', 'bugs'));
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toContain(
       '# CONTEXT.md',
     );
@@ -63,9 +62,6 @@ describe('scifi init', () => {
     await expect(access(join(projectRoot, 'docs', 'scifi', 'specs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'bugs'))).rejects.toMatchObject({
-      code: 'ENOENT',
-    });
   });
 
   it('fails without partial writes when a scaffold directory path conflicts', async () => {
@@ -84,9 +80,6 @@ describe('scifi init', () => {
 
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi'), 'utf8')).toBe('conflict');
     await expect(access(join(projectRoot, 'docs', 'scifi', 'specs'))).rejects.toMatchObject({
-      code: 'ENOENT',
-    });
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'bugs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
     await expect(access(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'))).rejects.toMatchObject({
