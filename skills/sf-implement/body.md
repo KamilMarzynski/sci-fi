@@ -88,18 +88,23 @@ For each runnable task, in order:
 Run continuously — do not stop to ask "should I continue?" between tasks. Stop
 only for a `BLOCKED` you cannot resolve, a genuine ambiguity, or all tasks done.
 
-### 4. Final review and verification
+### 4. Handover
 
 After every task is `done`:
 
-- Dispatch a whole-feature code review (`DISPATCH-FINAL-REVIEW.md`) over the
-  complete change, not just the last task — integration seams and cross-task
-  consistency only show up here.
-- Run `sf-verification` to exercise the feature the way `EVALUATION.md`
-  prescribes (start the app, drive it, e.g. Playwright).
-- Route every finding back to a subagent to fix; the orchestrator coordinates
-  but does not fix substantial issues itself. Only trivially small fixes are
-  yours. Re-review until clean.
+- Dispatch the handover subagent with `DISPATCH-HANDOVER.md`, which loads the
+  `sf-handover` skill. It verifies the whole feature against `spec.md` and
+  `design.md` and runs a final quality check over the complete change — there is
+  no separate whole-feature code review; the per-task reviews already gated each
+  task to **Pass**.
+- Route every finding back to a fix subagent; the orchestrator coordinates but
+  does not fix substantial issues itself. Only trivially small fixes are yours.
+  Re-dispatch handover until the verdict is **Pass**.
+- When handover passes, read `docs/scifi/HANDOVER.md` if it exists and run the
+  finishing actions it defines, in order — smoke tests, PR creation, invoking
+  any skills it points to. These run here at the orchestrator's top level (not
+  inside a subagent) so irreversible or visible actions stay visible. If the
+  file is absent, there are no finishing actions and you go straight to finish.
 
 ### 5. Finish
 
@@ -107,7 +112,9 @@ After every task is `done`:
 scifi finish <slug> --json
 ```
 
-Transitions `in-progress → done`. This is the end of the implement stage.
+Transitions `in-progress → done`. Run this **last** — after handover passes and
+after every `HANDOVER.md` action (PR creation included) has completed. This is
+the end of the implement stage.
 
 ## Hard rules
 
@@ -115,6 +122,6 @@ Transitions `in-progress → done`. This is the end of the implement stage.
 - Never mark a task done before its code review verdict is **Pass**.
 - Never let a subagent read your session history — construct its context from
   the task and the reference files.
-- Never call `scifi finish` while a final-review or verification finding is
-  open.
+- Never call `scifi finish` while a handover finding is open or a `HANDOVER.md`
+  action is still pending.
 - Never implement a task's feature code yourself — that is the subagent's job.
