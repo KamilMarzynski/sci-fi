@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 This repository is building `scifi` as a production-ready developer tool, not a throwaway prototype.
 
@@ -40,3 +40,11 @@ This repository is building `scifi` as a production-ready developer tool, not a 
 - No skipping docs when public behavior changes.
 - No “temporary” shortcuts that weaken the long-term shape of the tool.
 - No task is complete until affected automated checks and the required installed-build command checks have been run.
+
+## Git Workflow
+
+- Never commit directly to `main`.
+- Start every change on a new branch, isolated in its own worktree.
+- Branch naming: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `docs/<slug>`.
+- Use conventional commit messages (`feat:`, `fix:`, `docs:`, `chore:`, ...).
+- Finish work by opening a pull request; leave merging to the maintainer.
