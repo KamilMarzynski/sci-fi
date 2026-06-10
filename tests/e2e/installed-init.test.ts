@@ -18,7 +18,6 @@ describe('installed build init verification', () => {
       expect(result.stderr).toBe('');
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(true);
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(true);
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'))).toBe(true);
       expect(
         existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
       ).toBe(false);
@@ -68,7 +67,6 @@ describe('installed build init verification', () => {
       const scifiRoot = join(installation.installDirectory, 'docs', 'scifi');
       const contextPath = join(scifiRoot, 'CONTEXT.md');
       const specPath = join(scifiRoot, 'specs', 'existing-spec.md');
-      const bugPath = join(scifiRoot, 'bugs', 'existing-bug.md');
       const statePath = join(scifiRoot, '.scifi', 'state.json');
       const skillPath = join(
         installation.installDirectory,
@@ -87,7 +85,6 @@ describe('installed build init verification', () => {
 
       writeFileSync(contextPath, preservedContextDocument, 'utf8');
       writeFileSync(specPath, preservedSpecDocument, 'utf8');
-      writeFileSync(bugPath, preservedBugDocument, 'utf8');
       writeFileSync(statePath, preservedStateDocument, 'utf8');
 
       const skillBeforeRerun = readFileSync(skillPath, 'utf8');
@@ -105,11 +102,9 @@ describe('installed build init verification', () => {
       expect(rerun.stderr).toBe('');
       expect(readFileSync(contextPath, 'utf8')).toBe(preservedContextDocument);
       expect(readFileSync(specPath, 'utf8')).toBe(preservedSpecDocument);
-      expect(readFileSync(bugPath, 'utf8')).toBe(preservedBugDocument);
       expect(readFileSync(statePath, 'utf8')).toBe(preservedStateDocument);
       expect(existsSync(join(scifiRoot, '.scifi'))).toBe(true);
       expect(existsSync(join(scifiRoot, 'specs'))).toBe(true);
-      expect(existsSync(join(scifiRoot, 'bugs'))).toBe(true);
 
       // Bundled sf-* skills are sci-fi-owned: rerun must overwrite
       // local edits back to the bundled content (documented in README).
@@ -126,7 +121,7 @@ describe('installed build init verification', () => {
     try {
       mkdirSync(join(installation.installDirectory, 'docs', 'scifi'), { recursive: true });
       writeFileSync(
-        join(installation.installDirectory, 'docs', 'scifi', 'bugs'),
+        join(installation.installDirectory, 'docs', 'scifi', 'specs'),
         'conflict',
         'utf8',
       );
@@ -136,7 +131,7 @@ describe('installed build init verification', () => {
         'claude-code',
         '--yes',
       ]);
-      const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, 'docs', 'scifi', 'bugs')}: path exists and is not a directory.`;
+      const expectedErrorMessage = `Cannot scaffold directory at ${join(installation.installDirectory, 'docs', 'scifi', 'specs')}: path exists and is not a directory.`;
 
       expect(result.status).not.toBe(0);
       expect(result.stderr).toContain(expectedErrorMessage);
@@ -145,9 +140,8 @@ describe('installed build init verification', () => {
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', '.scifi'))).toBe(
         false,
       );
-      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(false);
       expect(
-        readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'), 'utf8'),
+        readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'), 'utf8'),
       ).toBe('conflict');
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
         false,
@@ -182,11 +176,6 @@ Preserve this custom glossary note on rerun.
 const preservedSpecDocument = `# Existing Spec
 
 This generated spec file must survive init reruns.
-`;
-
-const preservedBugDocument = `# Existing Bug
-
-This generated bug file must survive init reruns.
 `;
 
 const preservedStateDocument = `{"initialized":true,"preserve":"yes"}\n`;

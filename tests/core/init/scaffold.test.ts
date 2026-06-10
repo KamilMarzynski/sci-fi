@@ -26,7 +26,6 @@ describe('scaffoldInit', () => {
 
     await expectDirectory(join(projectRoot, 'docs', 'scifi', '.scifi'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
-    await expectDirectory(join(projectRoot, 'docs', 'scifi', 'bugs'));
 
     await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
       { code: 'ENOENT' },

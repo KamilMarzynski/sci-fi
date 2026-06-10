@@ -6,7 +6,6 @@ import { Command, CommanderError } from 'commander';
 import { ScifiError } from '../core/output/errors.js';
 import { emitError } from '../core/output/index.js';
 import { findPackageRoot } from '../core/package-root.js';
-import { registerBugCommand } from './commands/bug.js';
 import { registerFinishCommand } from './commands/finish.js';
 import { registerFixCommand } from './commands/fix.js';
 import { registerInitCommand } from './commands/init.js';
@@ -54,7 +53,6 @@ export function buildProgram(): Command {
   registerListCommand(program);
   registerStatusCommand(program);
   registerTaskCommand(program);
-  registerBugCommand(program);
   registerFixCommand(program);
 
   applyExitOverride(program);

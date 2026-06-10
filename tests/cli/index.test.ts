@@ -45,7 +45,6 @@ describe('buildProgram', () => {
 
       expect(existsSync(join(projectRoot, 'docs', 'scifi', '.scifi'))).toBe(true);
       expect(existsSync(join(projectRoot, 'docs', 'scifi', 'specs'))).toBe(true);
-      expect(existsSync(join(projectRoot, 'docs', 'scifi', 'bugs'))).toBe(true);
     } finally {
       process.chdir(originalWorkingDirectory);
       rmSync(projectRoot, { force: true, recursive: true });
@@ -184,7 +183,6 @@ describe('installed artifact cli', () => {
       expect(result.stderr).toBe('');
       expect(existsSync(join(installDirectory, 'docs', 'scifi', '.scifi'))).toBe(true);
       expect(existsSync(join(installDirectory, 'docs', 'scifi', 'specs'))).toBe(true);
-      expect(existsSync(join(installDirectory, 'docs', 'scifi', 'bugs'))).toBe(true);
     } finally {
       rmSync(sandboxRoot, { force: true, recursive: true });
     }
