@@ -73,4 +73,14 @@ describe('updateFixStatus', () => {
       updateFixStatus(projectRoot, 'auth-flow', 'FIX-0001', 'resolved'),
     ).rejects.toMatchObject({ code: 'PRECONDITION_FAILED' });
   });
+
+  it('throws PRECONDITION_FAILED when the fix is already wont-fix', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-transition-'));
+    temporaryDirectories.push(projectRoot);
+    await createFixFile(projectRoot, 'wont-fix');
+
+    await expect(
+      updateFixStatus(projectRoot, 'auth-flow', 'FIX-0001', 'resolved'),
+    ).rejects.toMatchObject({ code: 'PRECONDITION_FAILED' });
+  });
 });

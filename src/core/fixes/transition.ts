@@ -4,7 +4,7 @@ import { findFixById } from './list.js';
 import type { FixStatus } from './types.js';
 
 export interface UpdateFixStatusResult {
-  feature: string;
+  featureSlug: string;
   id: string;
   slug: string;
   previousStatus: FixStatus;
@@ -27,8 +27,7 @@ export async function updateFixStatus(
     );
   }
 
-  const file = await readFixFile(location.filePath);
-  const previousStatus = file.frontmatter.status;
+  const previousStatus = location.frontmatter.status;
 
   if (previousStatus !== 'open' && previousStatus !== 'in-progress') {
     throw new ScifiError(
@@ -38,13 +37,15 @@ export async function updateFixStatus(
     );
   }
 
+  const file = await readFixFile(location.filePath);
+
   await writeFixFile(location.filePath, {
     ...file,
     frontmatter: { ...file.frontmatter, status: targetStatus },
   });
 
   return {
-    feature: featureSlug,
+    featureSlug,
     id: file.frontmatter.id,
     slug: file.frontmatter.slug,
     previousStatus,
