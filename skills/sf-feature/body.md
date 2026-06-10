@@ -37,7 +37,16 @@ directory is lazy — it does not exist until the first record.
 
 ## Flow
 
-### 1. Name and create the container
+### 1. Name and create (or reopen) the container
+
+**If you were sent here to resume or reopen an existing feature** — by
+`sf-continue` on a `created` feature, or by `sf-change` rolling a feature back to
+the spec stage — the container already exists. Do **not** run `scifi spec`; it
+would `CONFLICT`. Confirm the feature with `scifi status <slug> --json`, read
+`path` (the existing feature directory), and go straight to grilling against the
+spec that is already there. Skip the rest of this step.
+
+**Otherwise, for genuinely new work,** create the container:
 
 - Derive a short kebab-case slug from the request (e.g. `google-auth`).
 - If the user pasted an issue reference instead of a description — an issue
@@ -53,9 +62,10 @@ directory is lazy — it does not exist until the first record.
   - `--json` gives you a structured result. Read `path` from it — that is the
     feature directory. Your spec goes at `<path>/spec.md`.
   - On success the status is `created`.
-  - If it errors with `CONFLICT`, the slug already exists. Pick a different
-    slug or inspect the existing one with `scifi status <slug>`; do not
-    overwrite.
+  - If it errors with `CONFLICT`, the slug already exists. If you meant to start
+    new work, pick a different slug; do not overwrite. If you actually meant to
+    revise that feature, this is the reopen case above — work against the
+    existing `<path>` instead of creating.
 - Tell the user the slug you picked and the path.
 
 ### 2. Grill (this is the real work)

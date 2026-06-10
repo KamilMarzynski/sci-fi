@@ -111,6 +111,9 @@ grill and the review gate live:
 
 - Rolled to `spec-ready` → run `sf-feature` to settle the changed spec under
   `sf-spec-review`, then `sf-plan`, then `sf-implement`. Each gate re-runs.
+  `sf-feature` reopens the *existing* container in this case — it skips its
+  `scifi spec` create step, so you keep working against the original feature
+  rather than scaffolding a new one.
 - Rolled to `plan-ready` → run `sf-plan` to settle the changed design and tasks
   under `sf-plan-review`, then `sf-implement`.
 - Stayed `in-progress` → run `sf-implement`; it resumes from the next runnable
