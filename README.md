@@ -1,12 +1,16 @@
 # scifi
 
+[![CI](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml/badge.svg)](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg)](https://nodejs.org)
+
 `scifi` is a TypeScript CLI for specification-driven repository scaffolding. The current bootstrap milestone provides the package/build foundation, the `scifi init` command, a dedicated `.testing/` verification workspace, and installed-build end-to-end coverage.
 
 > **On the name:** this project was originally called `spec-flow` (`sf` for short). It was renamed to `scifi` — the same `sf` short form, now spelled out the fun way. The bundled skills keep their `sf-` prefix.
 
 ## Requirements
 
-- Node.js `>=20`
+- Node.js `>=22`
 - npm
 
 ## Bootstrap Development Usage
