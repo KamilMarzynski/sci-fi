@@ -38,3 +38,33 @@ export async function listOpenFixes(
   const fixes = await listFixes(projectRoot, featureSlug);
   return fixes.filter((f) => f.status === 'open' || f.status === 'in-progress');
 }
+
+export interface FixFileLocation {
+  filePath: string;
+  frontmatter: FixFrontmatter;
+}
+
+export async function findFixById(
+  projectRoot: string,
+  featureSlug: string,
+  fixId: string,
+): Promise<FixFileLocation | undefined> {
+  const fixesDir = buildFixesDirectoryPath(projectRoot, featureSlug);
+
+  const entries = await readdir(fixesDir, { withFileTypes: true }).catch((error: unknown) => {
+    if (isMissingPathError(error)) return [];
+    throw error;
+  });
+
+  const mdFiles = entries.filter((e) => e.isFile() && e.name.endsWith('.md'));
+
+  for (const entry of mdFiles) {
+    const filePath = join(fixesDir, entry.name);
+    const file = await readFixFile(filePath);
+    if (file.frontmatter.id === fixId) {
+      return { filePath, frontmatter: file.frontmatter };
+    }
+  }
+
+  return undefined;
+}
