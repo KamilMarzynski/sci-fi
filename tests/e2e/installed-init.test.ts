@@ -20,8 +20,11 @@ describe('installed build init verification', () => {
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'specs'))).toBe(true);
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'))).toBe(true);
       expect(
-        readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md'), 'utf8'),
-      ).toBe(expectedEvaluationDocument);
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
+      ).toBe(false);
+      expect(
+        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'CONTEXT.md')),
+      ).toBe(true);
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
         false,
       );
@@ -63,7 +66,7 @@ describe('installed build init verification', () => {
       expect(initialRun.stderr).toBe('');
 
       const scifiRoot = join(installation.installDirectory, 'docs', 'scifi');
-      const evaluationPath = join(scifiRoot, 'EVALUATION.md');
+      const contextPath = join(scifiRoot, 'CONTEXT.md');
       const specPath = join(scifiRoot, 'specs', 'existing-spec.md');
       const bugPath = join(scifiRoot, 'bugs', 'existing-bug.md');
       const statePath = join(scifiRoot, '.scifi', 'state.json');
@@ -82,7 +85,7 @@ describe('installed build init verification', () => {
         'SKILL.md',
       );
 
-      writeFileSync(evaluationPath, preservedEvaluationDocument, 'utf8');
+      writeFileSync(contextPath, preservedContextDocument, 'utf8');
       writeFileSync(specPath, preservedSpecDocument, 'utf8');
       writeFileSync(bugPath, preservedBugDocument, 'utf8');
       writeFileSync(statePath, preservedStateDocument, 'utf8');
@@ -100,7 +103,7 @@ describe('installed build init verification', () => {
 
       expect(rerun.status).toBe(0);
       expect(rerun.stderr).toBe('');
-      expect(readFileSync(evaluationPath, 'utf8')).toBe(preservedEvaluationDocument);
+      expect(readFileSync(contextPath, 'utf8')).toBe(preservedContextDocument);
       expect(readFileSync(specPath, 'utf8')).toBe(preservedSpecDocument);
       expect(readFileSync(bugPath, 'utf8')).toBe(preservedBugDocument);
       expect(readFileSync(statePath, 'utf8')).toBe(preservedStateDocument);
@@ -146,9 +149,6 @@ describe('installed build init verification', () => {
       expect(
         readFileSync(join(installation.installDirectory, 'docs', 'scifi', 'bugs'), 'utf8'),
       ).toBe('conflict');
-      expect(
-        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
-      ).toBe(false);
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
         false,
       );
@@ -168,35 +168,15 @@ describe('installed build init verification', () => {
       expect(result.stderr).toContain('opencode');
       expect(result.stderr).toContain('not implemented');
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
-      expect(
-        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
-      ).toBe(false);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);
     }
   });
 });
 
-const expectedEvaluationDocument = `# EVALUATION.md
+const preservedContextDocument = `# CONTEXT.md
 
-Evaluation is a release gate for this repository.
-
-## Required Checks
-
-- Run targeted tests for the module you changed.
-- Add filesystem-level coverage for scaffolding and generated output.
-- Verify command behavior end to end once CLI wiring exists.
-
-## Verification Notes
-
-- Prefer deterministic tests over mocks for file generation.
-- Inspect generated files for meaningful content, not only existence.
-- Record any skipped verification so the gap is explicit.
-`;
-
-const preservedEvaluationDocument = `# EVALUATION.md
-
-Preserve this custom evaluation note on rerun.
+Preserve this custom glossary note on rerun.
 `;
 
 const preservedSpecDocument = `# Existing Spec
