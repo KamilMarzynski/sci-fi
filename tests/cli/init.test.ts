@@ -31,8 +31,11 @@ describe('scifi init', () => {
     await expectDirectory(join(projectRoot, 'docs', 'scifi', '.scifi'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'bugs'));
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
-      expectedEvaluationDocument,
+    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toContain(
+      '# CONTEXT.md',
+    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
     );
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
@@ -44,14 +47,14 @@ describe('scifi init', () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), {
       recursive: true,
     });
 
     const run = await runCli(['init', '--harness', 'claude-code', '--yes']);
     expect(run.exitCode).not.toBe(0);
     expect(run.stderr).toContain(
-      `${join('docs', 'scifi', 'EVALUATION.md')}: path exists and is not a regular file.`,
+      `${join('docs', 'scifi', 'CONTEXT.md')}: path exists and is not a regular file.`,
     );
 
     await expect(access(join(projectRoot, 'docs', 'scifi', '.scifi'))).rejects.toMatchObject({
@@ -86,31 +89,14 @@ describe('scifi init', () => {
     await expect(access(join(projectRoot, 'docs', 'scifi', 'bugs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
   });
 });
-
-const expectedEvaluationDocument = `# EVALUATION.md
-
-Evaluation is a release gate for this repository.
-
-## Required Checks
-
-- Run targeted tests for the module you changed.
-- Add filesystem-level coverage for scaffolding and generated output.
-- Verify command behavior end to end once CLI wiring exists.
-
-## Verification Notes
-
-- Prefer deterministic tests over mocks for file generation.
-- Inspect generated files for meaningful content, not only existence.
-- Record any skipped verification so the gap is explicit.
-`;
 
 async function expectDirectory(directoryPath: string): Promise<void> {
   await access(directoryPath);

@@ -22,13 +22,13 @@ describe('bundled skill catalog', () => {
       'sf-continue',
       'sf-feature',
       'sf-fix',
+      'sf-handover',
       'sf-implement',
       'sf-plan',
       'sf-plan-review',
       'sf-receiving-review',
       'sf-spec-review',
       'sf-tdd',
-      'sf-verification',
     ]);
   });
 });

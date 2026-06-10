@@ -43,10 +43,6 @@ function buildScaffoldDirectories(specsRoot: string): ScaffoldDirectory[] {
 function buildBootstrapDocuments(specsRoot: string): BootstrapDocument[] {
   return [
     {
-      path: join(specsRoot, 'EVALUATION.md'),
-      contents: buildEvaluationDocument(),
-    },
-    {
       path: join(specsRoot, 'CONTEXT.md'),
       contents: buildContextDocument(),
     },
@@ -128,25 +124,6 @@ function isPathAlreadyPresentError(error: unknown): error is NodeJS.ErrnoExcepti
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
-}
-
-function buildEvaluationDocument(): string {
-  return `# EVALUATION.md
-
-Evaluation is a release gate for this repository.
-
-## Required Checks
-
-- Run targeted tests for the module you changed.
-- Add filesystem-level coverage for scaffolding and generated output.
-- Verify command behavior end to end once CLI wiring exists.
-
-## Verification Notes
-
-- Prefer deterministic tests over mocks for file generation.
-- Inspect generated files for meaningful content, not only existence.
-- Record any skipped verification so the gap is explicit.
-`;
 }
 
 function buildContextDocument(): string {

@@ -40,7 +40,7 @@ describe('installSkills', () => {
       'sf-spec-review',
       'sf-plan-review',
       'sf-code-review',
-      'sf-verification',
+      'sf-handover',
       'sf-tdd',
     ]) {
       expect(existsSync(join(projectRoot, '.claude', 'skills', id, 'SKILL.md'))).toBe(true);

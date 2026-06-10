@@ -28,8 +28,8 @@ describe('scaffoldInit', () => {
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'specs'));
     await expectDirectory(join(projectRoot, 'docs', 'scifi', 'bugs'));
 
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
-      expectedEvaluationDocument,
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
     );
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
@@ -54,18 +54,10 @@ describe('scaffoldInit', () => {
     temporaryDirectories.push(projectRoot);
 
     await mkdir(join(projectRoot, 'docs', 'scifi'), { recursive: true });
-    writeFileSync(
-      join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'),
-      '# Existing evaluation\nDo not replace.\n',
-      'utf8',
-    );
     writeFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), '# Existing context\n', 'utf8');
 
     await scaffoldInit({ projectRoot });
 
-    expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), 'utf8')).toBe(
-      '# Existing evaluation\nDo not replace.\n',
-    );
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toBe(
       '# Existing context\n',
     );
@@ -75,12 +67,12 @@ describe('scaffoldInit', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-core-'));
     temporaryDirectories.push(projectRoot);
 
-    await mkdir(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'), {
+    await mkdir(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), {
       recursive: true,
     });
 
     await expect(scaffoldInit({ projectRoot })).rejects.toMatchObject({
-      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')}: path exists and is not a regular file.`,
+      message: `Cannot scaffold bootstrap document at ${join(projectRoot, 'docs', 'scifi', 'CONTEXT.md')}: path exists and is not a regular file.`,
     });
   });
 
@@ -114,28 +106,11 @@ describe('scaffoldInit', () => {
 
     const conflictingEntry = await stat(join(projectRoot, 'docs', 'scifi', 'specs'));
     expect(conflictingEntry.isFile()).toBe(true);
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 });
-
-const expectedEvaluationDocument = `# EVALUATION.md
-
-Evaluation is a release gate for this repository.
-
-## Required Checks
-
-- Run targeted tests for the module you changed.
-- Add filesystem-level coverage for scaffolding and generated output.
-- Verify command behavior end to end once CLI wiring exists.
-
-## Verification Notes
-
-- Prefer deterministic tests over mocks for file generation.
-- Inspect generated files for meaningful content, not only existence.
-- Record any skipped verification so the gap is explicit.
-`;
 
 const expectedContextDocument = `# CONTEXT.md
 
