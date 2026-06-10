@@ -32,6 +32,21 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
   );
 }
 
+/**
+ * Like scaffoldFeature but also adds a done task so that `finish` can
+ * succeed once all open fixes are resolved.
+ */
+async function scaffoldFeatureWithDoneTask(projectRoot: string, slug: string): Promise<void> {
+  await scaffoldFeature(projectRoot, slug);
+  const tasksDir = join(projectRoot, 'docs', 'scifi', 'specs', slug, 'tasks');
+  await mkdir(tasksDir, { recursive: true });
+  await writeFile(
+    join(tasksDir, 'setup.md'),
+    '---\nid: TASK-001\nslug: setup\nstatus: done\ndepends-on: []\n---\n# Setup\n',
+    'utf8',
+  );
+}
+
 describe('fix command', () => {
   it("creates a fix file inside the feature's fixes/ dir and prints id and path", async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
@@ -51,6 +66,7 @@ describe('fix command', () => {
         'node',
         'scifi',
         'fix',
+        'create',
         'token expiry off by one',
         '--feature',
         'auth-flow',
@@ -83,7 +99,7 @@ describe('fix command', () => {
     process.chdir(projectRoot);
 
     await expect(
-      buildProgram().parseAsync(['node', 'scifi', 'fix', 'some description']),
+      buildProgram().parseAsync(['node', 'scifi', 'fix', 'create', 'some description']),
     ).rejects.toThrow();
   });
 
@@ -92,9 +108,84 @@ describe('fix command', () => {
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
-    const run = await runCli(['fix', 'some description', '--feature', 'nonexistent']);
+    const run = await runCli(['fix', 'create', 'some description', '--feature', 'nonexistent']);
     expect(run.exitCode).toBe(3);
     expect(run.stderr).toContain('Feature "nonexistent" does not exist.');
     expect(run.stderr).toContain('NOT_FOUND');
+  });
+
+  it('resolves an open fix via `fix resolve`', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+    await scaffoldFeature(projectRoot, 'auth-flow');
+
+    await runCli(['fix', 'create', 'token expiry off by one', '--feature', 'auth-flow']);
+    const run = await runCli(['fix', 'resolve', 'auth-flow', 'FIX-0001']);
+
+    expect(run.exitCode).toBe(0);
+    const file = await readFixFile(
+      join(
+        projectRoot,
+        'docs',
+        'scifi',
+        'specs',
+        'auth-flow',
+        'fixes',
+        'FIX-0001-token-expiry-off-by-one.md',
+      ),
+    );
+    expect(file.frontmatter.status).toBe('resolved');
+  });
+
+  it('marks a fix wont-fix via `fix wont-fix`', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+    await scaffoldFeature(projectRoot, 'auth-flow');
+
+    await runCli(['fix', 'create', 'token expiry off by one', '--feature', 'auth-flow']);
+    const run = await runCli(['fix', 'wont-fix', 'auth-flow', 'FIX-0001']);
+
+    expect(run.exitCode).toBe(0);
+    const file = await readFixFile(
+      join(
+        projectRoot,
+        'docs',
+        'scifi',
+        'specs',
+        'auth-flow',
+        'fixes',
+        'FIX-0001-token-expiry-off-by-one.md',
+      ),
+    );
+    expect(file.frontmatter.status).toBe('wont-fix');
+  });
+
+  it('returns NOT_FOUND when resolving a missing fix id', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+    await scaffoldFeature(projectRoot, 'auth-flow');
+
+    const run = await runCli(['fix', 'resolve', 'auth-flow', 'FIX-9999']);
+    expect(run.exitCode).toBe(3);
+    expect(run.stderr).toContain('NOT_FOUND');
+  });
+
+  it('resolving the last open fix unblocks `finish`', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+    // Use a feature with a done task so that finish only blocks on open fixes.
+    await scaffoldFeatureWithDoneTask(projectRoot, 'auth-flow');
+
+    await runCli(['fix', 'create', 'token expiry off by one', '--feature', 'auth-flow']);
+    const blocked = await runCli(['finish', 'auth-flow']);
+    expect(blocked.exitCode).toBe(4);
+
+    await runCli(['fix', 'resolve', 'auth-flow', 'FIX-0001']);
+    const finished = await runCli(['finish', 'auth-flow']);
+    expect(finished.exitCode).toBe(0);
   });
 });

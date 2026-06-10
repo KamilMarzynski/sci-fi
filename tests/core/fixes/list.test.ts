@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { listFixes, listOpenFixes } from '../../../src/core/fixes/list.js';
+import { findFixById, listFixes, listOpenFixes } from '../../../src/core/fixes/list.js';
 
 const temporaryDirectories: string[] = [];
 
@@ -117,5 +117,32 @@ describe('listOpenFixes', () => {
 
     const open = await listOpenFixes(projectRoot, 'auth-flow');
     expect(open).toEqual([]);
+  });
+});
+
+describe('findFixById', () => {
+  it('returns the file location and frontmatter for a matching id', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-findfix-'));
+    temporaryDirectories.push(projectRoot);
+    const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
+
+    const fileName = 'FIX-0001-token-expiry.md';
+    await writeFile(
+      join(fixesDir, fileName),
+      makeFixContent('FIX-0001', 'token-expiry', 'open', 'auth-flow'),
+      'utf8',
+    );
+
+    const found = await findFixById(projectRoot, 'auth-flow', 'FIX-0001');
+    expect(found).toBeDefined();
+    expect(found.frontmatter.slug).toBe('token-expiry');
+    expect(found.filePath).toBe(join(fixesDir, fileName));
+  });
+
+  it('returns undefined when no fix matches the id', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-findfix-'));
+    temporaryDirectories.push(projectRoot);
+    const found = await findFixById(projectRoot, 'auth-flow', 'FIX-9999');
+    expect(found).toBeUndefined();
   });
 });
