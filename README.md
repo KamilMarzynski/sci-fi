@@ -59,7 +59,7 @@ Existing bootstrap docs are preserved when the target path is already a regular 
 
 ## Bundled Skills
 
-`scifi init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 11 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-handover`, `sf-tdd`).
+`scifi init` installs a bundled skill catalog into the chosen harness. For Claude Code that means `.claude/skills/sf-<id>/SKILL.md` for all 13 skills (`sf-feature`, `sf-plan`, `sf-fix`, `sf-bug`, `sf-change`, `sf-continue`, `sf-implement`, `sf-spec-review`, `sf-plan-review`, `sf-code-review`, `sf-receiving-review`, `sf-handover`, `sf-tdd`).
 
 All bundled skills carry the `sf-` prefix so they cannot collide with user-authored skills living in the same directories.
 
