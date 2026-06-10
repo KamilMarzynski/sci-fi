@@ -4,6 +4,11 @@ import { readFixFile } from './frontmatter.js';
 import { buildFixesDirectoryPath } from './paths.js';
 import type { FixFrontmatter } from './types.js';
 
+export interface FixFileLocation {
+  filePath: string;
+  frontmatter: FixFrontmatter;
+}
+
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
@@ -37,11 +42,6 @@ export async function listOpenFixes(
 ): Promise<FixFrontmatter[]> {
   const fixes = await listFixes(projectRoot, featureSlug);
   return fixes.filter((f) => f.status === 'open' || f.status === 'in-progress');
-}
-
-export interface FixFileLocation {
-  filePath: string;
-  frontmatter: FixFrontmatter;
 }
 
 export async function findFixById(
