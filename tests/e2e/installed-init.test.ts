@@ -22,9 +22,9 @@ describe('installed build init verification', () => {
       expect(
         existsSync(join(installation.installDirectory, 'docs', 'scifi', 'EVALUATION.md')),
       ).toBe(false);
-      expect(
-        existsSync(join(installation.installDirectory, 'docs', 'scifi', 'CONTEXT.md')),
-      ).toBe(true);
+      expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'CONTEXT.md'))).toBe(
+        true,
+      );
       expect(existsSync(join(installation.installDirectory, 'docs', 'scifi', 'ROADMAP.md'))).toBe(
         false,
       );

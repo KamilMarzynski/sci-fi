@@ -34,9 +34,9 @@ describe('scifi init', () => {
     expect(readFileSync(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'), 'utf8')).toContain(
       '# CONTEXT.md',
     );
-    await expect(
-      access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md')),
-    ).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'EVALUATION.md'))).rejects.toMatchObject(
+      { code: 'ENOENT' },
+    );
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
@@ -89,9 +89,9 @@ describe('scifi init', () => {
     await expect(access(join(projectRoot, 'docs', 'scifi', 'bugs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    await expect(access(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'))).rejects.toMatchObject(
-      { code: 'ENOENT' },
-    );
+    await expect(access(join(projectRoot, 'docs', 'scifi', 'CONTEXT.md'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
