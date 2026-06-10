@@ -28,8 +28,11 @@ Before dispatching anything, read enough to brief subagents precisely:
 scifi start <slug> --json
 ```
 
-Transitions `plan-ready → in-progress`. If it errors `PRECONDITION_FAILED`, the
-feature is not plan-ready — stop and tell the user to finish `sf-plan` first.
+Transitions `plan-ready → in-progress`. Starting a feature that is *already*
+`in-progress` is an idempotent no-op, so a resumed run (e.g. routed here by
+`sf-continue`) passes straight through. If it errors `PRECONDITION_FAILED`, the
+feature has not been planned yet — stop and tell the user to finish `sf-plan`
+first.
 
 ### 2. Build the task order
 

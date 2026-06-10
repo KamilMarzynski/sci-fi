@@ -193,6 +193,16 @@ describe('validateStatusTransition with context', () => {
     ).resolves.toBeUndefined();
   });
 
+  it('accepts in-progress when already in-progress (idempotent resume)', async () => {
+    await expect(
+      validateStatusTransition(
+        { specExists: true, designExists: true, taskFileCount: 1 },
+        'in-progress',
+        { currentStatus: 'in-progress' },
+      ),
+    ).resolves.toBeUndefined();
+  });
+
   it('rejects done when allTasksDone is false', async () => {
     await expect(
       validateStatusTransition({ specExists: true, designExists: true, taskFileCount: 1 }, 'done', {

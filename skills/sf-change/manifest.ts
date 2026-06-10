@@ -3,6 +3,6 @@ import type { SkillManifest } from "scifi/skill-types";
 export const manifest: SkillManifest = {
   id: "sf-change",
   description:
-    "Change scope of an in-flight feature. Detects current step, loads spec/design, updates files, adds or removes tasks via CLI. Gate before resuming planning or implementation.",
-  argumentHint: "[spec-id]",
+    "Absorb a scope change to an existing feature: scope it against spec/design, reset lifecycle status to the deepest artifact it invalidates, and re-enter the pipeline so the right review gate runs again.",
+  argumentHint: "[feature-slug | description]",
 };

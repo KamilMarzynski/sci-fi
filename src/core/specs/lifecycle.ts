@@ -139,7 +139,10 @@ export async function validateStatusTransition(
   if (
     targetStatus === 'in-progress' &&
     context?.currentStatus !== undefined &&
-    context.currentStatus !== 'plan-ready'
+    context.currentStatus !== 'plan-ready' &&
+    // Starting an already in-progress feature is an idempotent no-op so a
+    // resumed run (e.g. via sf-continue) passes through instead of failing.
+    context.currentStatus !== 'in-progress'
   ) {
     throw new ScifiError(
       'PRECONDITION_FAILED',
