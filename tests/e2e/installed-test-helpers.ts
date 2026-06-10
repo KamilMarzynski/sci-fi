@@ -131,6 +131,8 @@ export type InstalledPackageTestEnvironment = {
 export function createInstalledPackageTestEnvironment(
   sandboxPrefix: string,
 ): InstalledPackageTestEnvironment {
+  mkdirSync(sandboxesRoot, { recursive: true });
+  mkdirSync(artifactsRoot, { recursive: true });
   const sandboxRoot = mkdtempSync(join(sandboxesRoot, sandboxPrefix));
   const artifactRoot = mkdtempSync(join(artifactsRoot, sandboxPrefix));
   const packDirectory = join(artifactRoot, 'pack');
