@@ -51,7 +51,6 @@ Running `scifi init` in a repository creates:
 
 - `.scifi/`
 - `specs/`
-- `bugs/`
 - `AGENTS.md`
 - `TESTING.md`
 
