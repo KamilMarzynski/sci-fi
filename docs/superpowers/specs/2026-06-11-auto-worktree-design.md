@@ -172,10 +172,8 @@ command style.
 
 ## Known limitations (record in ROADMAP.md, not solved here)
 
-1. **Feature-ID collision.** `FEAT-NNNN` is derived from the count of `specs/`
-   dirs on the current branch, so two features branched from the same `main` can
-   compute the same next id until merged. The slug is the real key, so this is
-   cosmetic; left as debt.
+1. **Feature-ID collision.** Resolved: the `FEAT-NNNN` id field has been dropped
+   entirely; the slug is now the sole identity for a feature.
 2. **Cross-branch discovery.** `scifi list` from `main` won't show in-flight
    features — their `specs/<slug>/` lives on their branch. Discovery across
    features is via `git worktree list`. Inherent to per-feature isolation.
