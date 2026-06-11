@@ -8,9 +8,12 @@ the task file (do not make the subagent search for it). Replace
 (ships beside this skill) — the implementer uses it to dispatch its reviewer.
 Pick the model from the task's size — a single-file task with a complete spec
 runs on a cheap model; multi-file or judgment-heavy tasks need a stronger one.
-The TDD discipline lives in `sf-tdd`; do not restate it here.
+The TDD discipline lives in `sf-tdd`; do not restate it here. The outer prompt
+below is fenced with four backticks so the triple-backtick fences inside
+`DISPATCH-CODE-REVIEW.md` survive substitution into `{CODE_REVIEW_DISPATCH}`
+without closing this block early.
 
-```
+````
 You are implementing one task from an approved plan. Load and follow the `sf-tdd` skill.
 
 Task: {TASK_SLUG}  (feature: {FEATURE_PATH})
@@ -64,4 +67,4 @@ verdict and a one-line note of what the review cleared:
 - NEEDS_CONTEXT — name exactly what information is missing.
 - BLOCKED — state what stops you (including a verification command that won't run).
 Do not mark the task done — the orchestrator does that after the gate clears.
-```
+````
