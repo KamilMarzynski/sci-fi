@@ -59,7 +59,8 @@ export function registerInitCommand(program: Command): void {
         getAdapter(harness);
 
         await scaffoldInit({ projectRoot, harness });
-        const skills = await installSkills({ projectRoot, harness, packageRoot });
+        const report = await installSkills({ projectRoot, harnesses: [harness], packageRoot });
+        const skills = report.installed.flatMap((entry) => entry.skills);
         await writeConfig({ projectRoot, harnesses: [harness] });
 
         emitSuccess(
