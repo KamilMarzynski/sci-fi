@@ -36,6 +36,8 @@ export async function updateFeatureStatus(
     status: targetStatus,
     createdAt: metadata.createdAt,
     updatedAt: now,
+    ...(metadata.branch !== undefined && { branch: metadata.branch }),
+    ...(metadata.worktreePath !== undefined && { worktreePath: metadata.worktreePath }),
   };
 
   const metadataPath = buildFeatureMetadataPath(projectRoot, slug);

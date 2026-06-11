@@ -16,6 +16,8 @@ export interface FeatureMetadata {
   status: FeatureStatus;
   createdAt: string;
   updatedAt: string;
+  branch?: string;
+  worktreePath?: string;
 }
 
 export interface CreateFeatureMetadataInput {
