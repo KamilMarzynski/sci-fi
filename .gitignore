@@ -6,3 +6,6 @@ data
 .worktrees/
 .claude/worktrees
 .testing
+
+# macOS
+.DS_Store
