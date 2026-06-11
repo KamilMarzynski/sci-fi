@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  HarnessNotImplementedError,
-  InvalidHarnessError,
-} from '../../../../src/core/skills/harness/adapter.js';
+import { InvalidHarnessError } from '../../../../src/core/skills/harness/adapter.js';
 import { getAdapter } from '../../../../src/core/skills/harness/registry.js';
 import '../../../../src/core/skills/harness/register-defaults.js';
 
@@ -11,25 +8,27 @@ describe('getAdapter', () => {
     expect(() => getAdapter('nope' as never)).toThrowError(InvalidHarnessError);
   });
 
-  it('throws HarnessNotImplementedError for opencode', () => {
-    expect(() => getAdapter('opencode')).toThrowError(HarnessNotImplementedError);
+  it('throws InvalidHarnessError for agents-md (no longer a known id)', () => {
+    expect(() => getAdapter('agents-md' as never)).toThrowError(InvalidHarnessError);
   });
 
-  it('throws HarnessNotImplementedError for codex', () => {
-    expect(() => getAdapter('codex')).toThrowError(HarnessNotImplementedError);
-  });
-
-  it('throws HarnessNotImplementedError for cursor', () => {
-    expect(() => getAdapter('cursor')).toThrowError(HarnessNotImplementedError);
-  });
-
-  it('throws HarnessNotImplementedError for agents-md', () => {
-    expect(() => getAdapter('agents-md')).toThrowError(HarnessNotImplementedError);
-  });
-
-  it('returns the Claude Code adapter for claude-code', () => {
+  it('returns the claude-code adapter', () => {
     const adapter = getAdapter('claude-code');
-
     expect(adapter.id).toBe('claude-code');
+  });
+
+  it('returns the opencode adapter', () => {
+    const adapter = getAdapter('opencode');
+    expect(adapter.id).toBe('opencode');
+  });
+
+  it('returns the codex adapter', () => {
+    const adapter = getAdapter('codex');
+    expect(adapter.id).toBe('codex');
+  });
+
+  it('returns the cursor adapter', () => {
+    const adapter = getAdapter('cursor');
+    expect(adapter.id).toBe('cursor');
   });
 });

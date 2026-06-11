@@ -49,7 +49,7 @@ describe('resolveHarness', () => {
       },
     });
 
-    expect(received).toEqual(['claude-code', 'opencode', 'codex', 'cursor', 'agents-md']);
+    expect(received).toEqual(['claude-code', 'opencode', 'codex', 'cursor']);
     expect(harness).toBe('opencode');
   });
 

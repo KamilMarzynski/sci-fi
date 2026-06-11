@@ -4,7 +4,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
 import { installSkills } from '../../../src/core/init/install-skills.js';
-import { HarnessNotImplementedError } from '../../../src/core/skills/harness/adapter.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageRoot = join(__dirname, '..', '..', '..');
@@ -47,14 +46,30 @@ describe('installSkills', () => {
     }
   });
 
-  it('throws HarnessNotImplementedError for opencode without writing anything', async () => {
+  it('installs all 11 bundled skills to the opencode targets', async () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-install-'));
     temporaryDirectories.push(projectRoot);
 
-    await expect(
-      installSkills({ projectRoot, harness: 'opencode', packageRoot }),
-    ).rejects.toThrowError(HarnessNotImplementedError);
+    await installSkills({
+      projectRoot,
+      harness: 'opencode',
+      packageRoot,
+    });
 
-    expect(existsSync(join(projectRoot, '.claude'))).toBe(false);
+    for (const id of [
+      'sf-feature',
+      'sf-plan',
+      'sf-fix',
+      'sf-bug',
+      'sf-change',
+      'sf-implement',
+      'sf-spec-review',
+      'sf-plan-review',
+      'sf-code-review',
+      'sf-handover',
+      'sf-tdd',
+    ]) {
+      expect(existsSync(join(projectRoot, '.opencode', 'skills', id, 'SKILL.md'))).toBe(true);
+    }
   });
 });

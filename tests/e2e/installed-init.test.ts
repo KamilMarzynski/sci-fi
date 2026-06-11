@@ -152,15 +152,14 @@ describe('installed build init verification', () => {
     }
   });
 
-  it('returns a stable non-zero exit when the chosen harness is not implemented', () => {
+  it('returns a stable non-zero exit when given an unknown harness id', () => {
     const installation = createInstalledPackageTestEnvironment('installed-init-');
 
     try {
-      const result = runInstalledInit(installation.installDirectory, ['--harness', 'opencode']);
+      const result = runInstalledInit(installation.installDirectory, ['--harness', 'agents-md']);
 
       expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain('opencode');
-      expect(result.stderr).toContain('not implemented');
+      expect(result.stderr).toContain('agents-md');
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);

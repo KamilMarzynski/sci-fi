@@ -15,7 +15,6 @@ import {
 import { findPackageRoot } from '../../core/package-root.js';
 import {
   type HarnessId,
-  HarnessNotImplementedError,
   InvalidHarnessError,
   KNOWN_HARNESS_IDS,
 } from '../../core/skills/harness/adapter.js';
@@ -90,7 +89,7 @@ export function registerInitCommand(program: Command): void {
 }
 
 function normalizeInitError(error: unknown): unknown {
-  if (error instanceof InvalidHarnessError || error instanceof HarnessNotImplementedError) {
+  if (error instanceof InvalidHarnessError) {
     return new ScifiError('INVALID_ARGUMENT', error.message, {
       hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.`,
       cause: error,

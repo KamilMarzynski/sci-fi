@@ -1,23 +1,14 @@
 import {
   type HarnessAdapter,
   type HarnessId,
-  HarnessNotImplementedError,
   InvalidHarnessError,
   isHarnessId,
 } from './adapter.js';
 
-type RegistryEntry = HarnessAdapter | 'not-implemented';
-
-const registry: Record<HarnessId, RegistryEntry> = {
-  'claude-code': 'not-implemented',
-  opencode: 'not-implemented',
-  codex: 'not-implemented',
-  cursor: 'not-implemented',
-  'agents-md': 'not-implemented',
-};
+const registry = new Map<HarnessId, HarnessAdapter>();
 
 export function registerAdapter(adapter: HarnessAdapter): void {
-  registry[adapter.id] = adapter;
+  registry.set(adapter.id, adapter);
 }
 
 export function getAdapter(id: string): HarnessAdapter {
@@ -25,11 +16,11 @@ export function getAdapter(id: string): HarnessAdapter {
     throw new InvalidHarnessError(id);
   }
 
-  const entry = registry[id];
+  const adapter = registry.get(id);
 
-  if (entry === 'not-implemented') {
-    throw new HarnessNotImplementedError(id);
+  if (adapter === undefined) {
+    throw new Error(`Harness "${id}" is known but has no registered adapter (internal error).`);
   }
 
-  return entry;
+  return adapter;
 }
