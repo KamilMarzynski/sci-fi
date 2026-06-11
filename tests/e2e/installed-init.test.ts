@@ -45,7 +45,7 @@ describe('installed build init verification', () => {
           'utf8',
         ),
       );
-      expect(config).toEqual({ version: 1, harness: 'claude-code' });
+      expect(config).toEqual({ version: 1, harnesses: ['claude-code'] });
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);
     }
@@ -152,15 +152,63 @@ describe('installed build init verification', () => {
     }
   });
 
-  it('returns a stable non-zero exit when the chosen harness is not implemented', () => {
+  it('installs multiple harnesses when two --harness flags are provided', () => {
     const installation = createInstalledPackageTestEnvironment('installed-init-');
 
     try {
-      const result = runInstalledInit(installation.installDirectory, ['--harness', 'opencode']);
+      const result = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'claude-code',
+        '--harness',
+        'cursor',
+      ]);
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.claude', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.cursor', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+
+      const rawConfig = readFileSync(
+        join(installation.installDirectory, 'docs', 'scifi', '.scifi', 'config.json'),
+        'utf8',
+      );
+      const parsed: unknown = JSON.parse(rawConfig);
+
+      if (typeof parsed !== 'object' || parsed === null) {
+        throw new Error(`config is not an object: ${rawConfig}`);
+      }
+      if (!('version' in parsed)) {
+        throw new Error(`config.version is missing: ${rawConfig}`);
+      }
+      if (!('harnesses' in parsed) || !Array.isArray(parsed.harnesses)) {
+        throw new Error(`config.harnesses is not an array: ${rawConfig}`);
+      }
+
+      expect(parsed.version).toBe(1);
+      expect([...parsed.harnesses].sort()).toEqual(['claude-code', 'cursor']);
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
+
+  it('returns a stable non-zero exit when given an unknown harness id', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
+
+    try {
+      const result = runInstalledInit(installation.installDirectory, ['--harness', 'agents-md']);
 
       expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain('opencode');
-      expect(result.stderr).toContain('not implemented');
+      expect(result.stderr).toContain('agents-md');
       expect(existsSync(join(installation.installDirectory, '.claude'))).toBe(false);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);

@@ -1,65 +1,67 @@
 import { describe, expect, it } from 'vitest';
-import { resolveHarness } from '../../../src/core/init/prompt-harness.js';
+import { resolveHarnesses } from '../../../src/core/init/prompt-harness.js';
 import { InvalidHarnessError } from '../../../src/core/skills/harness/adapter.js';
 
-describe('resolveHarness', () => {
-  it('returns the validated flag value when provided', async () => {
-    const harness = await resolveHarness({
-      flag: 'claude-code',
+describe('resolveHarnesses', () => {
+  it('deduplicates flag values preserving first-seen order', async () => {
+    const harnesses = await resolveHarnesses({
+      flags: ['cursor', 'claude-code', 'cursor'],
       yes: false,
       ask: async () => {
-        throw new Error('ask should not be called when a flag is provided');
+        throw new Error('ask should not be called when flags are provided');
       },
     });
 
-    expect(harness).toBe('claude-code');
+    expect(harnesses).toEqual(['cursor', 'claude-code']);
   });
 
-  it('throws InvalidHarnessError on an unknown flag value', async () => {
+  it('throws InvalidHarnessError when a flag value is unknown', async () => {
     await expect(
-      resolveHarness({
-        flag: 'nope',
+      resolveHarnesses({
+        flags: ['claude-code', 'nope'],
         yes: false,
-        ask: async () => 'claude-code',
+        ask: async () => {
+          throw new Error('ask should not be called');
+        },
       }),
     ).rejects.toThrowError(InvalidHarnessError);
   });
 
-  it('defaults to claude-code when --yes is set and no flag', async () => {
-    const harness = await resolveHarness({
-      flag: undefined,
+  it('returns [claude-code] when yes is true and no flags', async () => {
+    const harnesses = await resolveHarnesses({
+      flags: [],
       yes: true,
       ask: async () => {
         throw new Error('ask should not be called when --yes is set');
       },
     });
 
-    expect(harness).toBe('claude-code');
+    expect(harnesses).toEqual(['claude-code']);
   });
 
-  it('calls ask with all known harness ids and returns the picked one', async () => {
-    let received: readonly string[] | undefined;
+  it('calls ask with all known harness ids and returns validated deduped result', async () => {
+    let receivedChoices: readonly string[] | undefined;
 
-    const harness = await resolveHarness({
-      flag: undefined,
+    const harnesses = await resolveHarnesses({
+      flags: [],
       yes: false,
       ask: async (choices) => {
-        received = choices;
-        return 'opencode';
+        receivedChoices = choices;
+        return ['opencode', 'cursor', 'opencode'];
       },
     });
 
-    expect(received).toEqual(['claude-code', 'opencode', 'codex', 'cursor', 'agents-md']);
-    expect(harness).toBe('opencode');
+    expect(receivedChoices).toEqual(['claude-code', 'opencode', 'codex', 'cursor']);
+    expect(harnesses).toEqual(['opencode', 'cursor']);
   });
 
-  it('throws InvalidHarnessError when ask returns an unknown id', async () => {
+  it('throws when ask returns an empty selection', async () => {
     await expect(
-      resolveHarness({
-        flag: undefined,
+      resolveHarnesses({
+        flags: [],
         yes: false,
-        ask: async () => 'nope',
+        ask: async () => [],
       }),
-    ).rejects.toThrowError(InvalidHarnessError);
+    ).rejects.toThrow('At least one harness must be selected.');
   });
 });

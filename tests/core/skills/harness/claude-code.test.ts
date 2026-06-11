@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import { claudeCodeAdapter } from '../../../../src/core/skills/harness/claude-code.js';
+import { writeSkillBundles } from '../../../../src/core/skills/harness/skill-writer.js';
 import type { SkillBundle } from '../../../../src/core/skills/types.js';
 
 const temporaryDirectories: string[] = [];
@@ -98,6 +99,41 @@ describe('claudeCodeAdapter', () => {
       name: 'sf-bug',
       description: 'Create a bug report.',
     });
+  });
+});
+
+describe('claudeCodeAdapter regression — byte-identical to writeSkillBundles', () => {
+  it('produces the same SKILL.md as writeSkillBundles called on the claude-code skills root', async () => {
+    const bundle: SkillBundle = {
+      manifest: {
+        id: 'sf-feature',
+        description: 'Start grilling session for a new feature.',
+        argumentHint: '[title]',
+        allowedTools: ['Read', 'Write'],
+      },
+      body: '# sf-feature\n\nstub body\n',
+      assets: [],
+    };
+
+    // Install via claudeCodeAdapter into one temp dir
+    const projectRootA = createProjectRoot();
+    await claudeCodeAdapter.install([bundle], projectRootA);
+    const fromAdapter = readFileSync(
+      join(projectRootA, '.claude', 'skills', 'sf-feature', 'SKILL.md'),
+      'utf8',
+    );
+
+    // Write via writeSkillBundles directly into the same relative skills root
+    const projectRootB = createProjectRoot();
+    const skillsRoot = join(projectRootB, '.claude', 'skills');
+    await writeSkillBundles([bundle], skillsRoot);
+    const fromWriter = readFileSync(join(skillsRoot, 'sf-feature', 'SKILL.md'), 'utf8');
+
+    expect(fromAdapter).toBe(fromWriter);
+  });
+
+  it('exposes skillsBaseDir as .claude/skills', () => {
+    expect(claudeCodeAdapter.skillsBaseDir).toBe(join('.claude', 'skills'));
   });
 });
 
