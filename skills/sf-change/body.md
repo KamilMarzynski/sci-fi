@@ -27,15 +27,21 @@ NEVER LET STATUS RUN AHEAD OF THE ARTIFACTS.
 
 The change must attach to one feature. Resolve it before anything else.
 
-- `/sf-change <slug>` — treat the argument as an exact feature slug. Confirm it
-  exists with `scifi status <slug>`.
-- `/sf-change <description>` — you were given prose, not a slug. Run
-  `scifi list --json` and match candidates by slug and title. Present your best
-  match (or the candidates, if ambiguous) and **confirm the pick with the
+- `/sf-change <slug>` — treat the argument as an exact feature slug.
+- `/sf-change <description>` — you were given prose, not a slug. Discover
+  candidates from **both** `scifi list --json` and `git worktree list` (an
+  in-flight feature lives on its own `feat/<slug>` branch and will not appear in
+  `scifi list` from the default checkout). Match by slug and title. Present your
+  best match (or the candidates, if ambiguous) and **confirm the pick with the
   user**. Never guess silently.
-- No feature matches — stop. If this is genuinely new work, point the user at
-  `sf-feature`. If it is a defect rather than a scope change, point them at
-  `sf-fix`.
+- **Locate the feature's workspace, then confirm it exists.** Run
+  `git worktree list`; if `.worktrees/feat-<slug>` (branch `feat/<slug>`) exists,
+  enter it and confirm with `scifi status <slug>` from there. Only when *no*
+  matching worktree exists **and** `scifi status <slug>` returns `NOT_FOUND` from
+  a checkout that would contain it is the feature truly absent — then stop: for
+  genuinely new work point the user at `sf-feature`; for a defect rather than a
+  scope change, `sf-fix`. A `NOT_FOUND` while a worktree exists just means you
+  are in the wrong checkout, not that the feature is gone.
 
 ### 2. Assess current state
 

@@ -24,15 +24,20 @@ NEVER FIX BEFORE THE USER AGREES.
 
 The fix must attach to one feature. Resolve it before anything else.
 
-- `/sf-fix <slug>` — treat the argument as an exact feature slug. Confirm it
-  exists with `scifi status <slug>`.
-- `/sf-fix <description>` — you were given prose, not a slug. Run
-  `scifi list --json` and match candidate features by slug and title. Present
-  your best match (or the candidates, if ambiguous) and **confirm the pick with
-  the user**. Never guess silently.
-- No feature matches — stop. If it is a defect with no owning feature, point the
-  user at `sf-bug` (untracked). If it is really new work, point them at
-  `sf-feature`.
+- `/sf-fix <slug>` — treat the argument as an exact feature slug.
+- `/sf-fix <description>` — you were given prose, not a slug. Discover candidates
+  from **both** `scifi list --json` and `git worktree list` (an in-flight feature
+  lives on its own `feat/<slug>` branch and will not appear in `scifi list` from
+  the default checkout). Match candidate features by slug and title. Present your
+  best match (or the candidates, if ambiguous) and **confirm the pick with the
+  user**. Never guess silently.
+- **Locate the feature, then confirm it exists.** Run `git worktree list`; if a
+  `feat/<slug>` worktree exists, read `scifi status <slug>` from inside it. Only
+  when *no* matching worktree exists **and** `scifi status <slug>` returns
+  `NOT_FOUND` from a checkout that would contain it is the feature truly absent —
+  then stop: a defect with no owning feature goes to `sf-bug` (untracked), real
+  new work to `sf-feature`. A `NOT_FOUND` while a `feat/<slug>` worktree exists
+  just means you are in the wrong checkout, not that the feature is gone.
 
 Once identified, read the feature's `spec.md` and `design.md`, and grep
 `docs/scifi/adr/` for decisions touching the area. Diagnosis is grounded in the
