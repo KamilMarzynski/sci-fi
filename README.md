@@ -104,31 +104,26 @@ feature back to `spec-ready` and it climbs again through every gate.
 Work is driven by invoking skills in your agent. The CLI calls happen *inside*
 the skills — you rarely type `scifi` commands by hand except to inspect state.
 
-**1. Start a feature.** Run the `sf-feature` skill. It creates the container,
-then grills you about the idea one question at a time — the real problem, what is
-out of scope, testable acceptance criteria, the edge cases — until the spec has
-no gaps. It writes `spec.md`, runs a spec review, and marks the feature
-`spec-ready`.
+**The spine is three skills, run in order:**
 
-**2. Plan it.** Run `sf-plan`. It grills the *how* against your codebase, pushing
-for deep modules (lots of behavior behind a narrow interface). It writes
-`design.md`, decomposes the work into test-first task files ordered by a
-`depends-on` graph, runs a plan review, and marks the feature `plan-ready`.
+| Step | Run…           | What happens                                                                 | Ends at      |
+| ---- | -------------- | --------------------------------------------------------------------------- | ------------ |
+| 1️⃣ Start  | `sf-feature`   | Grills you about the idea one question at a time — real problem, scope, testable acceptance, edge cases — then writes `spec.md` and runs a spec review. | `spec-ready` |
+| 2️⃣ Plan   | `sf-plan`      | Grills the *how* against your codebase, writes `design.md`, decomposes it into test-first task files ordered by a `depends-on` graph, runs a plan review. | `plan-ready` |
+| 3️⃣ Build  | `sf-implement` | Autonomous: one fresh subagent per task, each test-first (`sf-tdd`) and gated by an independent code review. A handover subagent then verifies the whole feature against spec + design. | `done`       |
 
-**3. Implement it.** Run `sf-implement`. This stage is autonomous. It dispatches a
-fresh subagent per task — each builds its slice test-first (`sf-tdd`) and is
-gated by an independent code review before the task is marked done. When all
-tasks pass, a handover subagent verifies the whole feature against the spec and
-design, runs your checks, and the feature is finished.
+To start a brand-new feature, run **`sf-feature`** in your agent — that's the
+only command you need to remember. Each skill advances the lifecycle to the next
+status and hands you off to the one after it.
 
-That is the spine. The other skills handle the situations that come up around it:
+The other skills handle the situations that come up around the spine:
 
-| When…                                  | Run…           |
-| -------------------------------------- | -------------- |
-| You picked up work and forgot where it was | `sf-continue` — reads the status and routes you to the right next step |
-| The feature's scope changed            | `sf-change` — rolls the feature back exactly as far as the change cuts, then re-enters |
-| You hit a defect with no owning feature | `sf-bug` — investigate-then-fix, no tracked artifact |
-| You hit a defect in a real feature     | `sf-fix` — same, but records a tracked fix that blocks `finish` until resolved |
+| When…                                       | Run…           | What it does                                                          |
+| -------------------------------------------- | -------------- | -------------------------------------------------------------------- |
+| You picked up work and forgot where it was   | `sf-continue`  | Reads the status and routes you to the right next step               |
+| The feature's scope changed                  | `sf-change`    | Rolls the feature back exactly as far as the change cuts, then re-enters |
+| You hit a defect with no owning feature      | `sf-bug`       | Investigate-then-fix, no tracked artifact                            |
+| You hit a defect in a real feature           | `sf-fix`       | Same, but records a tracked fix that blocks `finish` until resolved  |
 
 **Inspect state any time** with the CLI directly:
 
