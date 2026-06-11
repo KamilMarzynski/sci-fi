@@ -33,10 +33,10 @@ describe('scifi init — multi-harness', () => {
     await expectDirectory(join(projectRoot, '.claude', 'skills'));
     await expectDirectory(join(projectRoot, '.cursor', 'skills'));
 
-    const config = JSON.parse(
+    const config: unknown = JSON.parse(
       readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
-    ) as unknown;
-    expect((config as { harnesses: string[] }).harnesses).toEqual(['claude-code', 'cursor']);
+    );
+    expect(config).toMatchObject({ harnesses: ['claude-code', 'cursor'] });
   });
 
   it('installs only claude-code when --yes is given with no --harness flags', async () => {
@@ -50,10 +50,10 @@ describe('scifi init — multi-harness', () => {
 
     await expectDirectory(join(projectRoot, '.claude', 'skills'));
 
-    const config = JSON.parse(
+    const config: unknown = JSON.parse(
       readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
-    ) as unknown;
-    expect((config as { harnesses: string[] }).harnesses).toEqual(['claude-code']);
+    );
+    expect(config).toMatchObject({ harnesses: ['claude-code'] });
   });
 
   it('exits non-zero with INVALID_ARGUMENT when non-interactive with no --harness and no --yes', async () => {
@@ -78,10 +78,10 @@ describe('scifi init — multi-harness', () => {
 
     await expectDirectory(join(projectRoot, '.cursor', 'skills'));
 
-    const config = JSON.parse(
+    const config: unknown = JSON.parse(
       readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
-    ) as unknown;
-    expect((config as { harnesses: string[] }).harnesses).toEqual(['cursor']);
+    );
+    expect(config).toMatchObject({ harnesses: ['cursor'] });
   });
 
   it('exits zero and names the failed harness when one of several harnesses fails', async () => {
@@ -96,7 +96,7 @@ describe('scifi init — multi-harness', () => {
     const run = await runCli(['init', '--harness', 'claude-code', '--harness', 'cursor', '--yes']);
 
     expect(run.exitCode).toBe(0);
-    expect(run.stdout).toContain('cursor');
+    expect(run.stdout).toContain('Failed:  cursor');
     await expectDirectory(join(projectRoot, '.claude', 'skills'));
   });
 
@@ -145,18 +145,16 @@ describe('scifi init — multi-harness', () => {
     ]);
 
     expect(run.exitCode).toBe(0);
-    const parsed = JSON.parse(run.stdout) as { ok: boolean; data: { harnesses: unknown[] } };
-    expect(parsed.ok).toBe(true);
-    expect(Array.isArray(parsed.data.harnesses)).toBe(true);
-    expect(parsed.data.harnesses).toHaveLength(2);
-    const first = parsed.data.harnesses[0] as {
-      harness: string;
-      baseDir: string;
-      skills: string[];
-    };
-    expect(first).toHaveProperty('harness');
-    expect(first).toHaveProperty('baseDir');
-    expect(first).toHaveProperty('skills');
+    const parsed: unknown = JSON.parse(run.stdout);
+    expect(parsed).toMatchObject({
+      ok: true,
+      data: {
+        harnesses: [
+          { harness: expect.any(String), baseDir: expect.any(String), skills: expect.any(Array) },
+          { harness: expect.any(String), baseDir: expect.any(String), skills: expect.any(Array) },
+        ],
+      },
+    });
   });
 });
 

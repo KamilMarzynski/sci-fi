@@ -26,6 +26,7 @@ interface InitCommandOptions {
 }
 
 const BOOTSTRAP_FILES = ['CONTEXT.md'];
+const NO_HARNESS_FLAGS: string[] = [];
 
 export function registerInitCommand(program: Command): void {
   program
@@ -34,8 +35,8 @@ export function registerInitCommand(program: Command): void {
     .option(
       '--harness <id>',
       'harness adapter to install skills for (repeatable)',
-      (value: string, previous: string[]) => [...previous, value],
-      [] as string[],
+      (value: string, previous: string[]): string[] => [...previous, value],
+      NO_HARNESS_FLAGS,
     )
     .option('--yes', 'skip prompts and use defaults')
     .option('--json', 'output as structured JSON')
@@ -64,10 +65,14 @@ export function registerInitCommand(program: Command): void {
 
         if (report.installed.length === 0) {
           const errorDetails = report.failed.map((f) => `${f.harness}: ${f.error.message}`);
-          throw new ScifiError(
-            'INTERNAL',
-            `All selected harnesses failed to install: ${errorDetails.join('; ')}`,
+          emitError(
+            new ScifiError(
+              'INTERNAL',
+              `All selected harnesses failed to install: ${errorDetails.join('; ')}`,
+            ),
+            json,
           );
+          return;
         }
 
         await writeConfig({ projectRoot, harnesses: report.installed.map((e) => e.harness) });
