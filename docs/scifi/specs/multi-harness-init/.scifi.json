@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "slug": "multi-harness-init",
+  "title": "Multi-harness init with real adapters",
+  "status": "done",
+  "createdAt": "2026-06-11T13:15:18.393Z",
+  "updatedAt": "2026-06-11T14:33:51.081Z",
+  "branch": "feat/multi-harness-init",
+  "worktreePath": ".worktrees/feat-multi-harness-init"
+}
