@@ -3,5 +3,5 @@ import type { SkillManifest } from "scifi/skill-types";
 export const manifest: SkillManifest = {
   id: "sf-code-review",
   description:
-    "Quality review of changes against design.md/spec.md and AGENTS.md rules.",
+    "Read-only critic pass on one change: a feature task against design.md + the task's acceptance, or a bug/fix against the agreed solution. Returns a verdict that gates acceptance.",
 };
