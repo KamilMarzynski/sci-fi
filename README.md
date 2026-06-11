@@ -31,7 +31,7 @@ never advance the lifecycle until a review has passed.
 ## Install
 
 ```bash
-npm install -g scifi
+npm install -g @kamilmarzynski/scifi
 ```
 
 Then, inside the repository you want to manage:
