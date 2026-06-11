@@ -123,7 +123,7 @@ The other skills handle the situations that come up around the spine:
 | You picked up work and forgot where it was   | `sf-continue`  | Reads the status and routes you to the right next step               |
 | The feature's scope changed                  | `sf-change`    | Rolls the feature back exactly as far as the change cuts, then re-enters |
 | You hit a defect with no owning feature      | `sf-bug`       | Investigate-then-fix, no tracked artifact                            |
-| You hit a defect in a real feature           | `sf-fix`       | Same, but records a tracked fix that blocks `finish` until resolved  |
+| You hit a defect in a real feature           | `sf-fix`       | Anchors the fix to that feature — diagnoses against its `spec.md`, `design.md`, and ADRs so the session has the original intent — and records a tracked fix. Works whether the feature is already `done` or still in flight; while in flight the open fix blocks `finish` until resolved. |
 
 **Inspect state any time** with the CLI directly:
 
@@ -191,7 +191,7 @@ rest are dispatched by other skills as subagents.
 | `sf-continue`        | Route a picked-up feature to its next step                     |
 | `sf-change`          | Absorb a scope change; roll the lifecycle back as far as needed |
 | `sf-bug`             | Investigate and fix a defect (untracked)                       |
-| `sf-fix`             | Investigate and fix a defect anchored to a feature (tracked)   |
+| `sf-fix`             | Fix a defect in a feature, diagnosed against its spec + design (tracked) |
 | `sf-tdd`             | Test-first discipline held by implementer subagents            |
 | `sf-spec-review`     | Critique a spec before `spec-ready`                            |
 | `sf-plan-review`     | Critique a plan before `plan-ready`                            |
