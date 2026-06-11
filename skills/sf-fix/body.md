@@ -42,7 +42,8 @@ feature's original intent.
 belongs in `sf-implement`'s own review loop, not a separate tracked fix. Say so,
 and proceed only if the user confirms `sf-fix` is what they want.
 
-Create an isolated workspace for the fix before investigating:
+Create an isolated workspace for the fix before investigating (the base branch
+shows as `main` — substitute your repo's default branch if it differs):
 
 ```
 git worktree add -b fix/<slug> .worktrees/fix-<slug> main

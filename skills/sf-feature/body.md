@@ -54,7 +54,8 @@ there. Skip the rest of this step.
   number, a URL, a Jira ticket, anything — resolve it however is appropriate
   for that tracker to recover the actual request, then derive the slug.
 - **Create the feature's branch and worktree (this is automatic now).** From the
-  repository's default/integration branch (usually `main`), run:
+  repository's default/integration branch, run (the commands below show it as
+  `main` — substitute your repo's actual default branch if it differs):
 
   ```
   git worktree add -b feat/<slug> .worktrees/feat-<slug> main

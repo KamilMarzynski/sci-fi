@@ -57,7 +57,8 @@ current contract.
 Enter the feature's worktree (the `worktree` field, fallback
 `.worktrees/feat-<slug>`) before editing any artifact. If the feature was `done`
 and its worktree was cleaned up, recreate one off the default branch
-(`git worktree add -b feat/<slug> .worktrees/feat-<slug> main`) and re-record it
+(`git worktree add -b feat/<slug> .worktrees/feat-<slug> main`, substituting your
+default branch for `main` if it differs) and re-record it
 with `scifi worktree set <slug> --branch feat/<slug> --path
 .worktrees/feat-<slug>`.
 
