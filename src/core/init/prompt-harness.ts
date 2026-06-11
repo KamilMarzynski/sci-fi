@@ -5,10 +5,13 @@ import {
   KNOWN_HARNESS_IDS,
 } from '../skills/harness/adapter.js';
 
-// Single-select ask — used by the existing resolveHarness (kept for init.ts compat until T6).
+// Single-select ask — transitional; used by resolveHarness for init.ts compat. Removed in T6.
 export type HarnessAsk = (choices: readonly HarnessId[]) => Promise<string>;
 
-// Multi-select ask — used by resolveHarnesses.
+// Multi-select ask — used by resolveHarnesses. This is the type design.md refers to as
+// `HarnessAsk`; it was given a distinct name to coexist with the legacy single-select
+// HarnessAsk during the transition. T6 reconciles this by removing the legacy
+// resolveHarness/HarnessAsk once init.ts moves to multi-select.
 export type HarnessMultiAsk = (choices: readonly HarnessId[]) => Promise<readonly string[]>;
 
 export interface ResolveHarnessOptions {
@@ -25,7 +28,7 @@ export interface ResolveHarnessesOptions {
 
 const DEFAULT_HARNESS: HarnessId = 'claude-code';
 
-// Legacy single-select resolver — kept intact for init.ts until T6 replaces it.
+// Transitional single-select resolver — kept intact for init.ts until T6 removes it.
 export async function resolveHarness(options: ResolveHarnessOptions): Promise<HarnessId> {
   if (options.flag !== undefined) {
     return validate(options.flag);
