@@ -126,8 +126,6 @@ describe('claudeCodeAdapter regression — byte-identical to writeSkillBundles',
     // Write via writeSkillBundles directly into the same relative skills root
     const projectRootB = createProjectRoot();
     const skillsRoot = join(projectRootB, '.claude', 'skills');
-    const { mkdir } = await import('node:fs/promises');
-    await mkdir(skillsRoot, { recursive: true });
     await writeSkillBundles([bundle], skillsRoot);
     const fromWriter = readFileSync(join(skillsRoot, 'sf-feature', 'SKILL.md'), 'utf8');
 

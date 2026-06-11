@@ -22,7 +22,7 @@ export async function writeSkillBundles(
   }
 }
 
-export function renderDocument(bundle: SkillBundle): string {
+function renderDocument(bundle: SkillBundle): string {
   const frontmatter = buildFrontmatter(bundle.manifest);
   const serialized = stringify(frontmatter).trimEnd();
 
@@ -45,7 +45,7 @@ export function createSkillBundleAdapter({
   };
 }
 
-export function buildFrontmatter(manifest: SkillManifest): Record<string, unknown> {
+function buildFrontmatter(manifest: SkillManifest): Record<string, unknown> {
   const frontmatter: Record<string, unknown> = {
     name: manifest.id,
     description: manifest.description,

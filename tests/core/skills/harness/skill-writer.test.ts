@@ -183,5 +183,9 @@ function parseFrontmatter(contents: string): Record<string, unknown> {
     throw new Error('Missing closing frontmatter marker');
   }
 
-  return parse(trimmed.slice(0, closingIndex)) as Record<string, unknown>;
+  const parsed: unknown = parse(trimmed.slice(0, closingIndex));
+  if (typeof parsed !== 'object' || parsed === null) {
+    throw new Error('Frontmatter did not parse to an object');
+  }
+  return parsed as Record<string, unknown>;
 }
