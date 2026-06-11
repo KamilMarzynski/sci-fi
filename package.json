@@ -1,5 +1,5 @@
 {
-  "name": "scifi",
+  "name": "@kamilmarzynski/scifi",
   "version": "0.1.0",
   "description": "Specification-driven CLI scaffolding for agentic workflows",
   "type": "module",
@@ -48,6 +48,10 @@
     "node": ">=22.0.0"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
     "commander": "^14.0.0",
     "yaml": "^2.9.0",
