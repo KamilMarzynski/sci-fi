@@ -184,20 +184,18 @@ describe('installed build init verification', () => {
       );
       const parsed: unknown = JSON.parse(rawConfig);
 
-      if (
-        typeof parsed !== 'object' ||
-        parsed === null ||
-        !('version' in parsed) ||
-        !('harnesses' in parsed)
-      ) {
-        throw new Error(`Unexpected config shape: ${rawConfig}`);
+      if (typeof parsed !== 'object' || parsed === null) {
+        throw new Error(`config is not an object: ${rawConfig}`);
+      }
+      if (!('version' in parsed)) {
+        throw new Error(`config.version is missing: ${rawConfig}`);
+      }
+      if (!('harnesses' in parsed) || !Array.isArray(parsed.harnesses)) {
+        throw new Error(`config.harnesses is not an array: ${rawConfig}`);
       }
 
-      const config = parsed as { version: unknown; harnesses: unknown };
-
-      expect(config.version).toBe(1);
-      expect(Array.isArray(config.harnesses)).toBe(true);
-      expect((config.harnesses as unknown[]).sort()).toEqual(['claude-code', 'cursor']);
+      expect(parsed.version).toBe(1);
+      expect([...parsed.harnesses].sort()).toEqual(['claude-code', 'cursor']);
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);
     }
