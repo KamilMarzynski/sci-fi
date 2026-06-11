@@ -11,15 +11,27 @@ should pick up.
 
 ## Flow
 
-### 1. Identify the feature
+### 1. Identify the feature and enter its workspace
 
 - `/sf-continue <slug>` — treat the argument as an exact feature slug.
-- `/sf-continue <description>` or no argument — run `scifi list --json` and match
-  candidates by slug and title. If one obviously fits, name it; if several
-  could, present them and **confirm the pick with the user**. Never guess
-  silently.
-- If `scifi status <slug>` errors `NOT_FOUND`, the feature does not exist — say
-  so and point the user at `sf-feature` to start it.
+- `/sf-continue <description>` or no argument — discover candidates from **both**
+  `scifi list --json` (features whose specs are on the current checkout) **and**
+  `git worktree list` (an in-flight feature lives on its own `feat/<slug>` branch
+  and will *not* appear in `scifi list` run from the default checkout). Match by
+  slug and title. If one obviously fits, name it; if several could, present them
+  and **confirm the pick with the user**. Never guess silently.
+- **Enter the feature's worktree before reading its state.** An in-flight
+  feature's `docs/scifi/specs/<slug>/.scifi.json` exists only on its `feat/<slug>`
+  branch — not in the default checkout. Run `git worktree list`; if
+  `.worktrees/feat-<slug>` (branch `feat/<slug>`) exists, enter it and read state
+  from there. Running `scifi status <slug>` from the default checkout would
+  otherwise report `NOT_FOUND` for a feature that is merely on another branch.
+- Conclude the feature does **not** exist only when *both* hold: no `feat/<slug>`
+  worktree exists **and** `scifi status <slug>` returns `NOT_FOUND` from a
+  checkout that would contain it (e.g. the default branch for a merged feature).
+  Then say so and point the user at `sf-feature`. A `NOT_FOUND` while a matching
+  worktree exists just means you are in the wrong checkout — enter the worktree
+  and re-read; never route the user to start a new feature in that case.
 
 ### 2. Read the state
 
@@ -27,16 +39,13 @@ should pick up.
 scifi status <slug> --json
 ```
 
-Read `status`, the `artifacts` inventory (`artifacts.spec`, `artifacts.design`,
+Run this **from inside the feature's worktree** (entered in step 1). Read
+`status`, the `artifacts` inventory (`artifacts.spec`, `artifacts.design`,
 `artifacts.taskCount`), the per-task statuses in `tasks[]`, and `fixes[]` — each
 fix carries its own `status`, so filter for the open ones. That single call
 tells you everything you need to route. Do not start reading or editing the
-spec/design yourself — the owning skill will.
-
-Also read `worktree` (and `branch`) when present — the feature's isolated
-workspace. Enter that worktree before handing off to the owning skill; fall back
-to `.worktrees/feat-<slug>` (confirm with `git worktree list`) if the field is
-absent or the recorded path is gone.
+spec/design yourself — the owning skill will. The `worktree`/`branch` fields
+confirm the workspace you entered.
 
 ### 3. Route by lifecycle status
 
@@ -71,6 +80,10 @@ stop rather than guessing.
 
 - Never route from anything but the live `scifi status` output — not memory, not
   the directory listing alone.
+- Never treat a `NOT_FOUND` as "feature missing" until you have checked
+  `git worktree list` for a `feat/<slug>` worktree and read status from inside
+  it. An in-flight feature is invisible to `scifi status` from the default
+  checkout — routing such a user to `sf-feature` would start a duplicate.
 - Never re-create a container that already exists; a `created` feature resumes
   inside `sf-feature` without `scifi spec`.
 - Never silently pick a feature when the match is ambiguous — confirm first.
