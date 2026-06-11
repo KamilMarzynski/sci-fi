@@ -78,6 +78,16 @@ describe('setFeatureWorktree', () => {
     ).rejects.toThrow('Branch must not be empty');
   });
 
+  it('rejects an empty worktree path', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-worktree-'));
+    temporaryDirectories.push(projectRoot);
+    await createFeatureAt(projectRoot, 'google-auth');
+
+    await expect(
+      setFeatureWorktree(projectRoot, 'google-auth', { branch: 'feat/google-auth', path: '  ' }),
+    ).rejects.toThrow('Worktree path must not be empty');
+  });
+
   it('throws NOT_FOUND for a missing feature', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-worktree-'));
     temporaryDirectories.push(projectRoot);
