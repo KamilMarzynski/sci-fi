@@ -42,6 +42,15 @@ feature's original intent.
 belongs in `sf-implement`'s own review loop, not a separate tracked fix. Say so,
 and proceed only if the user confirms `sf-fix` is what they want.
 
+Create an isolated workspace for the fix before investigating:
+
+```
+git worktree add -b fix/<slug> .worktrees/fix-<slug> main
+```
+
+where `<slug>` is the feature slug (or a short fix-specific slug if you are
+fixing several defects in one feature). Work inside it; open the PR from it.
+
 ### 2. Capture the symptom
 
 Pin the symptom in the user's words: the error text *verbatim*, the wrong

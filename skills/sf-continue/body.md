@@ -33,6 +33,11 @@ fix carries its own `status`, so filter for the open ones. That single call
 tells you everything you need to route. Do not start reading or editing the
 spec/design yourself — the owning skill will.
 
+Also read `worktree` (and `branch`) when present — the feature's isolated
+workspace. Enter that worktree before handing off to the owning skill; fall back
+to `.worktrees/feat-<slug>` (confirm with `git worktree list`) if the field is
+absent or the recorded path is gone.
+
 ### 3. Route by lifecycle status
 
 Map the state to the next step. The lifecycle is

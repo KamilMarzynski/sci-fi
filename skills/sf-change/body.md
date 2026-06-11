@@ -54,6 +54,13 @@ grep `docs/scifi/adr/` for decisions touching the area. `<path>` is
 `docs/scifi/specs/<slug>/`. You cannot scope a change without knowing the
 current contract.
 
+Enter the feature's worktree (the `worktree` field, fallback
+`.worktrees/feat-<slug>`) before editing any artifact. If the feature was `done`
+and its worktree was cleaned up, recreate one off the default branch
+(`git worktree add -b feat/<slug> .worktrees/feat-<slug> main`) and re-record it
+with `scifi worktree set <slug> --branch feat/<slug> --path
+.worktrees/feat-<slug>`.
+
 ### 3. Scope the change (grill it)
 
 Interrogate the change the same way `sf-feature` interrogates a new idea — one
