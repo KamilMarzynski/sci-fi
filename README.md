@@ -1,8 +1,20 @@
-# Sci-Fi - specification-driven development framework
+<p align="center">
+  <img src="./assets/icon.png" alt="Sci-Fi logo" width="160" />
+</p>
 
-[![CI](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml/badge.svg)](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg)](https://nodejs.org)
+<h1 align="center">Sci-Fi</h1>
+<p align="center">specification-driven development framework</p>
+
+<p align="center">
+  <a href="https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml"><img src="https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg" alt="Node.js" /></a>
+</p>
+
+> **Inspired by** the great prior art in agent skills and spec-driven workflows —
+> [mattpocock/skills](https://github.com/mattpocock/skills),
+> [obra/superpowers](https://github.com/obra/superpowers), and
+> [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec). Credit where it's due.
 
 `Sci-Fi` is a specification-driven workflow for building software with a coding
 agent. It gives a feature a lifecycle — *spec → plan → implement → done* — and
