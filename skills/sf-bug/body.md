@@ -67,10 +67,13 @@ Once the user has chosen, implement that solution — and only that solution.
   reproduces it through the public interface at the smallest scope that captures
   it, watch it fail for the *right* reason (the root cause from step 2), then
   make it pass with the minimal change at the cause. Keep the full suite green.
-- **Review gate.** Dispatch a code-review subagent that loads `sf-code-review`,
-  then act on its report under `sf-receiving-review` with **review type: code**.
-  Re-review until the verdict is **Pass**. Do not skip it and do not review your
-  own fix.
+- **Review gate.** Dispatch a code-review subagent with `DISPATCH-CODE-REVIEW.md`
+  (ships beside this skill) — a fix-mode review: you pass the **change brief**
+  (the root cause and the agreed solution), not a task file. Act on its report
+  under `sf-receiving-review` with **review type: code**. Re-review until the
+  verdict is **Pass** or **With fixes**; a **Fail** re-loops. On **With fixes**,
+  address the Minor items (or defer them with the user's ok) before accepting.
+  Do not skip it and do not review your own fix.
 
 The regression test is the point: it proves the bug existed and guards its
 return.
@@ -91,7 +94,8 @@ The bug is done when:
 - you can state the root cause in one sentence,
 - the user agreed on the solution you built,
 - a test reproduces the bug, which you watched fail then pass,
-- the code review verdict is **Pass** and the full suite is green.
+- the code review cleared (**Pass**, or **With fixes** with its Minor items
+  handled) and the full suite is green.
 
 ## Hard rules
 
@@ -99,4 +103,5 @@ The bug is done when:
 - Never present the symptom as the cause.
 - Never ship a fix with no failing test behind it.
 - Never catch or silence the error in place of removing its cause.
-- Never mark done before the code review verdict is **Pass**.
+- Never mark done before the code review clears (**Pass**, or **With fixes** with
+  its Minor items handled).

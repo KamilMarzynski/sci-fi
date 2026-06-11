@@ -34,6 +34,13 @@ Transitions `plan-ready → in-progress`. Starting a feature that is *already*
 feature has not been planned yet — stop and tell the user to finish `sf-plan`
 first.
 
+**Record the base commit.** Capture the current `HEAD` SHA now (`git rev-parse
+HEAD`) — call it `{BASE}`. It is the point the feature's work branches from, so
+`{BASE}..HEAD` is the whole-feature range you hand to handover later. On a
+resumed run, `{BASE}` is the last commit *before* this feature's first task
+commit; recover it from the git log if you no longer have it. (The CLI does not
+manage git — branch creation and commits are yours and the implementers'.)
+
 ### 2. Build the task order
 
 ```
@@ -75,10 +82,15 @@ For each runnable task, in order:
      the same dispatch unchanged.
 
 4. **Review gate (single review).** Dispatch a code-review subagent with
-   `DISPATCH-CODE-REVIEW.md`, which loads the `sf-code-review` skill. Hand its
+   `DISPATCH-CODE-REVIEW.md`, which loads the `sf-code-review` skill. Fill
+   `{COMMIT_RANGE}` with the commit(s) the implementer reported for this task
+   (its `Commit:` line), plus `{FEATURE_PATH}` and `{TASK_SLUG}`. Hand its
    report to the *same* implementer subagent to act on, governed by
    `sf-receiving-review` with **review type: code**. Re-review until the verdict
-   is **Pass**. Do not skip this and do not review it yourself.
+   is **Pass** or **With fixes**; a **Fail** re-loops. On **With fixes**, the
+   implementer addresses the Minor items (or you defer them with the user's ok)
+   before the task is marked done. Do not skip this and do not review it
+   yourself.
 
 5. **Mark done.**
 
@@ -96,13 +108,15 @@ only for a `BLOCKED` you cannot resolve, a genuine ambiguity, or all tasks done.
 After every task is `done`:
 
 - Dispatch the handover subagent with `DISPATCH-HANDOVER.md`, which loads the
-  `sf-handover` skill. It verifies the whole feature against `spec.md` and
-  `design.md` and runs a final quality check over the complete change — there is
-  no separate whole-feature code review; the per-task reviews already gated each
-  task to **Pass**.
+  `sf-handover` skill. Fill `{COMMIT_RANGE}` with `{BASE}..HEAD` — the base
+  commit you recorded in step 1 through the current `HEAD`, i.e. the whole
+  feature's work. It verifies the whole feature against `spec.md` and `design.md`
+  and runs a final quality check over the complete change — there is no separate
+  whole-feature code review; the per-task reviews already cleared each task.
 - Route every finding back to a fix subagent; the orchestrator coordinates but
   does not fix substantial issues itself. Only trivially small fixes are yours.
-  Re-dispatch handover until the verdict is **Pass**.
+  Handover's verdict is **Pass** or **Fail** (no "With fixes") — re-dispatch
+  until it is **Pass**.
 - When handover passes, read `docs/scifi/HANDOVER.md` if it exists and run the
   finishing actions it defines, in order — smoke tests, PR creation, invoking
   any skills it points to. These run here at the orchestrator's top level (not
@@ -122,7 +136,8 @@ the end of the implement stage.
 ## Hard rules
 
 - Never dispatch two implementer subagents at once — serial only.
-- Never mark a task done before its code review verdict is **Pass**.
+- Never mark a task done before its code review clears (**Pass**, or **With
+  fixes** with its Minor items handled).
 - Never let a subagent read your session history — construct its context from
   the task and the reference files.
 - Never call `scifi finish` while a handover finding is open or a `HANDOVER.md`

@@ -25,7 +25,9 @@ Build exactly this task, test-first per sf-tdd. Stay inside the task's scope —
 no extra features, no unrelated refactors. Run the task's Validation step and
 commit when green.
 
-Report back with a status line and a one-line summary:
+Report back with a status line, a one-line summary, and — when you committed —
+a `Commit:` line giving the SHA(s) you produced (or `<base>..HEAD`) so the
+orchestrator can hand the exact range to code review:
 - DONE — built, tests green, validation passes, committed.
 - DONE_WITH_CONCERNS — done, but flag doubts about correctness or scope.
 - NEEDS_CONTEXT — name exactly what information is missing.

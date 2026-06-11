@@ -45,8 +45,10 @@ Read where the feature is before touching anything:
 scifi status <slug> --json
 ```
 
-Read the `status`, the artifact inventory (`spec`, `design`, `taskCount`), the
-per-task statuses, and any open fixes. Then read the artifacts themselves —
+Read `status`, the `artifacts` inventory (`artifacts.spec`, `artifacts.design`,
+`artifacts.taskCount`), the per-task statuses in `tasks[]`, and `fixes[]` (each
+carries its own `status`, so filter for the open ones). Then read the artifacts
+themselves —
 `<path>/spec.md`, `<path>/design.md`, the task files under `<path>/tasks/` — and
 grep `docs/scifi/adr/` for decisions touching the area. `<path>` is
 `docs/scifi/specs/<slug>/`. You cannot scope a change without knowing the
@@ -123,6 +125,13 @@ Adding or removing a task means adding or deleting a file under `<path>/tasks/`
 (`sf-plan` owns the task template and the decomposition rules — re-enter it
 rather than hand-rolling task files for anything beyond a trivial edit). The CLI
 tracks task *status* (`scifi task start|done`), not task creation.
+
+**Re-open the tasks the change invalidated.** A design change usually rewrites
+tasks that are already `done`, and `sf-implement` *skips* `done` tasks on resume
+— so a changed-but-done task would never be rebuilt. For each existing task the
+change invalidates, run `scifi task start <slug> <task>` to flip it back to
+`in-progress` before re-entering `sf-implement`; it then picks the task up as
+runnable. A brand-new task file already starts `pending`, so it needs no reset.
 
 ## When you are stuck
 

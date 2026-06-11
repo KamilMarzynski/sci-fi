@@ -27,10 +27,11 @@ should pick up.
 scifi status <slug> --json
 ```
 
-Read the `status`, the artifact inventory (`spec`, `design`, `taskCount`), the
-per-task statuses, and any open `fixes`. That single call tells you everything
-you need to route. Do not start reading or editing the spec/design yourself —
-the owning skill will.
+Read `status`, the `artifacts` inventory (`artifacts.spec`, `artifacts.design`,
+`artifacts.taskCount`), the per-task statuses in `tasks[]`, and `fixes[]` — each
+fix carries its own `status`, so filter for the open ones. That single call
+tells you everything you need to route. Do not start reading or editing the
+spec/design yourself — the owning skill will.
 
 ### 3. Route by lifecycle status
 
