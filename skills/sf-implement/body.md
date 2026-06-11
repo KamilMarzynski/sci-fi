@@ -38,8 +38,10 @@ first.
 HEAD`) — call it `{BASE}`. It is the point the feature's work branches from, so
 `{BASE}..HEAD` is the whole-feature range you hand to handover later. On a
 resumed run, `{BASE}` is the last commit *before* this feature's first task
-commit; recover it from the git log if you no longer have it. (The CLI does not
-manage git — branch creation and commits are yours and the implementers'.)
+commit; recover it from the git log if you no longer have it. The feature's
+branch and worktree already exist (created by `sf-feature`); confirm you are
+inside it — `scifi status <slug> --json` reports the `worktree` path. The CLI
+does not run git; commits are yours and the implementers'.
 
 ### 2. Build the task order
 

@@ -17,6 +17,7 @@ import { registerSpecReadyCommand } from './commands/spec-ready.js';
 import { registerStartCommand } from './commands/start.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerTaskCommand } from './commands/task.js';
+import { registerWorktreeCommand } from './commands/worktree.js';
 
 const require = createRequire(import.meta.url);
 const packageJson = require(join(findPackageRoot(import.meta.url), 'package.json'));
@@ -54,6 +55,7 @@ export function buildProgram(): Command {
   registerStatusCommand(program);
   registerTaskCommand(program);
   registerFixCommand(program);
+  registerWorktreeCommand(program);
 
   applyExitOverride(program);
 

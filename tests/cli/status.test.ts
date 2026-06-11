@@ -27,7 +27,6 @@ describe('status command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           title: 'User Auth',
           status: 'in-progress',
@@ -81,7 +80,6 @@ describe('status command', () => {
       join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -132,7 +130,6 @@ describe('status command', () => {
       join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -156,5 +153,44 @@ describe('status command', () => {
 
     const combined = output.join('');
     expect(combined).not.toContain('fixes:');
+  });
+
+  it('prints the recorded branch and worktree when present', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'google-auth');
+    await mkdir(featureDir, { recursive: true });
+    await writeFile(
+      join(featureDir, '.scifi.json'),
+      JSON.stringify({
+        version: 1,
+        slug: 'google-auth',
+        status: 'created',
+        createdAt: '2026-06-11T00:00:00Z',
+        updatedAt: '2026-06-11T00:00:00Z',
+        branch: 'feat/google-auth',
+        worktreePath: '.worktrees/feat-google-auth',
+      }),
+      'utf8',
+    );
+
+    const output: string[] = [];
+    const originalWrite = process.stdout.write.bind(process.stdout);
+    process.stdout.write = (chunk: string | Uint8Array): boolean => {
+      if (typeof chunk === 'string') output.push(chunk);
+      return true;
+    };
+
+    try {
+      await buildProgram().parseAsync(['node', 'scifi', 'status', 'google-auth']);
+    } finally {
+      process.stdout.write = originalWrite;
+    }
+
+    const combined = output.join('');
+    expect(combined).toContain('feat/google-auth');
+    expect(combined).toContain('.worktrees/feat-google-auth');
   });
 });

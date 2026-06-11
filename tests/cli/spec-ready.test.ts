@@ -27,7 +27,6 @@ describe('spec-ready command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'created',
           createdAt: '2026-05-20T00:00:00Z',
@@ -60,7 +59,6 @@ describe('spec-ready command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'created',
           createdAt: '2026-05-20T00:00:00Z',
@@ -90,7 +88,6 @@ describe('spec-ready command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'created',
           createdAt: '2026-05-20T00:00:00Z',
@@ -109,7 +106,6 @@ describe('spec-ready command', () => {
     expect(payload.ok).toBe(true);
     expect(payload.data).toMatchObject({
       action: 'spec-ready',
-      id: 'FEAT-0001',
       slug: 'user-auth',
       previousStatus: 'created',
       newStatus: 'spec-ready',

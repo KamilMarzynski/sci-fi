@@ -9,7 +9,6 @@ import {
 describe('createInitialFeatureMetadata', () => {
   it('creates the initial metadata shape for a new feature', () => {
     const metadata = createInitialFeatureMetadata({
-      id: 'FEAT-0001',
       slug: 'user-auth',
       title: 'User Auth',
       createdAt: '2026-05-20T06:29:55Z',
@@ -17,7 +16,6 @@ describe('createInitialFeatureMetadata', () => {
 
     expect(metadata).toEqual({
       version: 1,
-      id: 'FEAT-0001',
       slug: 'user-auth',
       title: 'User Auth',
       status: 'created',

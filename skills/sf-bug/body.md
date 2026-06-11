@@ -27,6 +27,16 @@ it well enough to lay out real options; the choice between them is theirs.
   output, the failing case. Quote it; do not paraphrase.
 - Note the conditions they hit it under — environment, data, version, steps.
 
+Before investigating, create an isolated workspace from the default branch
+(shown as `main` below — substitute your repo's default branch if it differs):
+
+```
+git worktree add -b fix/<slug> .worktrees/fix-<slug> main
+```
+
+Derive `<slug>` from the bug (e.g. `stale-token-refresh`). Work inside it; open
+the PR from it. A bug is untracked, so there is no `scifi` pointer to record.
+
 ### 2. Investigate
 
 Reproduce, then find the root cause. One hypothesis at a time.

@@ -32,7 +32,6 @@ export function registerListCommand(program: Command): void {
           features.map(async (feature) => {
             const openFixes = await listOpenFixes(projectRoot, feature.slug);
             return {
-              id: feature.id,
               slug: feature.slug,
               status: feature.status,
               openFixes: openFixes.length,
@@ -42,10 +41,9 @@ export function registerListCommand(program: Command): void {
         );
 
         const humanLines = [
-          ['ID', 'SLUG', 'STATUS', 'OPEN FIXES', 'TITLE'].join('\t'),
+          ['SLUG', 'STATUS', 'OPEN FIXES', 'TITLE'].join('\t'),
           ...rows.map((row) =>
             [
-              row.id,
               row.slug,
               row.status,
               row.openFixes > 0

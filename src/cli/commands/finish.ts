@@ -41,7 +41,6 @@ export function registerFinishCommand(program: Command): void {
         const result = await updateFeatureStatus(projectRoot, slug, 'done', createTimestamp());
         emitSuccess({ action: 'finish', ...result }, json, [
           `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
-          `  ID: ${result.id}`,
           `  Timestamp: ${result.timestamp}`,
         ]);
       } catch (error) {

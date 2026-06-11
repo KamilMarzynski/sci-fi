@@ -19,7 +19,6 @@ export function registerSpecReadyCommand(program: Command): void {
         const result = await updateFeatureStatus(cwd(), slug, 'spec-ready', createTimestamp());
         emitSuccess({ action: 'spec-ready', ...result }, json, [
           `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
-          `  ID: ${result.id}`,
           `  Timestamp: ${result.timestamp}`,
         ]);
       } catch (error) {

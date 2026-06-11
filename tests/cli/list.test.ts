@@ -27,7 +27,6 @@ describe('list command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           title: 'User Auth',
           status: 'created',
@@ -44,7 +43,6 @@ describe('list command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0002',
           slug: 'payment-flow',
           status: 'spec-ready',
           createdAt: '2026-05-20T00:00:00Z',
@@ -70,9 +68,7 @@ describe('list command', () => {
     }
 
     const combined = output.join('');
-    expect(combined).toContain('FEAT-0001');
     expect(combined).toContain('user-auth');
-    expect(combined).toContain('FEAT-0002');
     expect(combined).toContain('payment-flow');
   });
 
@@ -89,7 +85,6 @@ describe('list command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'created',
           createdAt: '2026-05-20T00:00:00Z',
@@ -105,7 +100,6 @@ describe('list command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0002',
           slug: 'payment-flow',
           status: 'spec-ready',
           createdAt: '2026-05-20T00:00:00Z',
@@ -146,7 +140,6 @@ describe('list command', () => {
       join(specsDir, 'user-auth', '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -186,7 +179,7 @@ describe('list command', () => {
     const lineWithFixes = combined.split('\n').find((l) => l.includes('user-auth'));
     expect(lineWithFixes).toBeDefined();
     const fixColumns = lineWithFixes?.split('\t');
-    expect(fixColumns[3]).toBe('2 open fixes');
+    expect(fixColumns[2]).toBe('2 open fixes');
   });
 
   it('shows dash for features with no open fixes', async () => {
@@ -200,7 +193,6 @@ describe('list command', () => {
       join(specsDir, 'user-auth', '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -227,6 +219,6 @@ describe('list command', () => {
     const lineNoFixes = combined.split('\n').find((l) => l.includes('user-auth'));
     expect(lineNoFixes).toBeDefined();
     const noFixColumns = lineNoFixes?.split('\t');
-    expect(noFixColumns[3]).toBe('-');
+    expect(noFixColumns[2]).toBe('-');
   });
 });

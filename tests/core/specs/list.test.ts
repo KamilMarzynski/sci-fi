@@ -11,11 +11,10 @@ afterEach(async () => {
   temporaryDirectories.length = 0;
 });
 
-function makeMetadata(slug: string, id: string, status: string): string {
+function makeMetadata(slug: string, status: string): string {
   return `${JSON.stringify(
     {
       version: 1,
-      id,
       slug,
       status,
       createdAt: '2026-05-20T00:00:00Z',
@@ -44,12 +43,12 @@ describe('listFeatures', () => {
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
       join(specsDir, 'user-auth', '.scifi.json'),
-      makeMetadata('user-auth', 'FEAT-0001', 'created'),
+      makeMetadata('user-auth', 'created'),
       'utf8',
     );
     await writeFile(
       join(specsDir, 'payment-flow', '.scifi.json'),
-      makeMetadata('payment-flow', 'FEAT-0002', 'spec-ready'),
+      makeMetadata('payment-flow', 'spec-ready'),
       'utf8',
     );
 
@@ -69,12 +68,12 @@ describe('listFeatures', () => {
     await mkdir(join(specsDir, 'payment-flow'), { recursive: true });
     await writeFile(
       join(specsDir, 'user-auth', '.scifi.json'),
-      makeMetadata('user-auth', 'FEAT-0001', 'created'),
+      makeMetadata('user-auth', 'created'),
       'utf8',
     );
     await writeFile(
       join(specsDir, 'payment-flow', '.scifi.json'),
-      makeMetadata('payment-flow', 'FEAT-0002', 'spec-ready'),
+      makeMetadata('payment-flow', 'spec-ready'),
       'utf8',
     );
 

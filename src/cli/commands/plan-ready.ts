@@ -19,7 +19,6 @@ export function registerPlanReadyCommand(program: Command): void {
         const result = await updateFeatureStatus(cwd(), slug, 'plan-ready', createTimestamp());
         emitSuccess({ action: 'plan-ready', ...result }, json, [
           `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
-          `  ID: ${result.id}`,
           `  Timestamp: ${result.timestamp}`,
         ]);
       } catch (error) {

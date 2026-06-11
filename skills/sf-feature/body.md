@@ -42,9 +42,10 @@ directory is lazy — it does not exist until the first record.
 **If you were sent here to resume or reopen an existing feature** — by
 `sf-continue` on a `created` feature, or by `sf-change` rolling a feature back to
 the spec stage — the container already exists. Do **not** run `scifi spec`; it
-would `CONFLICT`. Confirm the feature with `scifi status <slug> --json`; the
-feature directory is `docs/scifi/specs/<slug>/` (call it `<path>`). Go straight
-to grilling against the spec that is already there. Skip the rest of this step.
+would `CONFLICT`. Confirm the feature with `scifi status <slug> --json`; its
+worktree is reported as `worktree` (fallback: `.worktrees/feat-<slug>`). Enter
+that worktree and go straight to grilling against the spec that is already
+there. Skip the rest of this step.
 
 **Otherwise, for genuinely new work,** create the container:
 
@@ -52,6 +53,19 @@ to grilling against the spec that is already there. Skip the rest of this step.
 - If the user pasted an issue reference instead of a description — an issue
   number, a URL, a Jira ticket, anything — resolve it however is appropriate
   for that tracker to recover the actual request, then derive the slug.
+- **Create the feature's branch and worktree (this is automatic now).** From the
+  repository's default/integration branch, run (the commands below show it as
+  `main` — substitute your repo's actual default branch if it differs):
+
+  ```
+  git worktree add -b feat/<slug> .worktrees/feat-<slug> main
+  ```
+
+  This gives the feature an isolated workspace so several features can be in
+  flight at once without colliding. Work from inside `.worktrees/feat-<slug>`
+  for the rest of this skill and for planning and implementation. If the path
+  already exists, the feature was started before — treat this as the reopen case
+  above instead of creating a second worktree.
 - Create the container:
 
   ```
@@ -66,6 +80,11 @@ to grilling against the spec that is already there. Skip the rest of this step.
     new work, pick a different slug; do not overwrite. If you actually meant to
     revise that feature, this is the reopen case above — work against the
     existing `<path>` instead of creating.
+- Record the workspace on the feature so status and resume can find it:
+
+  ```
+  scifi worktree set <slug> --branch feat/<slug> --path .worktrees/feat-<slug>
+  ```
 - Tell the user the slug you picked and the path.
 
 ### 2. Grill (this is the real work)

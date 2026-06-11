@@ -135,6 +135,11 @@ A few ideas recur through every stage and are worth understanding:
 - **Deep modules.** Planning and review both push for narrow interfaces over deep
   implementations, and apply the *deletion test*: would removing a unit
   concentrate complexity (keep it) or just scatter it (inline it)?
+- **Isolated per feature.** Starting a feature with `sf-feature` creates its own
+  git branch (`feat/<slug>`) and worktree (`.worktrees/feat-<slug>`) up front, so
+  several features can be built in parallel without colliding, and nothing lands
+  on the default branch until the feature's PR merges. `scifi status` reports the
+  branch and worktree; the maintainer removes the worktree after the PR merges.
 
 ## Project conventions
 
@@ -190,6 +195,7 @@ rest are dispatched by other skills as subagents.
 | `scifi finish <slug>`                      | `in-progress → done` (all tasks done, no open fixes)|
 | `scifi list [--status <s>]`                | List features                                       |
 | `scifi status <slug>`                      | Show a feature's full state                         |
+| `scifi worktree set <slug> --branch <b> --path <p>` | Record the branch + worktree backing a feature |
 
 Every command accepts `--json` for structured output, and reports failures with
 a stable error code (`NOT_FOUND`, `PRECONDITION_FAILED`, `CONFLICT`,

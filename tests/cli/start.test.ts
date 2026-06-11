@@ -27,7 +27,6 @@ describe('start command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'plan-ready',
           createdAt: '2026-05-20T00:00:00Z',
@@ -68,7 +67,6 @@ describe('start command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'in-progress',
           createdAt: '2026-05-20T00:00:00Z',
@@ -110,7 +108,6 @@ describe('start command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           status: 'spec-ready',
           createdAt: '2026-05-20T00:00:00Z',

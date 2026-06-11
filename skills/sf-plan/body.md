@@ -18,7 +18,13 @@ Before planning, read:
 
 `<path>` is the feature directory (`docs/scifi/specs/<slug>/`). When the design
 introduces a new domain term, define it in `CONTEXT.md` and apply the edit live
-once the user approves. For prior architectural decisions, grep
+once the user approves.
+
+Run this session inside the feature's worktree (created by `sf-feature`);
+`scifi status <slug> --json` reports its `worktree` path. On a resumed run,
+enter that worktree before reading or writing anything.
+
+For prior architectural decisions, grep
 `docs/scifi/adr/` on demand — see "Architecture Decision Records" below.
 
 ## Architecture Decision Records

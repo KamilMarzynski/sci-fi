@@ -1,6 +1,5 @@
-import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, stat, writeFile } from 'node:fs/promises';
 import { ScifiError } from '../output/errors.js';
-import { formatFeatureId } from './id.js';
 import { createInitialFeatureMetadata } from './metadata.js';
 import {
   buildFeatureDirectoryPath,
@@ -16,7 +15,6 @@ export interface CreateFeatureOptions {
 }
 
 export interface CreateFeatureResult {
-  id: string;
   featureDirectoryPath: string;
   metadataPath: string;
 }
@@ -47,15 +45,9 @@ export async function createFeature(options: CreateFeatureOptions): Promise<Crea
 
   await mkdir(featuresRootPath, { recursive: true });
 
-  const existingEntries = await readdir(featuresRootPath, {
-    withFileTypes: true,
-  });
-  const nextId = formatFeatureId(existingEntries.filter((entry) => entry.isDirectory()).length + 1);
-
   await mkdir(featureDirectoryPath, { recursive: false });
 
   const metadata = createInitialFeatureMetadata({
-    id: nextId,
     slug,
     ...(title !== undefined && { title }),
     createdAt: now,
@@ -64,7 +56,6 @@ export async function createFeature(options: CreateFeatureOptions): Promise<Crea
   await writeFile(metadataPath, `${JSON.stringify(metadata, null, 2)}\n`, 'utf8');
 
   return {
-    id: nextId,
     featureDirectoryPath,
     metadataPath,
   };

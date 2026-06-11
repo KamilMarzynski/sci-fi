@@ -22,7 +22,6 @@ async function scaffoldFeature(projectRoot: string, slug: string): Promise<void>
     join(featureDir, '.scifi.json'),
     JSON.stringify({
       version: 1,
-      id: 'FEAT-0001',
       slug,
       status: 'in-progress',
       createdAt: '2026-05-21T00:00:00Z',

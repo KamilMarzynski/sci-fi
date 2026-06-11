@@ -23,9 +23,10 @@ export function registerStatusCommand(program: Command): void {
 
         const data = {
           slug: metadata.slug,
-          id: metadata.id,
           ...(metadata.title !== undefined && { title: metadata.title }),
           status: metadata.status,
+          ...(metadata.branch !== undefined && { branch: metadata.branch }),
+          ...(metadata.worktreePath !== undefined && { worktree: metadata.worktreePath }),
           artifacts: {
             spec: artifacts.specExists,
             design: artifacts.designExists,
@@ -42,8 +43,9 @@ export function registerStatusCommand(program: Command): void {
         const title = metadata.title !== undefined ? ` (${metadata.title})` : '';
         const humanLines = [
           `slug:    ${metadata.slug}${title}`,
-          `id:      ${metadata.id}`,
           `status:  ${metadata.status}`,
+          ...(metadata.branch !== undefined ? [`branch:  ${metadata.branch}`] : []),
+          ...(metadata.worktreePath !== undefined ? [`worktree: ${metadata.worktreePath}`] : []),
           ``,
           `spec.md:    ${artifacts.specExists ? 'present' : 'missing'}`,
           `design.md:  ${artifacts.designExists ? 'present' : 'missing'}`,

@@ -6,11 +6,10 @@ export {
 } from './paths.js';
 
 export function createInitialFeatureMetadata(input: CreateFeatureMetadataInput): FeatureMetadata {
-  const { id, slug, title, createdAt } = input;
+  const { slug, title, createdAt } = input;
 
   return {
     version: 1,
-    id,
     slug,
     ...(title !== undefined && { title }),
     status: 'created',

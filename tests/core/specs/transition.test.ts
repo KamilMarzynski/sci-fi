@@ -19,7 +19,6 @@ async function createFeatureAt(projectRoot: string, slug: string, status: string
     `${JSON.stringify(
       {
         version: 1,
-        id: 'FEAT-0001',
         slug,
         status,
         createdAt: '2026-05-20T00:00:00Z',

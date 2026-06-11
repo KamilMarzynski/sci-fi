@@ -76,6 +76,38 @@ describe('installed build lifecycle verification', () => {
     }
   });
 
+  it('records and reports a feature worktree pointer against the installed build', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-worktree-');
+    try {
+      const dir = installation.installDirectory;
+      runInstalledCommand(dir, ['spec', 'google-auth', '--title', 'Google Auth']);
+
+      const setResult = runInstalledCommand(dir, [
+        'worktree',
+        'set',
+        'google-auth',
+        '--branch',
+        'feat/google-auth',
+        '--path',
+        '.worktrees/feat-google-auth',
+      ]);
+      expect(setResult.status).toBe(0);
+
+      const metadata = JSON.parse(
+        readFileSync(join(dir, 'docs', 'scifi', 'specs', 'google-auth', '.scifi.json'), 'utf8'),
+      ) as { branch?: string; worktreePath?: string };
+      expect(metadata.branch).toBe('feat/google-auth');
+      expect(metadata.worktreePath).toBe('.worktrees/feat-google-auth');
+
+      const statusResult = runInstalledCommand(dir, ['status', 'google-auth', '--json']);
+      expect(statusResult.status).toBe(0);
+      expect(statusResult.stdout).toContain('feat/google-auth');
+      expect(statusResult.stdout).toContain('.worktrees/feat-google-auth');
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
+
   it('fails spec-ready when spec.md is missing from installed binary', () => {
     const installation = createInstalledPackageTestEnvironment('installed-lifecycle-err-');
 

@@ -19,7 +19,6 @@ export function registerStartCommand(program: Command): void {
         const result = await updateFeatureStatus(cwd(), slug, 'in-progress', createTimestamp());
         emitSuccess({ action: 'start', ...result }, json, [
           `feature ${result.slug}: ${result.previousStatus} → ${result.newStatus}`,
-          `  ID: ${result.id}`,
           `  Timestamp: ${result.timestamp}`,
         ]);
       } catch (error) {

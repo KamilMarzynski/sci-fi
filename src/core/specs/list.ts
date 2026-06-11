@@ -12,8 +12,6 @@ function isValidFeatureMetadata(value: unknown): value is FeatureMetadata {
   return (
     'version' in obj &&
     typeof obj.version === 'number' &&
-    'id' in obj &&
-    typeof obj.id === 'string' &&
     'slug' in obj &&
     typeof obj.slug === 'string' &&
     'status' in obj &&
