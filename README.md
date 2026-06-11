@@ -1,10 +1,10 @@
-# scifi
+# Sci-Fi - specification-driven development framework
 
 [![CI](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml/badge.svg)](https://github.com/KamilMarzynski/sci-fi/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg)](https://nodejs.org)
 
-`scifi` is a specification-driven workflow for building software with a coding
+`Sci-Fi` is a specification-driven workflow for building software with a coding
 agent. It gives a feature a lifecycle — *spec → plan → implement → done* — and
 holds every stage to a written artifact and a review gate before it can advance.
 
@@ -20,7 +20,7 @@ The CLI is the bookkeeping; the skills are the method. The CLI never refuses to
 let the agent advance unless an artifact is genuinely missing, and the skills
 never advance the lifecycle until a review has passed.
 
-> **On the name:** originally `spec-flow` (`sf` for short), now `scifi` — same
+> **On the name:** originally `spec-flow` (`sf` for short), now `Sci-Fi` — same
 > `sf`, spelled the fun way. The bundled skills keep their `sf-` prefix.
 
 ## Requirements

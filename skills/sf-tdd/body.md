@@ -97,6 +97,18 @@ the public interface, not query the database directly.
 | Must mock everything | Too coupled. Inject dependencies. |
 | Test setup is huge | Extract helpers; if still huge, simplify the design. |
 
+## When a verification command will not run
+
+The test suite or the task's **Validation** step failing to *run* — missing
+dependencies, a broken harness, an installed-build step that errors before it
+verifies anything — is **BLOCKED, never a workaround**. Do not label it a
+"pre-existing env issue", do not skip it, do not assume green. A verification
+command that cannot run means the mandatory gate is off, and shipping past it is
+the one thing this discipline forbids. Stop and report `BLOCKED`, stating the
+exact command and the exact error. The orchestrator bootstraps the harness
+(`sf-implement` step 1); a harness that still will not run is its problem to
+resolve, not yours to route around.
+
 ## Done
 
 The task is done (from your side) when:
@@ -106,9 +118,17 @@ The task is done (from your side) when:
 - the task's **Validation** step passes,
 - you committed the work.
 
-Hand back to `sf-implement` with your status (`DONE`, `DONE_WITH_CONCERNS`,
-`NEEDS_CONTEXT`, or `BLOCKED`) and a one-line summary. The orchestrator runs the
-code review — you do not mark the task done yourself.
+Once green and committed, **run the code-review gate your dispatch defines**:
+dispatch a fresh code-review subagent (it loads `sf-code-review` — never review
+your own work), act on its findings in your own context per `sf-receiving-review`
+(review type: code), and re-dispatch until the verdict clears. Critical and
+Important are must-fix; only Minor may be deferred. You own this loop — the
+orchestrator no longer runs it for you, so it never has to re-contact you.
+
+Then hand back to `sf-implement` with your status (`DONE`, `DONE_WITH_CONCERNS`,
+`REVIEW_UNAVAILABLE`, `NEEDS_CONTEXT`, or `BLOCKED`), a one-line summary, your
+`Commit:` range, and — for `DONE` — the final reviewer verdict. You do not mark
+the task done yourself; the orchestrator does that once your gate has cleared.
 
 ## Red flags — stop and start over
 
