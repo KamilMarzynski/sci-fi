@@ -152,6 +152,57 @@ describe('installed build init verification', () => {
     }
   });
 
+  it('installs multiple harnesses when two --harness flags are provided', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
+
+    try {
+      const result = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'claude-code',
+        '--harness',
+        'cursor',
+      ]);
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.claude', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.cursor', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+
+      const rawConfig = readFileSync(
+        join(installation.installDirectory, 'docs', 'scifi', '.scifi', 'config.json'),
+        'utf8',
+      );
+      const parsed: unknown = JSON.parse(rawConfig);
+
+      if (
+        typeof parsed !== 'object' ||
+        parsed === null ||
+        !('version' in parsed) ||
+        !('harnesses' in parsed)
+      ) {
+        throw new Error(`Unexpected config shape: ${rawConfig}`);
+      }
+
+      const config = parsed as { version: unknown; harnesses: unknown };
+
+      expect(config.version).toBe(1);
+      expect(Array.isArray(config.harnesses)).toBe(true);
+      expect((config.harnesses as unknown[]).sort()).toEqual(['claude-code', 'cursor']);
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
+
   it('returns a stable non-zero exit when given an unknown harness id', () => {
     const installation = createInstalledPackageTestEnvironment('installed-init-');
 
