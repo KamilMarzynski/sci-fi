@@ -210,6 +210,17 @@ User-facing CLI changes are verified against an installed build, not only
 source-level tests. That workflow lives under `.testing/` and is covered by
 `tests/e2e/`; see `TESTING.md` for the mandatory process.
 
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the dev
+setup, branch/commit conventions, and verification steps. By participating you
+agree to the [Code of Conduct](./CODE_OF_CONDUCT.md). To report a security issue,
+follow [SECURITY.md](./SECURITY.md) — do not open a public issue.
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please):
+merged [Conventional Commits](https://www.conventionalcommits.org/) drive the
+version bump and changelog, and merging the Release PR publishes to npm.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).
