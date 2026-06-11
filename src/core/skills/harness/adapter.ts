@@ -23,6 +23,7 @@ export const KNOWN_HARNESS_IDS: readonly HarnessId[] = [
 
 export interface HarnessAdapter {
   readonly id: HarnessId;
+  readonly skillsBaseDir: string;
   install(bundles: readonly SkillBundle[], projectRoot: string): Promise<void>;
 }
 
