@@ -27,7 +27,6 @@ describe('inspectFeatureLifecycle', () => {
       join(featureRoot, '.scifi.json'),
       `${JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'created',
         createdAt: '2026-05-20T06:29:55Z',
@@ -56,7 +55,6 @@ describe('inspectFeatureLifecycle', () => {
       join(featureRoot, '.scifi.json'),
       `${JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'created',
         createdAt: '2026-05-20T06:29:55Z',

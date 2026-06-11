@@ -10,7 +10,6 @@ export type FeatureStatus = (typeof FEATURE_STATUS_VALUES)[number];
 
 export interface FeatureMetadata {
   version: 1;
-  id: string;
   slug: string;
   title?: string;
   status: FeatureStatus;
@@ -21,7 +20,6 @@ export interface FeatureMetadata {
 }
 
 export interface CreateFeatureMetadataInput {
-  id: string;
   slug: string;
   title?: string;
   createdAt: string;

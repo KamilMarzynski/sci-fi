@@ -20,7 +20,6 @@ async function createFeatureAt(projectRoot: string, slug: string): Promise<void>
     `${JSON.stringify(
       {
         version: 1,
-        id: 'FEAT-0001',
         slug,
         status: 'created',
         createdAt: '2026-06-11T00:00:00Z',
@@ -56,7 +55,6 @@ describe('setFeatureWorktree', () => {
     });
 
     expect(result).toEqual({
-      id: 'FEAT-0001',
       slug: 'google-auth',
       branch: 'feat/google-auth',
       worktreePath: '.worktrees/feat-google-auth',

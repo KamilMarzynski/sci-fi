@@ -33,7 +33,6 @@ export function registerSpecCommand(program: Command): void {
           {
             action: 'spec',
             slug,
-            id: result.id,
             path,
             status: 'created',
             metadataPath,
@@ -41,7 +40,6 @@ export function registerSpecCommand(program: Command): void {
           json,
           [
             `Feature created: ${slug}`,
-            `  ID:     ${result.id}`,
             `  Path:   ${path}`,
             `  Status: created`,
             ``,

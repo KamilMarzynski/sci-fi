@@ -5,7 +5,6 @@ import { buildFeatureMetadataPath } from './paths.js';
 import type { FeatureMetadata, FeatureStatus } from './types.js';
 
 export interface UpdateFeatureStatusResult {
-  id: string;
   slug: string;
   previousStatus: FeatureStatus;
   newStatus: FeatureStatus;
@@ -30,7 +29,6 @@ export async function updateFeatureStatus(
   const metadata = lifecycle.metadata;
   const updatedMetadata: FeatureMetadata = {
     version: metadata.version,
-    id: metadata.id,
     slug: metadata.slug,
     ...(metadata.title !== undefined && { title: metadata.title }),
     status: targetStatus,
@@ -44,7 +42,6 @@ export async function updateFeatureStatus(
   await writeFile(metadataPath, `${JSON.stringify(updatedMetadata, null, 2)}\n`, 'utf8');
 
   return {
-    id: metadata.id,
     slug: metadata.slug,
     previousStatus: metadata.status,
     newStatus: targetStatus,

@@ -10,7 +10,6 @@ export interface SetFeatureWorktreeInput {
 }
 
 export interface SetFeatureWorktreeResult {
-  id: string;
   slug: string;
   branch: string;
   worktreePath: string;
@@ -47,7 +46,6 @@ export async function setFeatureWorktree(
   await writeFile(metadataPath, `${JSON.stringify(updatedMetadata, null, 2)}\n`, 'utf8');
 
   return {
-    id: metadata.id,
     slug: metadata.slug,
     branch,
     worktreePath,

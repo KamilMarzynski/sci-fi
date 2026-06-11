@@ -36,7 +36,6 @@ export function registerPlanCommand(program: Command): void {
 
         emitSuccess({ action: 'plan', ...session }, json, [
           `feature ${session.slug}: ${session.status} (plan ${session.state})`,
-          `  ID: ${session.id}`,
           '',
           ...guidance,
         ]);

@@ -27,7 +27,6 @@ describe('status command', () => {
       `${JSON.stringify(
         {
           version: 1,
-          id: 'FEAT-0001',
           slug: 'user-auth',
           title: 'User Auth',
           status: 'in-progress',
@@ -81,7 +80,6 @@ describe('status command', () => {
       join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -132,7 +130,6 @@ describe('status command', () => {
       join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'user-auth',
         status: 'in-progress',
         createdAt: '2026-05-21T00:00:00Z',
@@ -169,7 +166,6 @@ describe('status command', () => {
       join(featureDir, '.scifi.json'),
       JSON.stringify({
         version: 1,
-        id: 'FEAT-0001',
         slug: 'google-auth',
         status: 'created',
         createdAt: '2026-06-11T00:00:00Z',

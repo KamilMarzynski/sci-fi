@@ -63,7 +63,7 @@ describe('createFeature', () => {
     );
   });
 
-  it('assigns sequential ids', async () => {
+  it('returns the slug for each created feature', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-create-'));
     temporaryDirectories.push(projectRoot);
 
@@ -79,8 +79,8 @@ describe('createFeature', () => {
       now: '2026-05-20T06:30:55Z',
     });
 
-    expect(first.id).toBe('FEAT-0001');
-    expect(second.id).toBe('FEAT-0002');
+    expect(first.featureDirectoryPath).toContain('first-feature');
+    expect(second.featureDirectoryPath).toContain('second-feature');
   });
 
   it('omits title when not provided', async () => {

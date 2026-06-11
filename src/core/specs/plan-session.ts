@@ -13,7 +13,6 @@ export type PlanSessionState = 'ready-to-plan' | 'in-progress' | 'already-planne
 
 export interface PlanSession {
   slug: string;
-  id: string;
   title?: string;
   status: FeatureStatus;
   state: PlanSessionState;
@@ -41,7 +40,6 @@ export async function inspectPlanSession(projectRoot: string, slug: string): Pro
 
   return {
     slug: metadata.slug,
-    id: metadata.id,
     ...(metadata.title !== undefined && { title: metadata.title }),
     status: metadata.status,
     state,
