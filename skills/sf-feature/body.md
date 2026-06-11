@@ -42,9 +42,9 @@ directory is lazy — it does not exist until the first record.
 **If you were sent here to resume or reopen an existing feature** — by
 `sf-continue` on a `created` feature, or by `sf-change` rolling a feature back to
 the spec stage — the container already exists. Do **not** run `scifi spec`; it
-would `CONFLICT`. Confirm the feature with `scifi status <slug> --json`, read
-`path` (the existing feature directory), and go straight to grilling against the
-spec that is already there. Skip the rest of this step.
+would `CONFLICT`. Confirm the feature with `scifi status <slug> --json`; the
+feature directory is `docs/scifi/specs/<slug>/` (call it `<path>`). Go straight
+to grilling against the spec that is already there. Skip the rest of this step.
 
 **Otherwise, for genuinely new work,** create the container:
 
@@ -101,7 +101,9 @@ placeholder.
   this skill), filling in the spec path.
 - Process its report with the `sf-receiving-review` skill, passing **review
   type: spec**. That skill governs how you act on the findings.
-- Re-dispatch until the verdict is **Pass**. Do not skip this.
+- Re-dispatch until the verdict is **Pass** or **With fixes**; a **Fail**
+  re-loops. On **With fixes**, address the Minor items (or defer them with the
+  user's ok) before finalizing. Do not skip this.
 
 ### 5. Finalize
 
@@ -115,7 +117,7 @@ placeholder.
     `created → spec-ready`.
   - If it errors with `PRECONDITION_FAILED` (spec.md missing), you put the spec
     in the wrong place — write it to `<path>/spec.md` and retry.
-- This is the end of spec creation. Planning happens later via `/sf:plan`.
+- This is the end of spec creation. Planning happens later via `sf-plan`.
 
 ## Hard rules
 

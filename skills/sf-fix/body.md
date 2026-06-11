@@ -100,10 +100,13 @@ Implement the chosen solution — and only that solution.
   reproduces it through the public interface at the smallest scope that captures
   it, watch it fail for the *right* reason (the root cause from step 3), then make
   it pass with the minimal change at the cause. Keep the full suite green.
-- **Review gate.** Dispatch a code-review subagent that loads `sf-code-review`,
-  then act on its report under `sf-receiving-review` with **review type: code**.
-  Re-review until the verdict is **Pass**. Do not skip it and do not review your
-  own fix.
+- **Review gate.** Dispatch a code-review subagent with `DISPATCH-CODE-REVIEW.md`
+  (ships beside this skill) — a fix-mode review: you pass the **change brief**
+  (the root cause and the agreed solution) and the owning feature path, not a
+  task file. Act on its report under `sf-receiving-review` with **review type:
+  code**. Re-review until the verdict is **Pass** or **With fixes**; a **Fail**
+  re-loops. On **With fixes**, address the Minor items (or defer them with the
+  user's ok) before accepting. Do not skip it and do not review your own fix.
 
 ### 7. Record and resolve
 
@@ -139,7 +142,8 @@ The fix is done when:
 - you can state the root cause in one sentence,
 - the user agreed on the solution you built,
 - a test reproduces the defect, which you watched fail then pass,
-- the code review verdict is **Pass** and the full suite is green,
+- the code review cleared (**Pass**, or **With fixes** with its Minor items
+  handled) and the full suite is green,
 - the fix file carries the lightweight record and is transitioned to `resolved`
   (or `wont-fix`).
 
@@ -151,4 +155,5 @@ The fix is done when:
 - Never ship a fix with no failing test behind it.
 - Never leave the tracked fix `open`/`in-progress` once the work is settled —
   resolve it or mark it wont-fix.
-- Never mark a fix resolved before the code review verdict is **Pass**.
+- Never mark a fix resolved before the code review clears (**Pass**, or **With
+  fixes** with its Minor items handled).

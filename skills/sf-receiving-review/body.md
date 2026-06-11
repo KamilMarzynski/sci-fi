@@ -65,5 +65,9 @@ paragraph, no defending the pushback.
 
 After you have addressed (fixed or reasonably pushed back on) every Critical and
 Important finding, hand control back to the flow that dispatched you — e.g.
-`sf-feature` re-runs `sf-spec-review` to confirm the verdict is now **Pass**
-before it proceeds.
+`sf-feature` re-runs `sf-spec-review` to confirm the verdict before it proceeds.
+
+The gate advances on **Pass** or **With fixes**; only **Fail** loops. A **With
+fixes** verdict means no Critical or Important issues remain — clear it by
+resolving the Minor items it lists, or by deferring them with the user's explicit
+ok. Never advance while a Critical or Important finding is open.

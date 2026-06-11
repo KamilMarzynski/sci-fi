@@ -130,7 +130,9 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
   this skill), filling in the feature path.
 - Process its report with the `sf-receiving-review` skill, passing **review
   type: plan**. That skill governs how you act on the findings.
-- Re-dispatch until the verdict is **Pass**. Do not skip this.
+- Re-dispatch until the verdict is **Pass** or **With fixes**; a **Fail**
+  re-loops. On **With fixes**, address the Minor items (or defer them with the
+  user's ok) before finalizing. Do not skip this.
 
 ### 6. Finalize
 
@@ -144,7 +146,7 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
     and transitions the feature `spec-ready → plan-ready`.
   - If it errors `PRECONDITION_FAILED`, an artifact is missing or misplaced —
     write it under `<path>` and retry.
-- This is the end of planning. Implementation happens later via `/sf:implement`.
+- This is the end of planning. Implementation happens later via `sf-implement`.
 
 ## Hard rules
 
