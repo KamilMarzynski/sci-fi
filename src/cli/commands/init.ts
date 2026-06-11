@@ -60,7 +60,7 @@ export function registerInitCommand(program: Command): void {
 
         await scaffoldInit({ projectRoot, harness });
         const skills = await installSkills({ projectRoot, harness, packageRoot });
-        await writeConfig({ projectRoot, harness });
+        await writeConfig({ projectRoot, harnesses: [harness] });
 
         emitSuccess(
           {

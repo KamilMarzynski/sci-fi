@@ -45,7 +45,7 @@ describe('installed build init verification', () => {
           'utf8',
         ),
       );
-      expect(config).toEqual({ version: 1, harness: 'claude-code' });
+      expect(config).toEqual({ version: 1, harnesses: ['claude-code'] });
     } finally {
       cleanupInstalledPackageTestEnvironment(installation);
     }

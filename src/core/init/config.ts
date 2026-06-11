@@ -4,13 +4,13 @@ import type { HarnessId } from '../skills/harness/adapter.js';
 
 export interface WriteConfigOptions {
   readonly projectRoot: string;
-  readonly harness: HarnessId;
+  readonly harnesses: readonly HarnessId[];
 }
 
 export async function writeConfig(options: WriteConfigOptions): Promise<void> {
   const configPath = join(options.projectRoot, 'docs', 'scifi', '.scifi', 'config.json');
 
-  const document = JSON.stringify({ version: 1, harness: options.harness });
+  const document = JSON.stringify({ version: 1, harnesses: options.harnesses });
 
   await writeFile(configPath, document, {
     encoding: 'utf8',

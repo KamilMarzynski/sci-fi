@@ -16,20 +16,20 @@ afterEach(async () => {
 });
 
 describe('writeConfig', () => {
-  it('writes config.json with the chosen harness', async () => {
+  it('writes config.json with the chosen harnesses array', async () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-config-'));
     temporaryDirectories.push(projectRoot);
     await mkdir(join(projectRoot, 'docs', 'scifi', '.scifi'), {
       recursive: true,
     });
 
-    await writeConfig({ projectRoot, harness: 'claude-code' });
+    await writeConfig({ projectRoot, harnesses: ['claude-code', 'cursor'] });
 
     const written = JSON.parse(
       readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
     );
 
-    expect(written).toEqual({ version: 1, harness: 'claude-code' });
+    expect(written).toEqual({ version: 1, harnesses: ['claude-code', 'cursor'] });
   });
 
   it('preserves existing config.json on rerun', async () => {
@@ -40,10 +40,10 @@ describe('writeConfig', () => {
     });
     const { writeFile } = await import('node:fs/promises');
     const configPath = join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json');
-    await writeFile(configPath, '{"version":1,"harness":"opencode"}', 'utf8');
+    await writeFile(configPath, '{"version":1,"harnesses":["opencode"]}', 'utf8');
 
-    await writeConfig({ projectRoot, harness: 'claude-code' });
+    await writeConfig({ projectRoot, harnesses: ['claude-code'] });
 
-    expect(readFileSync(configPath, 'utf8')).toBe('{"version":1,"harness":"opencode"}');
+    expect(readFileSync(configPath, 'utf8')).toBe('{"version":1,"harnesses":["opencode"]}');
   });
 });
