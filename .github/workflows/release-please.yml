@@ -34,10 +34,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Node 24 ships npm >= 11.5.1, required for trusted publishing (OIDC).
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
 
@@ -47,7 +48,7 @@ jobs:
       - name: Build
         run: npm run build
 
+      # No NODE_AUTH_TOKEN: npm detects the GitHub OIDC token and exchanges it
+      # for a short-lived publish credential via the configured trusted publisher.
       - name: Publish to npm
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
