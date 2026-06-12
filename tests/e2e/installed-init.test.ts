@@ -214,6 +214,36 @@ describe('installed build init verification', () => {
       cleanupInstalledPackageTestEnvironment(installation);
     }
   });
+
+  it('initializes with github-copilot harness and produces .github/skills/sf-feature/SKILL.md', () => {
+    const installation = createInstalledPackageTestEnvironment('installed-init-');
+
+    try {
+      const result = runInstalledInit(installation.installDirectory, [
+        '--harness',
+        'github-copilot',
+        '--yes',
+      ]);
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(
+        existsSync(
+          join(installation.installDirectory, '.github', 'skills', 'sf-feature', 'SKILL.md'),
+        ),
+      ).toBe(true);
+
+      const config = JSON.parse(
+        readFileSync(
+          join(installation.installDirectory, 'docs', 'scifi', '.scifi', 'config.json'),
+          'utf8',
+        ),
+      );
+      expect(config).toEqual({ version: 1, harnesses: ['github-copilot'] });
+    } finally {
+      cleanupInstalledPackageTestEnvironment(installation);
+    }
+  });
 });
 
 const preservedContextDocument = `# CONTEXT.md
