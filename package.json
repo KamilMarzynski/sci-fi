@@ -1,6 +1,6 @@
 {
   "name": "@kamilmarzynski/scifi",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Specification-driven CLI scaffolding for agentic workflows",
   "type": "module",
   "bin": {

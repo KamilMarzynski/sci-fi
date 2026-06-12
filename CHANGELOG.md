@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.2](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.1...v0.1.2) (2026-06-12)
+
+
+### Features
+
+* **config:** persist harnesses as array in config.json ([91a2d0c](https://github.com/KamilMarzynski/sci-fi/commit/91a2d0cbc325e35a10d0bfe56cd5b2f46f6b4122))
+* extract shared skill-folder writer and adapter factory ([3e2aa19](https://github.com/KamilMarzynski/sci-fi/commit/3e2aa19326f97ac0582bf07766fefb2586a66f5a))
+* **init:** add resolveHarnesses with dedup, yes, multi-ask, empty-rejection ([9d906f8](https://github.com/KamilMarzynski/sci-fi/commit/9d906f848d454726eaec85ba0ae1d2af0ab1e04a))
+* **init:** wire multi-select harness and per-harness output ([6f174ad](https://github.com/KamilMarzynski/sci-fi/commit/6f174ad560042de9081d5686e4585ddde5a36190))
+* **install-skills:** best-effort multi-harness install with InstallReport ([300221d](https://github.com/KamilMarzynski/sci-fi/commit/300221d872507d849fe9d5103a96ff9457b6b46c))
+* real adapters for opencode/codex/cursor; remove agents-md and HarnessNotImplementedError ([6e7c78b](https://github.com/KamilMarzynski/sci-fi/commit/6e7c78b2c5b19e2f40d5cc41eadfd87823310c6d))
+* support opencode/codex/cursor harnesses with multi-select init ([b1be2f9](https://github.com/KamilMarzynski/sci-fi/commit/b1be2f9d2258e2c5f431597a2e4c4e825854f816))
+
+
+### Bug Fixes
+
+* close skill/CLI consistency gaps found in review ([90d43f7](https://github.com/KamilMarzynski/sci-fi/commit/90d43f74b02e270c58d148356ce5d8e3ae6dab11))
+* close skill/CLI consistency gaps found in review ([3ded5ff](https://github.com/KamilMarzynski/sci-fi/commit/3ded5ff1513b5aedf4655bff5a5b9b858aacc7ee))
+* read legacy in-progress fix files as open ([f6c4384](https://github.com/KamilMarzynski/sci-fi/commit/f6c438488988a1feda63cce3aa451e768be21004))
+* widen DISPATCH-IMPLEMENTER fence to survive nested dispatch ([0bc80ed](https://github.com/KamilMarzynski/sci-fi/commit/0bc80ed1103bfb04243b6aa886ea4c5e252242d7))
+
 ## [0.1.1](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.0...v0.1.1) (2026-06-11)
 
 
