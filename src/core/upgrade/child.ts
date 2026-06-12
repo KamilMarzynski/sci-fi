@@ -46,6 +46,8 @@ export function spawnSkillInstall(args: SkillInstallArgs): Promise<InstallReport
           return;
         }
 
+        // Runtime shape validation: narrowed to non-null object above;
+        // safe property access for InstallReport shape check.
         if (
           typeof parsed !== 'object' ||
           parsed === null ||

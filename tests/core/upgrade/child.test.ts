@@ -186,4 +186,29 @@ describe('spawnSkillInstall', () => {
       message: expect.stringContaining('unexpected shape') as unknown,
     });
   });
+
+  it('throws ScifiError when child stdout has installed/failed keys but values are not arrays', async () => {
+    mockExistsSync.mockReturnValue(true);
+
+    mockExecFile.mockImplementation((_file, _args, _options, callback) => {
+      (callback as (err: null, stdout: string, stderr: string) => void)(
+        null,
+        JSON.stringify({ installed: 'not-an-array', failed: [] }),
+        '',
+      );
+      return {} as ReturnType<typeof execFile>;
+    });
+
+    await expect(
+      spawnSkillInstall({
+        binPath: '/usr/local/bin/scifi',
+        projectRoot: '/my/project',
+        harnesses: ['claude-code'],
+      }),
+    ).rejects.toMatchObject({
+      name: 'ScifiError',
+      code: 'INTERNAL',
+      message: expect.stringContaining('unexpected shape') as unknown,
+    });
+  });
 });
