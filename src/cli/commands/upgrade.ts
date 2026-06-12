@@ -119,13 +119,12 @@ async function runUserMode(options: UpgradeCommandOptions, command: Command): Pr
         previousVersion,
         newVersion,
         npmUpgraded,
-        harnesses: installReport.installed,
-        ...(installReport.failed.length > 0 && {
-          failed: installReport.failed.map((f) => ({
-            harness: f.harness,
-            error: f.error.message,
-          })),
-        }),
+        harnesses: config.harnesses,
+        installed: installReport.installed,
+        failed: installReport.failed.map((f) => ({
+          harness: f.harness,
+          error: f.error.message,
+        })),
       },
       json,
       [`scifi upgraded successfully.`, `  ${versionLine}`, ...installedLines, ...failedSummary],
