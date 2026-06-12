@@ -1,7 +1,6 @@
 # Spec: <title>
 
 - **Slug:** <slug>
-- **Status:** draft
 
 ## Problem / Why
 

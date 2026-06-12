@@ -9,10 +9,13 @@ argument-hint: "[feature-slug]"
 # sf-implement
 
 You orchestrate the implementation of ONE plan-ready feature. You do not write
-the feature's code yourself. You dispatch a fresh subagent per task, gate each
-on a code review, and drive the whole feature to done. Your context stays clean
-for coordination; each subagent gets exactly the context it needs and nothing
-from your history.
+the feature's code yourself, and you do not review it. You dispatch a fresh
+subagent per task; that implementer builds the task and runs its own code-review
+loop (it dispatches the reviewer, acts on the findings, re-reviews until clear),
+returning to you only once review has passed. You drive the whole feature to
+done and, at the end, dispatch handover. Your context stays clean for
+coordination; each subagent gets exactly the context it needs and nothing from
+your history.
 
 Where `sf-plan` produced `design.md` and a set of tasks, you execute them.
 
@@ -51,6 +54,26 @@ branch and worktree already exist (created by `sf-feature`); confirm you are
 inside it — `scifi status <slug> --json` reports the `worktree` path. The CLI
 does not run git; commits are yours and the implementers'.
 
+**Bootstrap the harness and prove it runs — before any task is dispatched.**
+A fresh worktree (created by `sf-feature`) has no installed dependencies, so the
+project's required checks — including any mandatory verification flow the repo's
+testing docs define (e.g. a `TESTING.md`) — cannot run in it yet. If you dispatch tasks against a
+tree where the verification command cannot run, the mandatory gate is silently
+off and every task ships unverified. So, from inside the worktree:
+
+1. Install dependencies the way the repo expects (e.g. `npm install`).
+2. Run the project's verification harness once as a smoke check — the test suite
+   and, for any CLI/packaging repo, whatever installed-build flow its testing
+   docs require. Confirm it actually executes and reports green.
+
+This is a **gate, not a courtesy**. If install fails, or the verification command
+will not run for any reason, **STOP and surface it to the user as BLOCKED** — do
+not label it a "pre-existing env issue", do not work around it, do not dispatch a
+single task. A verification harness that cannot run is the one thing that must
+never be passed silently. Only once the harness runs green do you proceed. On a
+resumed run, re-prove the harness here too — the worktree may have been recreated
+or its dependencies dropped since the last task.
+
 ### 2. Build the task order
 
 ```
@@ -66,7 +89,12 @@ concurrency; dispatching implementers in parallel against one working tree
 causes file conflicts. Walk the tasks in dependency order, skipping any already
 `done` (so a resumed run picks up where it stopped).
 
-### 3. Per task: dispatch → review → done
+### 3. Per task: dispatch → done
+
+The implementer owns its own review loop: it dispatches a fresh code-review
+subagent, acts on the findings in its own warm context, and re-reviews until the
+verdict clears — it reports back to you only once review has passed. You dispatch
+implementers; implementers dispatch reviewers; only you dispatch handover.
 
 For each runnable task, in order:
 
@@ -76,33 +104,41 @@ For each runnable task, in order:
    scifi task start <slug> <task>
    ```
 
-2. **Dispatch the implementer.** Use `DISPATCH-IMPLEMENTER.md` (ships beside
-   this skill). Inline the full task body into the prompt — do **not** make the
-   subagent hunt for it — and give it the reference paths (spec, design,
-   context). The implementer loads `sf-tdd` and builds the task
-   test-first.
+2. **Dispatch the implementer.** Use `DISPATCH-IMPLEMENTER.md` (ships beside this
+   skill). Inline the full task body into the prompt — do **not** make the
+   subagent hunt for it — and give it the reference paths (spec, design, context)
+   and the `DISPATCH-CODE-REVIEW.md` template it will use to dispatch its
+   reviewer. The implementer loads `sf-tdd`, builds the task test-first, then runs
+   the code-review gate itself before returning.
 
 3. **Handle the implementer's status:**
-   - `DONE` — proceed to review.
-   - `DONE_WITH_CONCERNS` — read the concerns. Correctness/scope concerns: fix
-     before review. Observations: note and proceed.
+   - `DONE` — built, tests green, **and its code-review loop cleared** (Pass, or
+     With fixes with only Minor handled). Its report carries the final reviewer
+     verdict and the `Commit:` range. Proceed to mark done.
+   - `DONE_WITH_CONCERNS` — done and review-clear, but it flags doubts.
+     Correctness/scope concerns: resolve (re-dispatch) before marking done.
+     Observations: note and proceed.
+   - `REVIEW_UNAVAILABLE` — the implementer could not dispatch a reviewer (the
+     harness does not let a subagent spawn one). Fall back to running the gate
+     yourself: dispatch the code-review subagent with `DISPATCH-CODE-REVIEW.md`
+     (fill `{COMMIT_RANGE}` from the implementer's `Commit:` line, plus
+     `{FEATURE_PATH}` and `{TASK_SLUG}`), then route its findings to a **fresh fix
+     subagent** with the findings and commit range inlined (you cannot resume the
+     original implementer). Re-review until the verdict clears, same bar as below.
    - `NEEDS_CONTEXT` — provide the missing context, re-dispatch.
    - `BLOCKED` — assess: more context (re-dispatch), too large (split the task),
      or the plan itself is wrong (escalate to the user). Never blindly re-run
      the same dispatch unchanged.
 
-4. **Review gate (single review).** Dispatch a code-review subagent with
-   `DISPATCH-CODE-REVIEW.md`, which loads the `sf-code-review` skill. Fill
-   `{COMMIT_RANGE}` with the commit(s) the implementer reported for this task
-   (its `Commit:` line), plus `{FEATURE_PATH}` and `{TASK_SLUG}`. Hand its
-   report to the *same* implementer subagent to act on, governed by
-   `sf-receiving-review` with **review type: code**. Re-review until the verdict
-   is **Pass** or **With fixes**; a **Fail** re-loops. On **With fixes**, the
-   implementer addresses the Minor items (or you defer them with the user's ok)
-   before the task is marked done. Do not skip this and do not review it
-   yourself.
+   **The review bar (whoever runs the gate):** re-review until **Pass** or a
+   clean **With fixes**; a **Fail** re-loops. **Critical and Important findings
+   are both must-fix** — the task is not done while either is open, whatever
+   verdict word the reviewer used (a "With fixes" listing an Important is a
+   mislabel; the findings govern, so it re-loops like a Fail). Only **Minor**
+   items may be addressed-or-deferred (defer with the user's ok). Never review a
+   task yourself — a fresh subagent reviews, never the orchestrator.
 
-5. **Mark done.**
+4. **Mark done.**
 
    ```
    scifi task done <slug> <task>
@@ -133,6 +169,16 @@ After every task is `done`:
   inside a subagent) so irreversible or visible actions stay visible. If the
   file is absent, there are no finishing actions and you go straight to finish.
 
+**Settle untracked workflow artifacts before finishing — not after.** The
+pipeline produces artifacts (this feature's `docs/scifi/specs/<slug>/`, any new
+ADRs, `CONTEXT.md` edits) that may be **untracked on the base branch**. Before
+`scifi finish` — and before any `HANDOVER.md` PR action — run `git status` and
+look for workflow files that are new or untracked. If any are, this is a decision
+the user must make *now*, not a surprise discovered after the feature is closed:
+surface the list and ask whether each belongs committed with the feature, in a
+separate commit, or git-ignored. Do not silently commit them and do not leave
+them dangling. Resolve it, then proceed to finish.
+
 ### 5. Finish
 
 ```
@@ -145,9 +191,19 @@ the end of the implement stage.
 
 ## Hard rules
 
+- Never dispatch a task before the verification harness is installed and proven
+  to run green in the worktree (step 1). A harness that will not run is BLOCKED,
+  never a workaround.
 - Never dispatch two implementer subagents at once — serial only.
 - Never mark a task done before its code review clears (**Pass**, or **With
-  fixes** with its Minor items handled).
+  fixes** with its Minor items handled). Any open Critical or Important finding
+  blocks done, regardless of the verdict word the reviewer wrote.
+- Never review a task yourself. The implementer dispatches its own reviewer; if
+  it cannot (`REVIEW_UNAVAILABLE`), you dispatch a fresh review subagent — never
+  the orchestrator judging the code.
+- Never re-contact a finished implementer to hand it a review — the implementer
+  already ran its review loop before returning. The only review you dispatch is
+  the `REVIEW_UNAVAILABLE` fallback (to a fresh fix subagent) and handover.
 - Never let a subagent read your session history — construct its context from
   the task and the reference files.
 - Never call `scifi finish` while a handover finding is open or a `HANDOVER.md`

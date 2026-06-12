@@ -18,7 +18,12 @@ Name them concretely: what they assert and where they live. -->
 
 ## Work
 
-<!-- The implementation steps, kept tight. Reference the design module(s). -->
+<!-- The implementation steps, kept tight. Reference the design module(s).
+If this task changes a shared signature, type, or seam, name the existing call
+sites it breaks (e.g. a shared entry point or wiring module) and how this task
+keeps the build green for each:
+update them here, widen the seam transitionally, or depend on a prior
+"widen the seam" task. Omit this note only when no consumer is affected. -->
 
 ## Validation
 
