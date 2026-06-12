@@ -39,21 +39,16 @@ describe('scifi init — multi-harness', () => {
     expect(config).toMatchObject({ harnesses: ['claude-code', 'cursor'] });
   });
 
-  it('installs only claude-code when --yes is given with no --harness flags', async () => {
+  it('exits non-zero with INVALID_ARGUMENT when --yes is given with no --harness flags', async () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-yes-default-'));
     temporaryDirectories.push(projectRoot);
     process.chdir(projectRoot);
 
     const run = await runCli(['init', '--yes']);
 
-    expect(run.exitCode).toBe(0);
-
-    await expectDirectory(join(projectRoot, '.claude', 'skills'));
-
-    const config: unknown = JSON.parse(
-      readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
-    );
-    expect(config).toMatchObject({ harnesses: ['claude-code'] });
+    expect(run.exitCode).not.toBe(0);
+    expect(run.stderr).toContain('INVALID_ARGUMENT');
+    expect(run.stderr).toContain('--harness');
   });
 
   it('exits non-zero with INVALID_ARGUMENT when non-interactive with no --harness and no --yes', async () => {

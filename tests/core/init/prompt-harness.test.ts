@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveHarnesses } from '../../../src/core/init/prompt-harness.js';
+import { ScifiError } from '../../../src/core/output/errors.js';
 import { InvalidHarnessError } from '../../../src/core/skills/harness/adapter.js';
 
 describe('resolveHarnesses', () => {
@@ -27,16 +28,24 @@ describe('resolveHarnesses', () => {
     ).rejects.toThrowError(InvalidHarnessError);
   });
 
-  it('returns [claude-code] when yes is true and no flags', async () => {
-    const harnesses = await resolveHarnesses({
-      flags: [],
-      yes: true,
-      ask: async () => {
-        throw new Error('ask should not be called when --yes is set');
-      },
-    });
-
-    expect(harnesses).toEqual(['claude-code']);
+  it('errors with INVALID_ARGUMENT when yes is true and no flags are provided', async () => {
+    await expect(
+      resolveHarnesses({
+        flags: [],
+        yes: true,
+        ask: async () => {
+          throw new Error('ask should not be called when --yes is set');
+        },
+      }),
+    ).rejects.toThrowError(
+      new ScifiError(
+        'INVALID_ARGUMENT',
+        'At least one --harness flag is required when using --yes.',
+        {
+          hint: 'Available harnesses: claude-code, opencode, codex, cursor, github-copilot.',
+        },
+      ),
+    );
   });
 
   it('calls ask with all known harness ids and returns validated deduped result', async () => {

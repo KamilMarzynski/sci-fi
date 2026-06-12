@@ -38,7 +38,7 @@ export function registerInitCommand(program: Command): void {
       (value: string, previous: string[]): string[] => [...previous, value],
       NO_HARNESS_FLAGS,
     )
-    .option('--yes', 'skip prompts and use defaults')
+    .option('--yes', 'skip prompts (requires --harness)')
     .option('--json', 'output as structured JSON')
     .action(async (options: InitCommandOptions, command: Command) => {
       const json = jsonMode(command);
