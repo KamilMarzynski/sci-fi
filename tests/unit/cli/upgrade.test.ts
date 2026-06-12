@@ -390,7 +390,8 @@ describe('registerUpgradeCommand', () => {
           newVersion: '1.0.0',
         },
       });
-      // Skill re-install still proceeds
+      // npm install always runs; skill re-install still proceeds
+      expect(mockNpmGlobalInstall).toHaveBeenCalled();
       expect(mockSpawnSkillInstall).toHaveBeenCalled();
     });
 
