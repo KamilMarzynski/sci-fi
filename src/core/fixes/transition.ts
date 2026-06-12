@@ -29,11 +29,11 @@ export async function updateFixStatus(
 
   const previousStatus = location.frontmatter.status;
 
-  if (previousStatus !== 'open' && previousStatus !== 'in-progress') {
+  if (previousStatus !== 'open') {
     throw new ScifiError(
       'PRECONDITION_FAILED',
       `Cannot transition fix ${fixId}: it is already ${previousStatus}.`,
-      { hint: 'Only open or in-progress fixes can be resolved or marked wont-fix.' },
+      { hint: 'Only open fixes can be resolved or marked wont-fix.' },
     );
   }
 

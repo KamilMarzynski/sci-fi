@@ -72,7 +72,7 @@ describe('listFixes', () => {
 });
 
 describe('listOpenFixes', () => {
-  it('returns only open and in-progress fixes', async () => {
+  it('returns only open fixes', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-fixes-'));
     temporaryDirectories.push(projectRoot);
     const fixesDir = await scaffoldFixesDir(projectRoot, 'auth-flow');
@@ -83,25 +83,20 @@ describe('listOpenFixes', () => {
       'utf8',
     );
     await writeFile(
-      join(fixesDir, 'FIX-0002-in-progress.md'),
-      makeFixContent('FIX-0002', 'in-progress', 'in-progress', 'auth-flow'),
+      join(fixesDir, 'FIX-0002-resolved.md'),
+      makeFixContent('FIX-0002', 'resolved', 'resolved', 'auth-flow'),
       'utf8',
     );
     await writeFile(
-      join(fixesDir, 'FIX-0003-resolved.md'),
-      makeFixContent('FIX-0003', 'resolved', 'resolved', 'auth-flow'),
-      'utf8',
-    );
-    await writeFile(
-      join(fixesDir, 'FIX-0004-wont-fix.md'),
-      makeFixContent('FIX-0004', 'wont-fix', 'wont-fix', 'auth-flow'),
+      join(fixesDir, 'FIX-0003-wont-fix.md'),
+      makeFixContent('FIX-0003', 'wont-fix', 'wont-fix', 'auth-flow'),
       'utf8',
     );
 
     const open = await listOpenFixes(projectRoot, 'auth-flow');
-    expect(open).toHaveLength(2);
-    const statuses = open.map((f) => f.status).sort();
-    expect(statuses).toEqual(['in-progress', 'open']);
+    expect(open).toHaveLength(1);
+    expect(open[0].status).toBe('open');
+    expect(open[0].id).toBe('FIX-0001');
   });
 
   it('returns empty when all fixes are resolved or wont-fix', async () => {

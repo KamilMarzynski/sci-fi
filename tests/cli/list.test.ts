@@ -157,7 +157,7 @@ describe('list command', () => {
     );
     await writeFile(
       join(fixesDir, 'FIX-0002-null-pointer.md'),
-      '---\nid: FIX-0002\nslug: null-pointer\nstatus: in-progress\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# null pointer\n',
+      '---\nid: FIX-0002\nslug: null-pointer\nstatus: open\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# null pointer\n',
       'utf8',
     );
 

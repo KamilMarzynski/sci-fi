@@ -45,10 +45,10 @@ describe('updateFixStatus', () => {
     expect(file.body).toContain('# token expiry');
   });
 
-  it('transitions an in-progress fix to wont-fix', async () => {
+  it('transitions an open fix to wont-fix', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-fix-transition-'));
     temporaryDirectories.push(projectRoot);
-    await createFixFile(projectRoot, 'in-progress');
+    await createFixFile(projectRoot, 'open');
 
     const result = await updateFixStatus(projectRoot, 'auth-flow', 'FIX-0001', 'wont-fix');
     expect(result.newStatus).toBe('wont-fix');

@@ -94,7 +94,7 @@ describe('status command', () => {
     );
     await writeFile(
       join(fixesDir, 'FIX-0002-null-ptr.md'),
-      '---\nid: FIX-0002\nslug: null-ptr\nstatus: in-progress\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# null ptr\n',
+      '---\nid: FIX-0002\nslug: null-ptr\nstatus: open\nfeature: user-auth\ncreated: 2026-05-21T00:00:00.000Z\n---\n# null ptr\n',
       'utf8',
     );
 

@@ -125,7 +125,8 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
   breaks in the meantime.
 - **For every interface change, name the call sites it breaks.** Before you
   finalize a task that changes a signature, type, or seam, grep the codebase for
-  its existing consumers (a shared one like `init.ts` is the classic trap) and
+  its existing consumers (a widely-shared one — an entry point, an init or
+  wiring module — is the classic trap) and
   decide, explicitly, how this task keeps the build green for each:
   - update every broken call site *within the same task* (preferred when the set
     is small and local), or
@@ -181,6 +182,5 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
 - Never write `design.md` while any template section is unanswered.
 - Never leave an in-scope acceptance criterion without a task.
 - Never finalize a task that changes a shared signature, type, or seam without
-  naming the call sites it breaks and how the task keeps the build green — every
-  task must leave the build green, not only the final one.
+  naming the call sites it breaks and how the task keeps the build green.
 - Never invent project facts — read the code and docs, or ask.
