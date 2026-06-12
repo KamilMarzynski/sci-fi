@@ -156,6 +156,31 @@ describe('scifi init — multi-harness', () => {
       },
     });
   });
+
+  it('installs both claude-code and github-copilot harnesses together', async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-multi-copilot-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const run = await runCli([
+      'init',
+      '--harness',
+      'claude-code',
+      '--harness',
+      'github-copilot',
+      '--yes',
+    ]);
+
+    expect(run.exitCode).toBe(0);
+
+    await expectDirectory(join(projectRoot, '.claude', 'skills'));
+    await expectDirectory(join(projectRoot, '.github', 'skills'));
+
+    const config: unknown = JSON.parse(
+      readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
+    );
+    expect(config).toMatchObject({ harnesses: ['claude-code', 'github-copilot'] });
+  });
 });
 
 describe('scifi init', () => {
@@ -240,6 +265,25 @@ describe('scifi init', () => {
     await expect(access(join(projectRoot, 'docs', 'scifi', 'ROADMAP.md'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
+  });
+
+  it('installs github-copilot skills and writes config with the harness', async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-copilot-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const run = await runCli(['init', '--harness', 'github-copilot', '--yes']);
+
+    expect(run.exitCode).toBe(0);
+
+    await expect(
+      access(join(projectRoot, '.github', 'skills', 'sf-feature', 'SKILL.md')),
+    ).resolves.toBeUndefined();
+
+    const config: unknown = JSON.parse(
+      readFileSync(join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'), 'utf8'),
+    );
+    expect(config).toMatchObject({ harnesses: ['github-copilot'] });
   });
 });
 
