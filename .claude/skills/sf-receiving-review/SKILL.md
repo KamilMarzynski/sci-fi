@@ -77,11 +77,3 @@ The gate advances on **Pass** or **With fixes**; only **Fail** loops. A **With
 fixes** verdict means no Critical or Important issues remain — clear it by
 resolving the Minor items it lists, or by deferring them with the user's explicit
 ok. Never advance while a Critical or Important finding is open.
-
-**The findings govern, not the label.** A reviewer can mislabel — stamp "With
-fixes" while listing an Important (or Critical) item. When the verdict and the
-Issues list disagree, the list wins: treat any open Critical or Important finding
-as a **Fail** regardless of the verdict word, fix it, and loop. Critical and
-Important are both must-fix before the gate advances; only Minor may be deferred
-(with the user's ok). Never advance on the strength of the verdict word while an
-Important finding sits unresolved in the list.

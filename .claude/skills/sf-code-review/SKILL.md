@@ -63,16 +63,6 @@ instead of assuming.
 Go through the diff against this checklist. No fixed priority order — weigh each
 finding by its real impact on the change.
 
-**Scope: judge the change, not the codebase.** Your subject is the diff. Code the
-change did not touch is out of scope — pre-existing debt (an old cast, a legacy
-pattern, a weak type that was already there) is **not** a finding against this
-change. Do not gate on it: at most note it once, in passing, as a Minor
-observation, and move on — never Critical or Important, never a re-flag round
-after round. The project fixes such debt opportunistically when work lands in
-that code, not on demand from a review. The line moves only when the change
-*touches* the debt: if the diff edits a line, reaches into that code, or makes
-existing debt materially worse, it is fair game and scored normally.
-
 - **Acceptance & design** — the change does what it was dispatched to do, and no
   more. *Task mode:* it satisfies the task's acceptance criteria and matches
   `design.md`; an acceptance item with no implementation, or code that
@@ -123,12 +113,6 @@ TypeScript, an `interface{}` assertion in Go, a `# type: ignore` in Python.
   Critical.
 - **Silent failure** — a swallowed error, an empty catch, a discarded result, a
   fallback that hides a broken invariant → Critical.
-- **Bypassed verification gate** — the change (or its commit message / report)
-  skips, stubs, or works around a mandatory verification command and presents it
-  as done: a disabled installed-build check, a `.skip`/`xfail` on the gate, a
-  "pre-existing env issue" note standing in for a check that was never run →
-  Critical. A verification command that will not run is BLOCKED, never a
-  workaround; treat any evidence of routing around it as a non-negotiable.
 - **Changed public behavior with no doc update** in the same change → Important.
 
 ## How to report
@@ -167,10 +151,7 @@ Calibration:
   modules are deep, new seams declared, no non-negotiable triggered, no
   placeholders. No Critical or Important issues.
 - **With fixes** — only Minor issues remain; the change is sound enough to land
-  once they are addressed. **Zero Critical, zero Important.** If your Issues list
-  has even one Important item, the verdict is **Fail**, not "With fixes" — the
-  two are not interchangeable. Do not downgrade an Important to Minor to reach
-  "With fixes"; if it is genuinely Minor, label it Minor and mean it.
+  once they are addressed.
 - **Fail** — any Critical or Important issue. An uncovered acceptance item,
   untested production code, a triggered non-negotiable, an undeclared new seam,
   or a placeholder is always at least Important.

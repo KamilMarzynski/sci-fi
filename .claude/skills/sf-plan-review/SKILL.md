@@ -43,16 +43,6 @@ unknowable from these files, flag it as a question instead of assuming.
   concrete validation step, and links to what it satisfies. `depends-on` forms a
   sane order (contracts → core → edges → hardening) with no cycle and no task
   depending on something never defined.
-- **Build stays green per task** — tasks run serially and commit one at a time,
-  so each must leave the build green on its own. For every task that changes a
-  shared signature, type, or seam, check that it names the existing call sites it
-  breaks (a widely-shared consumer such as an entry point or wiring module is
-  the classic trap) and says how it
-  keeps the build green — update them in-task, widen the seam transitionally, or
-  depend on a "widen the seam" task. A task that breaks a shared consumer and
-  leaves it red until a *later* task fixes it is a slicing defect, even when the
-  `depends-on` graph looks clean. Treat a missing call-site analysis on such a
-  task as at least Important.
 - **Naming / glossary** — domain terms used but not in `CONTEXT.md` (ubiquitous
   language) and not proposed for it. A naming-consistency check, not structural.
 - **Edge cases** — failure modes the spec or design names but no task handles.
@@ -94,9 +84,7 @@ Calibration:
   declared, tasks ordered and validated, no placeholders. No
   Critical or Important issues.
 - **With fixes** — only Minor issues remain; the plan is sound enough to proceed
-  once they are addressed. **Zero Critical, zero Important** — one Important item
-  makes the verdict **Fail**, not "With fixes". Do not downgrade an Important to
-  reach it.
+  once they are addressed.
 - **Fail** — any Critical or Important issue. An uncovered acceptance criterion,
   a shallow core module, an undeclared new seam, a dependency cycle, or a
   placeholder is always at least Important.

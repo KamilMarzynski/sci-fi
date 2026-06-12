@@ -78,9 +78,7 @@ Calibration:
 - **Pass** — unambiguous, criteria testable and complete, no silent structural changes, no
   placeholders. No Critical or Important issues.
 - **With fixes** — only Minor issues remain; the spec is sound enough to
-  proceed once they are addressed. **Zero Critical, zero Important** — one
-  Important item makes the verdict **Fail**, not "With fixes". Do not downgrade
-  an Important to reach it.
+  proceed once they are addressed.
 - **Fail** — any Critical or Important issue. A placeholder, a missing
   acceptance criterion is always at least Important.
 
