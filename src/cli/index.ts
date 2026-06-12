@@ -17,6 +17,7 @@ import { registerSpecReadyCommand } from './commands/spec-ready.js';
 import { registerStartCommand } from './commands/start.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerTaskCommand } from './commands/task.js';
+import { registerUpgradeCommand } from './commands/upgrade.js';
 import { registerWorktreeCommand } from './commands/worktree.js';
 
 export function buildProgram(): Command {
@@ -39,6 +40,7 @@ export function buildProgram(): Command {
   registerStatusCommand(program);
   registerTaskCommand(program);
   registerFixCommand(program);
+  registerUpgradeCommand(program);
   registerWorktreeCommand(program);
 
   applyExitOverride(program);
