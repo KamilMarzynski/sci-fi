@@ -2,7 +2,6 @@
 
 - **Slug:** <slug>
 - **Spec:** ./spec.md
-- **Status:** draft
 
 ## Approach
 

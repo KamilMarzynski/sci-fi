@@ -53,7 +53,17 @@ cannot verify without the contract.
 3. **Final quality check.** Look across the whole change for what no single task
    owns: cross-task coherence, integration seams, placeholders presented as
    finished work, silent failures, and whether the project's required checks are
-   green. Run the suite and build if that is how this repo confirms green.
+   green. Run the suite and build if that is how this repo confirms green — and,
+   when the change touches CLI/packaging behavior, any mandatory installed-build
+   verification the repo's testing docs define.
+
+   A required check that **will not run** — missing dependencies, broken harness,
+   an installed-build step that errors before it verifies — is a **Fail**, never
+   a workaround. Do not label it a "pre-existing env issue" and do not pass the
+   feature on the assumption it would have been green. "The verification command
+   could not run" is itself a finding: report it as a Fail so the orchestrator
+   fixes the harness before finishing. Green you did not actually observe is not
+   green.
 
 ## HANDOVER.md awareness
 
