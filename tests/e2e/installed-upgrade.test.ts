@@ -436,6 +436,13 @@ describe('installed build upgrade verification', () => {
         installStderr: 'npm ERR! network error',
       });
 
+      // Also create a mock scifi binary so the pre-check version read succeeds.
+      // The version must differ from the installed version so the code enters
+      // the npm install path (where it will fail).
+      createMockScifi(mockGlobalDir, {
+        versionOutput: '99.99.99',
+      });
+
       const env = {
         ...process.env,
         PATH: `${mockBinDir}:${process.env.PATH}`,

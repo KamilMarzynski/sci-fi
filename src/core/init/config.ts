@@ -25,7 +25,7 @@ export async function readConfig(projectRoot: string): Promise<Config> {
       'code' in error &&
       (error as NodeJS.ErrnoException).code === 'ENOENT'
     ) {
-      throw new ScifiError('NOT_FOUND', 'Project is not initialized. Run `scifi init` first.');
+      throw new ScifiError('NOT_FOUND', 'scifi not initialized here — run `scifi init` first.');
     }
     throw error;
   }
@@ -34,25 +34,34 @@ export async function readConfig(projectRoot: string): Promise<Config> {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    throw new ScifiError('INVALID_ARGUMENT', 'Config file contains malformed JSON.');
+    throw new ScifiError(
+      'INVALID_ARGUMENT',
+      'Config file contains malformed JSON. Run `scifi init` to reconfigure.',
+    );
   }
 
   if (typeof parsed !== 'object' || parsed === null || !('harnesses' in parsed)) {
-    throw new ScifiError('INVALID_ARGUMENT', 'Config file is missing the "harnesses" key.');
+    throw new ScifiError(
+      'INVALID_ARGUMENT',
+      'Config file is missing the "harnesses" key. Run `scifi init` to reconfigure.',
+    );
   }
 
   const obj = parsed as Record<string, unknown>;
   const harnessesRaw = obj.harnesses;
 
   if (!Array.isArray(harnessesRaw)) {
-    throw new ScifiError('INVALID_ARGUMENT', 'Config "harnesses" must be an array.');
+    throw new ScifiError(
+      'INVALID_ARGUMENT',
+      'Config "harnesses" must be an array. Run `scifi init` to reconfigure.',
+    );
   }
 
   for (const entry of harnessesRaw) {
     if (typeof entry !== 'string') {
       throw new ScifiError(
         'INVALID_ARGUMENT',
-        'Config "harnesses" must contain only string entries.',
+        'Config "harnesses" must contain only string entries. Run `scifi init` to reconfigure.',
       );
     }
   }

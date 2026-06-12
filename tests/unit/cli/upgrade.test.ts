@@ -343,20 +343,15 @@ describe('registerUpgradeCommand', () => {
       expect(mockSpawnSkillInstall).not.toHaveBeenCalled();
     });
 
-    it('sets npmUpgraded to false when already at latest version', async () => {
+    it('skips npm install when already at latest version', async () => {
       mockReadConfig.mockResolvedValue({
         version: 1,
         harnesses: ['claude-code'],
       });
       mockReadCurrentVersion.mockReturnValue('1.0.0');
-      mockNpmGlobalInstall.mockResolvedValue({
-        stdout: 'added 1 package',
-        stderr: '',
-        exitCode: 0,
-      });
       mockNpmGlobalPrefix.mockResolvedValue('/usr/local/lib/node_modules');
       mockResolveGlobalBinPath.mockReturnValue('/usr/local/bin/scifi');
-      // Same version as current
+      // Current binary reports same version as package.json
       mockReadNewVersion.mockResolvedValue('1.0.0');
       mockSpawnSkillInstall.mockResolvedValue({
         installed: [{ harness: 'claude-code', baseDir: '/some/dir', skills: ['sf-fix'] }],
@@ -390,8 +385,8 @@ describe('registerUpgradeCommand', () => {
           newVersion: '1.0.0',
         },
       });
-      // npm install always runs; skill re-install still proceeds
-      expect(mockNpmGlobalInstall).toHaveBeenCalled();
+      // npm install is skipped when already at latest; skill re-install still proceeds
+      expect(mockNpmGlobalInstall).not.toHaveBeenCalled();
       expect(mockSpawnSkillInstall).toHaveBeenCalled();
     });
 
@@ -401,6 +396,10 @@ describe('registerUpgradeCommand', () => {
         harnesses: ['claude-code'],
       });
       mockReadCurrentVersion.mockReturnValue('1.0.0');
+      // Pre-check: current binary version differs from package version → enters npm install path
+      mockNpmGlobalPrefix.mockResolvedValue('/usr/local/lib/node_modules');
+      mockResolveGlobalBinPath.mockReturnValue('/usr/local/bin/scifi');
+      mockReadNewVersion.mockResolvedValue('1.1.0');
       mockNpmGlobalInstall.mockRejectedValue(
         Object.assign(new Error('npm ERR! network error'), { code: 'INTERNAL' }),
       );

@@ -73,23 +73,32 @@ async function runUserMode(options: UpgradeCommandOptions, command: Command): Pr
       }
     }
 
-    // Phase 1: npm global install
+    // Phase 1: npm global install (skipped if already at latest)
     let npmUpgraded = true;
+    let binPath: string;
+    let newVersion: string;
 
-    try {
-      await npmGlobalInstall('scifi');
-    } catch (error) {
-      emitError(error, json);
-      return;
-    }
+    // Read the version of the currently installed global binary before upgrading
+    const currentPrefix = await npmGlobalPrefix();
+    const currentBinPath = resolveGlobalBinPath(currentPrefix, 'scifi');
+    const currentBinaryVersion = await readNewVersion(currentBinPath);
 
-    const prefix = await npmGlobalPrefix();
-    const binPath = resolveGlobalBinPath(prefix, 'scifi');
-    const newVersion = await readNewVersion(binPath);
-
-    // Check if version actually changed
-    if (newVersion === previousVersion) {
+    if (currentBinaryVersion === previousVersion) {
+      // Already at the latest — skip npm install, keep current binary
       npmUpgraded = false;
+      binPath = currentBinPath;
+      newVersion = currentBinaryVersion;
+    } else {
+      try {
+        await npmGlobalInstall('scifi');
+      } catch (error) {
+        emitError(error, json);
+        return;
+      }
+
+      const prefix = await npmGlobalPrefix();
+      binPath = resolveGlobalBinPath(prefix, 'scifi');
+      newVersion = await readNewVersion(binPath);
     }
 
     // Phase 2: skill re-install via child process
