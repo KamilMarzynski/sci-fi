@@ -48,15 +48,15 @@ does not run git; commits are yours and the implementers'.
 
 **Bootstrap the harness and prove it runs — before any task is dispatched.**
 A fresh worktree (created by `sf-feature`) has no installed dependencies, so the
-project's required checks — including the mandatory installed-build verification
-that `TESTING.md` defines — cannot run in it yet. If you dispatch tasks against a
+project's required checks — including any mandatory verification flow the repo's
+testing docs define (e.g. a `TESTING.md`) — cannot run in it yet. If you dispatch tasks against a
 tree where the verification command cannot run, the mandatory gate is silently
 off and every task ships unverified. So, from inside the worktree:
 
 1. Install dependencies the way the repo expects (e.g. `npm install`).
 2. Run the project's verification harness once as a smoke check — the test suite
-   and, for any CLI/packaging repo, the installed-build flow `TESTING.md`
-   requires. Confirm it actually executes and reports green.
+   and, for any CLI/packaging repo, whatever installed-build flow its testing
+   docs require. Confirm it actually executes and reports green.
 
 This is a **gate, not a courtesy**. If install fails, or the verification command
 will not run for any reason, **STOP and surface it to the user as BLOCKED** — do
@@ -83,13 +83,10 @@ causes file conflicts. Walk the tasks in dependency order, skipping any already
 
 ### 3. Per task: dispatch → done
 
-The implementer owns its own review loop. You dispatch the implementer; **the
-implementer** dispatches a fresh code-review subagent, acts on the findings in
-its own warm context, and re-reviews until the verdict clears — then reports
-back to you with review already passed. You never re-contact the implementer to
-hand it a review: that is what kept costing cold re-derivations when the harness
-had no way to resume a subagent. You dispatch implementers; implementers dispatch
-reviewers; only you dispatch handover.
+The implementer owns its own review loop: it dispatches a fresh code-review
+subagent, acts on the findings in its own warm context, and re-reviews until the
+verdict clears — it reports back to you only once review has passed. You dispatch
+implementers; implementers dispatch reviewers; only you dispatch handover.
 
 For each runnable task, in order:
 

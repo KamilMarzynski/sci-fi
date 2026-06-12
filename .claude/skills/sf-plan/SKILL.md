@@ -124,9 +124,31 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
 
 - **Test-first.** Each task delivers a vertical slice and names the tests that
   prove it. Implementation without a failing test first is not a task.
+- **The build stays green after *every* task, not just the last.** Tasks run
+  serially and each is reviewed and committed on its own. A task that leaves the
+  build or suite red until some later task "finishes the job" is a slicing bug —
+  the contracts-first heuristic produces a clean DAG that can still hide this,
+  because a tidy dependency graph says nothing about which *call sites* a change
+  breaks in the meantime.
+- **For every interface change, name the call sites it breaks.** Before you
+  finalize a task that changes a signature, type, or seam, grep the codebase for
+  its existing consumers (a widely-shared one — an entry point, an init or
+  wiring module — is the classic trap) and
+  decide, explicitly, how this task keeps the build green for each:
+  - update every broken call site *within the same task* (preferred when the set
+    is small and local), or
+  - widen the seam transitionally — keep the old shape working alongside the new
+    until consumers migrate — and record the cleanup as a later task, or
+  - front-load a thin **"widen the seam"** task that all the signature-changing
+    tasks depend on, so the shared consumer is migrated once, up front, instead
+    of being broken serially by each change.
+  Write the chosen approach and the affected call sites into the task's **Work**
+  section. A task that changes a shared signature without naming its consumers is
+  not plan-ready.
 - **Phase order** via `depends-on` (there is no phase field — ordering is the
   dependency graph; independent tasks run in parallel):
-  1. contracts / scaffolding — interfaces, types, seams.
+  1. contracts / scaffolding — interfaces, types, seams (including any
+     "widen the seam" task that protects a shared consumer).
   2. core behavior — the deep modules.
   3. edge cases — error states, boundaries.
   4. hardening — integration, observability, docs.
@@ -166,4 +188,6 @@ using `TASK-TEMPLATE.md` (ships beside this skill).
 - Never run `scifi plan-ready` before `sf-plan-review` passes.
 - Never write `design.md` while any template section is unanswered.
 - Never leave an in-scope acceptance criterion without a task.
+- Never finalize a task that changes a shared signature, type, or seam without
+  naming the call sites it breaks and how the task keeps the build green.
 - Never invent project facts — read the code and docs, or ask.

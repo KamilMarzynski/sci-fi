@@ -29,8 +29,10 @@ Reference only as needed (do not implement anything outside this task):
 
 Build exactly this task, test-first per sf-tdd. Stay inside the task's scope —
 no extra features, no unrelated refactors. Run the task's Validation step and
-commit when green. If a verification command will not run (missing deps, broken
-harness), that is BLOCKED — report it, do not work around it.
+commit when green — stage only the files this task touched, never a blanket
+`git add -A` (the worktree may carry unrelated workflow artifacts). If a
+verification command will not run (missing deps, broken harness), that is
+BLOCKED — report it, do not work around it.
 
 --- code-review gate (you run this yourself, do not skip) ---
 Once your work is green and committed, gate it with a code review — you own this

@@ -41,7 +41,7 @@ export async function listOpenFixes(
   featureSlug: string,
 ): Promise<FixFrontmatter[]> {
   const fixes = await listFixes(projectRoot, featureSlug);
-  return fixes.filter((f) => f.status === 'open' || f.status === 'in-progress');
+  return fixes.filter((f) => f.status === 'open');
 }
 
 export async function findFixById(

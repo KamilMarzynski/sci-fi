@@ -47,15 +47,25 @@ feature's original intent.
 belongs in `sf-implement`'s own review loop, not a separate tracked fix. Say so,
 and proceed only if the user confirms `sf-fix` is what they want.
 
-Create an isolated workspace for the fix before investigating (the base branch
-shows as `main` — substitute your repo's default branch if it differs):
+**Pick the workspace by the feature's state** — the fix must live where the
+feature's artifacts live:
 
-```
-git worktree add -b fix/<slug> .worktrees/fix-<slug> main
-```
+- **Feature still in flight** (its `feat/<slug>` worktree exists): work inside
+  that worktree, on the feature's branch. The feature directory
+  (`docs/scifi/specs/<slug>/`) exists only there, so `scifi fix create` only
+  works there — and the open fix blocks `scifi finish` only if it is recorded
+  on that branch. Do **not** branch off the default branch: a fix file created
+  there is invisible to the feature.
+- **Feature `done` and merged**: create an isolated workspace off the default
+  branch (shown as `main` — substitute your repo's default branch if it
+  differs):
 
-where `<slug>` is the feature slug (or a short fix-specific slug if you are
-fixing several defects in one feature). Work inside it; open the PR from it.
+  ```
+  git worktree add -b fix/<slug> .worktrees/fix-<slug> main
+  ```
+
+  where `<slug>` is the feature slug (or a short fix-specific slug if you are
+  fixing several defects in one feature). Work inside it; open the PR from it.
 
 ### 2. Capture the symptom
 
@@ -168,7 +178,7 @@ The fix is done when:
 - Never fix without first identifying and reading the target feature.
 - Never present the symptom as the cause.
 - Never ship a fix with no failing test behind it.
-- Never leave the tracked fix `open`/`in-progress` once the work is settled —
-  resolve it or mark it wont-fix.
+- Never leave the tracked fix `open` once the work is settled — resolve it or
+  mark it wont-fix.
 - Never mark a fix resolved before the code review clears (**Pass**, or **With
   fixes** with its Minor items handled).

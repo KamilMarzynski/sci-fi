@@ -48,8 +48,8 @@ cannot verify without the contract.
    owns: cross-task coherence, integration seams, placeholders presented as
    finished work, silent failures, and whether the project's required checks are
    green. Run the suite and build if that is how this repo confirms green — and,
-   when the change touches CLI/packaging behavior, the mandatory installed-build
-   verification `TESTING.md` defines.
+   when the change touches CLI/packaging behavior, any mandatory installed-build
+   verification the repo's testing docs define.
 
    A required check that **will not run** — missing dependencies, broken harness,
    an installed-build step that errors before it verifies — is a **Fail**, never

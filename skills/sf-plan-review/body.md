@@ -42,7 +42,8 @@ unknowable from these files, flag it as a question instead of assuming.
 - **Build stays green per task** — tasks run serially and commit one at a time,
   so each must leave the build green on its own. For every task that changes a
   shared signature, type, or seam, check that it names the existing call sites it
-  breaks (a shared consumer like `init.ts` is the classic trap) and says how it
+  breaks (a widely-shared consumer such as an entry point or wiring module is
+  the classic trap) and says how it
   keeps the build green — update them in-task, widen the seam transitionally, or
   depend on a "widen the seam" task. A task that breaks a shared consumer and
   leaves it red until a *later* task fixes it is a slicing defect, even when the

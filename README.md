@@ -23,7 +23,7 @@ holds every stage to a written artifact and a review gate before it can advance.
 It is two cooperating layers:
 
 - A small **CLI** (`scifi`) that tracks each feature's lifecycle on disk and
-  refuses to skip a gate.
+  gates every advance on its backing artifact.
 - A set of bundled **skills** (`sf-*`) that your agent runs to do the actual
   work — interrogating the idea, writing the spec, planning the design,
   implementing it test-first, and reviewing each step.
@@ -96,8 +96,10 @@ created ──spec.md──► spec-ready ──design.md+tasks──► plan-re
 | `in-progress` | implementation started         | reachable only from `plan-ready`     |
 | `done`        | built, verified, closed out    | all tasks done **and** no open fixes |
 
-You never jump the ladder. A scope change that invalidates the spec rolls the
-feature back to `spec-ready` and it climbs again through every gate.
+The skills climb the ladder one gate at a time — the CLI enforces the artifact
+behind each gate, the skills enforce the order. A scope change that invalidates
+the spec rolls the feature back to `spec-ready` and it climbs again through
+every gate.
 
 ## How to use it (the everyday flow)
 
@@ -181,7 +183,9 @@ These live under `docs/scifi/` and the skills read and maintain them:
 ## The skills
 
 `init` installs all 13. The first seven are the ones you invoke directly; the
-rest are dispatched by other skills as subagents.
+rest are loaded by other skills — the reviewers and `sf-handover` as subagents,
+`sf-tdd` and `sf-receiving-review` as disciplines held in the working agent's
+own context.
 
 | Skill                | Role                                                            |
 | -------------------- | -------------------------------------------------------------- |
