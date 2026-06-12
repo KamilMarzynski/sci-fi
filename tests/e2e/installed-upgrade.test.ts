@@ -247,6 +247,7 @@ describe('installed build upgrade verification', () => {
 
       createMockNpm(mockBinDir, { prefixPath: mockGlobalDir });
       // Mock scifi returns the SAME version as current → npmUpgraded should be false
+      // npm install always runs; the version comparison happens after install
       createMockScifi(mockGlobalDir, {
         versionOutput: '0.1.2', // same as current package version
         realScifiPath, // still execs real scifi for skill install
@@ -434,13 +435,6 @@ describe('installed build upgrade verification', () => {
         prefixPath: mockGlobalDir,
         installExitCode: 1,
         installStderr: 'npm ERR! network error',
-      });
-
-      // Also create a mock scifi binary so the pre-check version read succeeds.
-      // The version must differ from the installed version so the code enters
-      // the npm install path (where it will fail).
-      createMockScifi(mockGlobalDir, {
-        versionOutput: '99.99.99',
       });
 
       const env = {
