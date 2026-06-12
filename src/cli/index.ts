@@ -1,11 +1,11 @@
 import { existsSync, realpathSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command, CommanderError } from 'commander';
 import { ScifiError } from '../core/output/errors.js';
 import { emitError } from '../core/output/index.js';
 import { findPackageRoot } from '../core/package-root.js';
+import { readPackageVersion } from '../core/package-version.js';
 import { registerFinishCommand } from './commands/finish.js';
 import { registerFixCommand } from './commands/fix.js';
 import { registerInitCommand } from './commands/init.js';
@@ -17,23 +17,8 @@ import { registerSpecReadyCommand } from './commands/spec-ready.js';
 import { registerStartCommand } from './commands/start.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerTaskCommand } from './commands/task.js';
+import { registerUpgradeCommand } from './commands/upgrade.js';
 import { registerWorktreeCommand } from './commands/worktree.js';
-
-const require = createRequire(import.meta.url);
-const packageJson = require(join(findPackageRoot(import.meta.url), 'package.json'));
-
-function readPackageVersion(value: unknown): string {
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'version' in value &&
-    typeof value.version === 'string'
-  ) {
-    return value.version;
-  }
-
-  throw new Error('Unable to read version from package.json');
-}
 
 export function buildProgram(): Command {
   const program = new Command();
@@ -41,7 +26,7 @@ export function buildProgram(): Command {
   program
     .name('scifi')
     .description('Specification-driven CLI scaffolding for agentic workflows')
-    .version(readPackageVersion(packageJson))
+    .version(readPackageVersion(findPackageRoot(import.meta.url)))
     .exitOverride();
 
   registerInitCommand(program);
@@ -55,6 +40,7 @@ export function buildProgram(): Command {
   registerStatusCommand(program);
   registerTaskCommand(program);
   registerFixCommand(program);
+  registerUpgradeCommand(program);
   registerWorktreeCommand(program);
 
   applyExitOverride(program);

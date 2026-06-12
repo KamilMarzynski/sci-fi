@@ -199,12 +199,14 @@ export interface InstalledCommandResult {
 export function runInstalledCommand(
   installDirectory: string,
   args: readonly string[],
+  env?: NodeJS.ProcessEnv,
 ): InstalledCommandResult {
   const installedBinPath = join(installDirectory, 'node_modules', '.bin', 'scifi');
 
   const result = spawnSync(installedBinPath, args, {
     cwd: installDirectory,
     encoding: 'utf8',
+    env: env ?? process.env,
   });
 
   return {
