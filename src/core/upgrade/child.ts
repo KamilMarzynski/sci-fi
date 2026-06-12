@@ -46,6 +46,23 @@ export function spawnSkillInstall(args: SkillInstallArgs): Promise<InstallReport
           return;
         }
 
+        if (
+          typeof parsed !== 'object' ||
+          parsed === null ||
+          !('installed' in parsed) ||
+          !('failed' in parsed) ||
+          !Array.isArray((parsed as Record<string, unknown>).installed) ||
+          !Array.isArray((parsed as Record<string, unknown>).failed)
+        ) {
+          reject(
+            new ScifiError(
+              'INTERNAL',
+              `Child process produced output with unexpected shape: ${stdout.slice(0, 200)}`,
+            ),
+          );
+          return;
+        }
+
         resolve(parsed as InstallReport);
       },
     );

@@ -161,4 +161,29 @@ describe('spawnSkillInstall', () => {
       expect.any(Function),
     );
   });
+
+  it('throws ScifiError when child stdout is valid JSON but does not match InstallReport shape', async () => {
+    mockExistsSync.mockReturnValue(true);
+
+    mockExecFile.mockImplementation((_file, _args, _options, callback) => {
+      (callback as (err: null, stdout: string, stderr: string) => void)(
+        null,
+        JSON.stringify({ foo: 'bar' }),
+        '',
+      );
+      return {} as ReturnType<typeof execFile>;
+    });
+
+    await expect(
+      spawnSkillInstall({
+        binPath: '/usr/local/bin/scifi',
+        projectRoot: '/my/project',
+        harnesses: ['claude-code'],
+      }),
+    ).rejects.toMatchObject({
+      name: 'ScifiError',
+      code: 'INTERNAL',
+      message: expect.stringContaining('unexpected shape') as unknown,
+    });
+  });
 });
