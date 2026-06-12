@@ -51,7 +51,13 @@ describe('resolveHarnesses', () => {
       },
     });
 
-    expect(receivedChoices).toEqual(['claude-code', 'opencode', 'codex', 'cursor']);
+    expect(receivedChoices).toEqual([
+      'claude-code',
+      'opencode',
+      'codex',
+      'cursor',
+      'github-copilot',
+    ]);
     expect(harnesses).toEqual(['opencode', 'cursor']);
   });
 
