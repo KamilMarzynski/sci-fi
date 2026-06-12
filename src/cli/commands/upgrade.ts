@@ -40,6 +40,7 @@ export function registerUpgradeCommand(program: Command): void {
 async function runInstallMode(options: UpgradeCommandOptions): Promise<void> {
   const projectRoot = options.projectRoot ?? '';
   const harnessesRaw = options.harnesses ?? '';
+  // Safe: parent process passes only validated HarnessId values from config.
   const harnesses = harnessesRaw
     .split(',')
     .map((id) => id.trim())
@@ -50,7 +51,6 @@ async function runInstallMode(options: UpgradeCommandOptions): Promise<void> {
   const report = await installSkills({ projectRoot, harnesses, packageRoot });
 
   stdout.write(`${JSON.stringify(report)}\n`);
-  process.exitCode = 0;
 }
 
 async function runUserMode(options: UpgradeCommandOptions, command: Command): Promise<void> {
@@ -140,6 +140,8 @@ function formatVersionChange(previous: string, next: string): string {
   return `Changing scifi from ${previous} to ${next}${direction}`;
 }
 
+// Non-numeric suffixes (e.g. "-pre" in "1.0.0-pre") produce NaN from Number(),
+// which is treated as equal to its numeric base for comparison — intentional.
 function isDowngrade(previous: string, next: string): boolean {
   const prevParts = previous.split('.').map(Number);
   const nextParts = next.split('.').map(Number);
