@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "slug": "cli-upgrade-command",
+  "title": "CLI upgrade command",
+  "status": "in-progress",
+  "createdAt": "2026-06-12T08:47:55.846Z",
+  "updatedAt": "2026-06-12T09:36:28.826Z",
+  "branch": "feat/cli-upgrade-command",
+  "worktreePath": ".worktrees/feat-cli-upgrade-command"
+}
