@@ -46,6 +46,21 @@ describe('writeFixFile / readFixFile', () => {
     await expect(readFixFile(filePath)).rejects.toThrow('missing YAML frontmatter');
   });
 
+  it('reads a legacy in-progress fix as open', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'scifi-fix-fm-'));
+    temporaryDirectories.push(dir);
+    const filePath = join(dir, 'FIX-0001-legacy.md');
+
+    await writeFile(
+      filePath,
+      '---\nid: FIX-0001\nslug: legacy\nstatus: in-progress\nfeature: auth-flow\ncreated: 2026-05-21T00:00:00.000Z\n---\n# legacy\n',
+      'utf8',
+    );
+
+    const result = await readFixFile(filePath);
+    expect(result.frontmatter.status).toBe('open');
+  });
+
   it('throws when frontmatter is invalid', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'scifi-fix-fm-'));
     temporaryDirectories.push(dir);

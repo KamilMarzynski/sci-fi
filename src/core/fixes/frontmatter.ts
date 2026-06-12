@@ -9,6 +9,13 @@ export interface FixFile {
 
 const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/;
 
+// "in-progress" was a documented fix status in earlier releases even though the
+// CLI never wrote it. Files carrying it must stay readable, so it is folded
+// into "open" (the two were equivalent: both counted as blocking finish).
+function normalizeLegacyStatus(value: unknown): unknown {
+  return value === 'in-progress' ? 'open' : value;
+}
+
 function isValidFixStatus(value: unknown): value is FixFrontmatter['status'] {
   return typeof value === 'string' && (FIX_STATUS_VALUES as readonly string[]).includes(value);
 }
@@ -19,7 +26,7 @@ function isValidRawFixFrontmatter(raw: unknown): raw is Record<string, unknown> 
   return (
     typeof obj.id === 'string' &&
     typeof obj.slug === 'string' &&
-    isValidFixStatus(obj.status) &&
+    isValidFixStatus(normalizeLegacyStatus(obj.status)) &&
     typeof obj.feature === 'string' &&
     typeof obj.created === 'string'
   );
@@ -43,7 +50,7 @@ export async function readFixFile(filePath: string): Promise<FixFile> {
     frontmatter: {
       id: raw.id as string,
       slug: raw.slug as string,
-      status: raw.status as FixFrontmatter['status'],
+      status: normalizeLegacyStatus(raw.status) as FixFrontmatter['status'],
       feature: raw.feature as string,
       created: raw.created as string,
     },
