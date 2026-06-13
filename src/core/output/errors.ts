@@ -3,6 +3,7 @@ export type ErrorCode =
   | 'NOT_FOUND'
   | 'CONFLICT'
   | 'PRECONDITION_FAILED'
+  | 'CANCELLED'
   | 'INTERNAL';
 
 const EXIT_CODES: Record<ErrorCode, number> = {
@@ -10,6 +11,7 @@ const EXIT_CODES: Record<ErrorCode, number> = {
   NOT_FOUND: 3,
   PRECONDITION_FAILED: 4,
   CONFLICT: 5,
+  CANCELLED: 130,
   INTERNAL: 1,
 };
 
