@@ -66,32 +66,32 @@ automation are unchanged.
 
 Testable checklist. Each item must be verifiable as done or not done.
 
-- [ ] On open, the picker lists all five harness ids in `KNOWN_HARNESS_IDS`
+- [x] On open, the picker lists all five harness ids in `KNOWN_HARNESS_IDS`
       order, every box unchecked, cursor on the first row.
-- [ ] `space` toggles the checked state of the cursor row (checked→unchecked and
+- [x] `space` toggles the checked state of the cursor row (checked→unchecked and
       back).
-- [ ] `↑`/`↓` move the cursor one row, wrapping from the last row to the first
+- [x] `↑`/`↓` move the cursor one row, wrapping from the last row to the first
       and vice versa.
-- [ ] `enter` with ≥1 row checked resolves to exactly those harness ids in
+- [x] `enter` with ≥1 row checked resolves to exactly those harness ids in
       display (top-to-bottom) order, passed through `resolveHarnesses`'s `ask`.
-- [ ] `enter` with 0 rows checked does not resolve: the picker stays open and
+- [x] `enter` with 0 rows checked does not resolve: the picker stays open and
       shows an inline "select at least one" message.
-- [ ] `Ctrl-C` and `Esc` each abort: the unit test observes a cancellation
+- [x] `Ctrl-C` and `Esc` each abort: the unit test observes a cancellation
       outcome; terminal restoration (raw mode off, cursor shown) is invoked even
       on abort.
-- [ ] Aborting init from the picker performs no scaffold/install and exits
+- [x] Aborting init from the picker performs no scaffold/install and exits
       non-zero (verified at the command level).
-- [ ] When raw mode cannot be entered, init throws `INVALID_ARGUMENT` with a hint
+- [x] When raw mode cannot be entered, init throws `INVALID_ARGUMENT` with a hint
       listing the available harnesses; nothing is written to disk.
-- [ ] The picker's navigation/toggle/confirm/reject logic is covered by unit
+- [x] The picker's navigation/toggle/confirm/reject logic is covered by unit
       tests driving a scripted `KeyReader`, asserting both the returned selection
       and the rendered frames.
-- [ ] Existing `--harness`, `--yes`, multi-harness, unknown-harness, and
+- [x] Existing `--harness`, `--yes`, multi-harness, unknown-harness, and
       non-interactive-guard tests (`tests/cli/init.test.ts`,
       `tests/core/init/prompt-harness.test.ts`,
       `tests/e2e/installed-init.test.ts`) remain green unmodified except where
       they asserted the deleted number-prompt text.
-- [ ] An ADR records the hand-rolled-over-dependency decision.
+- [x] An ADR records the hand-rolled-over-dependency decision.
 
 ## Architecture & Context impact
 
