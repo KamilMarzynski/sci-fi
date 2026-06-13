@@ -143,7 +143,7 @@ only for a `BLOCKED` you cannot resolve, a genuine ambiguity, or all tasks done.
 
 ### 4. Handover
 
-After every task is `done`:
+Once all tasks are `done`:
 
 - Dispatch the handover subagent with `DISPATCH-HANDOVER.md`, which loads the
   `sf-handover` skill. Fill `{COMMIT_RANGE}` with `{BASE}..HEAD` — the base
@@ -155,21 +155,20 @@ After every task is `done`:
   does not fix substantial issues itself. Only trivially small fixes are yours.
   Handover's verdict is **Pass** or **Fail** (no "With fixes") — re-dispatch
   until it is **Pass**.
-- When handover passes, read `docs/scifi/HANDOVER.md` if it exists and run the
-  finishing actions it defines, in order — smoke tests, PR creation, invoking
-  any skills it points to. These run here at the orchestrator's top level (not
-  inside a subagent) so irreversible or visible actions stay visible. If the
-  file is absent, there are no finishing actions and you go straight to finish.
+- When handover passes, move to finish (step 5). Do **not** run the `HANDOVER.md`
+  finishing actions yet — those run after finish (step 6), so the
+  `in-progress → done` transition is committed into the branch the PR is opened
+  from.
 
 **Settle untracked workflow artifacts before finishing — not after.** The
 pipeline produces artifacts (this feature's `docs/scifi/specs/<slug>/`, any new
 ADRs, `CONTEXT.md` edits) that may be **untracked on the base branch**. Before
-`scifi finish` — and before any `HANDOVER.md` PR action — run `git status` and
-look for workflow files that are new or untracked. If any are, this is a decision
-the user must make *now*, not a surprise discovered after the feature is closed:
-surface the list and ask whether each belongs committed with the feature, in a
-separate commit, or git-ignored. Do not silently commit them and do not leave
-them dangling. Resolve it, then proceed to finish.
+`scifi finish` run `git status` and look for workflow files that are new or
+untracked. If any are, this is a decision the user must make *now*, not a
+surprise discovered after the feature is closed: surface the list and ask
+whether each belongs committed with the feature, in a separate commit, or
+git-ignored. Do not silently commit them and do not leave them dangling.
+Resolve it, then proceed to finish.
 
 ### 5. Finish
 
@@ -177,9 +176,18 @@ them dangling. Resolve it, then proceed to finish.
 scifi finish <slug> --json
 ```
 
-Transitions `in-progress → done`. Run this **last** — after handover passes and
-after every `HANDOVER.md` action (PR creation included) has completed. This is
-the end of the implement stage.
+Transitions `in-progress → done`, writing `status: "done"` into the feature's
+`docs/scifi/specs/<slug>/.scifi.json`. Run this **before** the `HANDOVER.md`
+finishing actions — and **commit the resulting `.scifi.json` change** — so the
+`done` state lands in the branch the PR is opened from. Otherwise the feature
+merges to the default branch still reading `in-progress`.
+
+### 6. Run HANDOVER.md
+
+After finish, if `docs/scifi/HANDOVER.md` exists, run the finishing actions it
+defines, in the order it gives. These run here at the orchestrator's top level
+(not inside a subagent) so irreversible or visible actions stay visible. If the
+file is absent, the implement stage ends at finish.
 
 ## Hard rules
 
@@ -198,6 +206,7 @@ the end of the implement stage.
   the `REVIEW_UNAVAILABLE` fallback (to a fresh fix subagent) and handover.
 - Never let a subagent read your session history — construct its context from
   the task and the reference files.
-- Never call `scifi finish` while a handover finding is open or a `HANDOVER.md`
-  action is still pending.
+- Never call `scifi finish` while a handover finding is open.
+- Never run the `HANDOVER.md` finishing actions before `scifi finish` and the
+  commit of its `.scifi.json` change — the PR must carry the `done` transition.
 - Never implement a task's feature code yourself — that is the subagent's job.
