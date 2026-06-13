@@ -1,7 +1,7 @@
 ---
 id: T6
 slug: final-check
-status: in-progress
+status: done
 depends-on:
   - T1
   - T2
