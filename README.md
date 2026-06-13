@@ -52,7 +52,7 @@ Then, inside the repository you want to manage:
 scifi init
 ```
 
-`init` prompts you to pick a harness (or accepts `--harness` flags with `--yes`),
+`init` prompts you to pick harnesses with an interactive checkbox picker — arrow keys move the cursor (with wrap-around), space toggles a harness, and enter confirms the selection (or accepts `--harness` flags with `--yes`),
 scaffolds the workspace under `docs/scifi/`, and installs the skill catalog into
 your agent. For Claude Code that means `.claude/skills/sf-*/SKILL.md` for all 13
 skills. It creates:
