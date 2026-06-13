@@ -143,7 +143,7 @@ only for a `BLOCKED` you cannot resolve, a genuine ambiguity, or all tasks done.
 
 ### 4. Handover
 
-After every task is `done`:
+Once all tasks are `done`:
 
 - Dispatch the handover subagent with `DISPATCH-HANDOVER.md`, which loads the
   `sf-handover` skill. Fill `{COMMIT_RANGE}` with `{BASE}..HEAD` — the base
