@@ -101,8 +101,8 @@ Testable checklist. Each item must be verifiable as done or not done.
   - New `src/cli/prompts/checkbox.ts` — raw-mode rendering, ANSI redraw,
     terminal restore, and the `KeyReader` interface.
   - Picker selection-state logic (cursor position, checked set,
-    move/toggle/confirm/reject) kept as a pure, injectable unit so it is testable
-    without a TTY.
+    move/toggle/confirm/reject) kept behind injected `KeyReader` and `output`
+    seams so it is testable without a TTY.
   - `src/core/init/prompt-harness.ts` — unchanged contract (`ask` still returns
     selected ids); only the wiring of `ask` in the command changes.
 - **New CONTEXT.md terms:** none (the existing "Harness" definition covers it;

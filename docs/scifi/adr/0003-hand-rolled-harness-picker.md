@@ -29,9 +29,10 @@ The constraints in play:
 
 Hand-roll the picker using `node`'s built-in `readline` keypress events and
 `stdin.setRawMode`, with no new runtime dependency. The picker depends on a
-`KeyReader` interface for input so its navigation/toggle/confirm logic is
-unit-testable without a real TTY, and its selection-state logic is kept as a
-pure, injectable unit.
+`KeyReader` interface for input and an injected `output` stream so its
+navigation/toggle/confirm logic is unit-testable without a real TTY, with
+selection-state changes driven by the injected `KeyReader` and rendered through
+the injected `output` seam.
 
 ## Consequences
 
