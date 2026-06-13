@@ -1,7 +1,7 @@
 ---
 id: T4
 slug: verify-and-docs
-status: in-progress
+status: done
 depends-on:
   - T3
 ---
