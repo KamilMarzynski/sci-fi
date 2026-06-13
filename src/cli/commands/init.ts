@@ -1,5 +1,4 @@
-import { cwd, stdin, stdout } from 'node:process';
-import { createInterface } from 'node:readline/promises';
+import { cwd, stdin } from 'node:process';
 import type { Command } from 'commander';
 import { writeConfig } from '../../core/init/config.js';
 import { installSkills } from '../../core/init/install-skills.js';
@@ -13,11 +12,8 @@ import {
   ScifiError,
 } from '../../core/output/index.js';
 import { findPackageRoot } from '../../core/package-root.js';
-import {
-  type HarnessId,
-  InvalidHarnessError,
-  KNOWN_HARNESS_IDS,
-} from '../../core/skills/harness/adapter.js';
+import { InvalidHarnessError, KNOWN_HARNESS_IDS } from '../../core/skills/harness/adapter.js';
+import { CheckboxCancelledError, canEnterRawMode, promptHarnesses } from '../prompts/checkbox.js';
 
 interface InitCommandOptions {
   readonly harness: string[];
@@ -46,18 +42,30 @@ export function registerInitCommand(program: Command): void {
         const projectRoot = cwd();
         const packageRoot = findPackageRoot(import.meta.url);
 
-        if (options.harness.length === 0 && options.yes !== true && !isInteractive()) {
-          throw new ScifiError(
-            'INVALID_ARGUMENT',
-            'harness selection requires --harness <id> when running non-interactively.',
-            { hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.` },
-          );
+        if (options.harness.length === 0 && options.yes !== true) {
+          if (!isInteractive()) {
+            throw new ScifiError(
+              'INVALID_ARGUMENT',
+              'harness selection requires --harness <id> when running non-interactively.',
+              { hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.` },
+            );
+          }
+
+          if (!canEnterRawMode(stdin)) {
+            throw new ScifiError(
+              'INVALID_ARGUMENT',
+              'harness selection requires an interactive terminal that supports raw mode.',
+              {
+                hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}. Pass --harness <id> to select without the prompt.`,
+              },
+            );
+          }
         }
 
         const harnesses = await resolveHarnesses({
           flags: options.harness,
           yes: options.yes === true,
-          ask: askInteractively,
+          ask: promptHarnesses,
         });
 
         await scaffoldInit({ projectRoot });
@@ -116,47 +124,17 @@ export function registerInitCommand(program: Command): void {
     });
 }
 
-function normalizeInitError(error: unknown): unknown {
+export function normalizeInitError(error: unknown): unknown {
   if (error instanceof InvalidHarnessError) {
     return new ScifiError('INVALID_ARGUMENT', error.message, {
       hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.`,
       cause: error,
     });
   }
-  return error;
-}
 
-async function askInteractively(choices: readonly HarnessId[]): Promise<readonly string[]> {
-  const rl = createInterface({ input: stdin, output: stdout });
-  try {
-    const numbered = choices.map((id, index) => `  ${index + 1}) ${id}`).join('\n');
-    const prompt = `Pick harnesses (multiple selections allowed — enter numbers separated by space/comma, default 1):\n${numbered}\nEnter numbers: `;
-
-    while (true) {
-      const answer = (await rl.question(prompt)).trim();
-
-      if (answer === '') {
-        const first = choices[0];
-        if (first === undefined) {
-          throw new Error('No harness choices available');
-        }
-        return [first];
-      }
-
-      const tokens = answer.split(/[\s,]+/).filter((t) => t.length > 0);
-      const selected = tokens.map((token) => {
-        const index = Number.parseInt(token, 10) - 1;
-        const picked = choices[index];
-        return picked !== undefined ? picked : token;
-      });
-
-      if (selected.length > 0) {
-        return selected;
-      }
-
-      stdout.write('Please select at least one harness.\n');
-    }
-  } finally {
-    rl.close();
+  if (error instanceof CheckboxCancelledError) {
+    return new ScifiError('CANCELLED', 'Harness selection cancelled.');
   }
+
+  return error;
 }
