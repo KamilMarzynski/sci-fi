@@ -79,6 +79,7 @@ describe('scifi init — multi-harness', () => {
 
     process.stdin.isTTY = true;
     process.stdout.isTTY = true;
+    // @ts-expect-error — simulate a TTY stream whose setRawMode method is unavailable
     process.stdin.setRawMode = undefined;
 
     const run = await runCli(['init']);
