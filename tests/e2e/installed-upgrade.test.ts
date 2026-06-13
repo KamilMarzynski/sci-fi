@@ -4,9 +4,31 @@ import { describe, expect, it } from 'vitest';
 import {
   cleanupInstalledPackageTestEnvironment,
   createInstalledPackageTestEnvironment,
+  repositoryRoot,
   runInstalledCommand,
   runInstalledInit,
 } from './installed-test-helpers.js';
+
+/**
+ * The version the installed package reports comes from the repo's
+ * package.json — the same file the release process bumps. Read it here so
+ * assertions track the real version instead of a literal that goes stale on
+ * every release.
+ */
+function readRepositoryVersion(): string {
+  const parsed: unknown = JSON.parse(readFileSync(join(repositoryRoot, 'package.json'), 'utf8'));
+  if (
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    'version' in parsed &&
+    typeof parsed.version === 'string'
+  ) {
+    return parsed.version;
+  }
+  throw new Error('Could not read string version from repository package.json');
+}
+
+const currentVersion = readRepositoryVersion();
 
 /**
  * Create a mock `npm` shell script at `<mockDir>/npm` that returns
@@ -178,7 +200,7 @@ describe('installed build upgrade verification', () => {
 
       // Value checks
       expect(data.action).toBe('upgrade');
-      expect(data.previousVersion).toBe('0.1.2');
+      expect(data.previousVersion).toBe(currentVersion);
       expect(data.newVersion).toBe('99.99.99');
       expect(data.npmUpgraded).toBe(true);
 
@@ -249,7 +271,7 @@ describe('installed build upgrade verification', () => {
       // Mock scifi returns the SAME version as current → npmUpgraded should be false
       // npm install always runs; the version comparison happens after install
       createMockScifi(mockGlobalDir, {
-        versionOutput: '0.1.2', // same as current package version
+        versionOutput: currentVersion, // same as current package version
         realScifiPath, // still execs real scifi for skill install
       });
 
@@ -271,8 +293,8 @@ describe('installed build upgrade verification', () => {
 
       const { data } = parsed;
       expect(data.npmUpgraded).toBe(false);
-      expect(data.previousVersion).toBe('0.1.2');
-      expect(data.newVersion).toBe('0.1.2');
+      expect(data.previousVersion).toBe(currentVersion);
+      expect(data.newVersion).toBe(currentVersion);
 
       // Skills still re-installed
       expect(data.installed).toHaveLength(1);
