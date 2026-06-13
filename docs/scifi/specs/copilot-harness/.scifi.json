@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "slug": "copilot-harness",
+  "title": "Copilot installation support",
+  "status": "done",
+  "createdAt": "2026-06-12T17:16:03.491Z",
+  "updatedAt": "2026-06-12T19:45:36.950Z",
+  "branch": "feat/copilot-harness",
+  "worktreePath": ".worktrees/feat-copilot-harness"
+}

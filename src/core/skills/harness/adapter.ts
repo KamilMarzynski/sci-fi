@@ -1,12 +1,13 @@
 import type { SkillBundle } from '../types.js';
 
-export type HarnessId = 'claude-code' | 'opencode' | 'codex' | 'cursor';
+export type HarnessId = 'claude-code' | 'opencode' | 'codex' | 'cursor' | 'github-copilot';
 
 export const KNOWN_HARNESS_IDS: readonly HarnessId[] = [
   'claude-code',
   'opencode',
   'codex',
   'cursor',
+  'github-copilot',
 ];
 
 export interface HarnessAdapter {

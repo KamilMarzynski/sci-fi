@@ -38,7 +38,7 @@ never advance the lifecycle until a review has passed.
 ## Requirements
 
 - Node.js `>=22`
-- A supported coding agent: **Claude Code**, **OpenCode**, **Codex CLI**, or **Cursor**
+- A supported coding agent: **Claude Code**, **OpenCode**, **Codex CLI**, **Cursor**, or **GitHub Copilot**
 
 ## Install
 
@@ -52,7 +52,7 @@ Then, inside the repository you want to manage:
 scifi init
 ```
 
-`init` prompts you to pick a harness (or defaults to `claude-code` with `--yes`),
+`init` prompts you to pick a harness (or accepts `--harness` flags with `--yes`),
 scaffolds the workspace under `docs/scifi/`, and installs the skill catalog into
 your agent. For Claude Code that means `.claude/skills/sf-*/SKILL.md` for all 13
 skills. It creates:
@@ -64,7 +64,7 @@ docs/scifi/
 └── CONTEXT.md             # project glossary (ubiquitous language)
 ```
 
-**Supported harnesses:** `claude-code`, `opencode`, `codex`, `cursor`.
+**Supported harnesses:** `claude-code`, `opencode`, `codex`, `cursor`, `github-copilot`.
 
 Use `--harness` to select one or more harnesses non-interactively. The flag is
 repeatable — pass it multiple times to install for several agents at once:
@@ -73,7 +73,7 @@ repeatable — pass it multiple times to install for several agents at once:
 scifi init --harness claude-code --harness cursor
 ```
 
-`--yes` skips the interactive prompt and defaults to `claude-code`.
+`--yes` skips the interactive prompt — you must also pass `--harness <id>`.
 
 Skill files are owned by `scifi` — rerunning `init` overwrites them in place. To
 customize one, copy it under a different id (e.g. `my-code-review`) and edit that;

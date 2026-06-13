@@ -1,3 +1,4 @@
+import { ScifiError } from '../output/errors.js';
 import {
   type HarnessId,
   InvalidHarnessError,
@@ -13,8 +14,6 @@ export interface ResolveHarnessesOptions {
   readonly ask: HarnessMultiAsk;
 }
 
-const DEFAULT_HARNESS: HarnessId = 'claude-code';
-
 // Multi-select resolver — precedence: non-empty flags > yes > ask.
 export async function resolveHarnesses(
   options: ResolveHarnessesOptions,
@@ -24,7 +23,11 @@ export async function resolveHarnesses(
   }
 
   if (options.yes) {
-    return [DEFAULT_HARNESS];
+    throw new ScifiError(
+      'INVALID_ARGUMENT',
+      'At least one --harness flag is required when using --yes.',
+      { hint: `Available harnesses: ${KNOWN_HARNESS_IDS.join(', ')}.` },
+    );
   }
 
   const picked = await options.ask(KNOWN_HARNESS_IDS);
