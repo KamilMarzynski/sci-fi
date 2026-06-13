@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.1.3](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.2...v0.1.3) (2026-06-13)
+
+
+### Features
+
+* add `scifi upgrade` command ([4e940c1](https://github.com/KamilMarzynski/sci-fi/commit/4e940c1801c06915b5ad24355b8cd54011df0685))
+* add CLI upgrade command handler ([ab8a0cb](https://github.com/KamilMarzynski/sci-fi/commit/ab8a0cb701cdc68110a68110115bdbae822bb36e))
+* add core upgrade child process spawn module ([1f9fdf6](https://github.com/KamilMarzynski/sci-fi/commit/1f9fdf655447571e154cb29a734ae9bdfba5edb2))
+* add github-copilot harness type and adapter registration ([bd4f97c](https://github.com/KamilMarzynski/sci-fi/commit/bd4f97c7c29e8d1339dc004ef99f3873776623ff))
+* add readConfig and extract readPackageVersion to shared module ([5e7864c](https://github.com/KamilMarzynski/sci-fi/commit/5e7864c15e54c107dbe81a9744085a5df6f6047f))
+* add version detection module (readCurrentVersion, readNewVersion) ([d3c2ace](https://github.com/KamilMarzynski/sci-fi/commit/d3c2ace6283161097e8489a811e6de7447f3b4c7))
+* **core:** add npm spawn module for upgrade command ([fad8bd4](https://github.com/KamilMarzynski/sci-fi/commit/fad8bd4a887cd9cb6af8f0d746fef6b23d629e02))
+* e2e upgrade verification tests ([d9e1d05](https://github.com/KamilMarzynski/sci-fi/commit/d9e1d05dd0f78b7ce5085a4226e9bae4109ba5d5))
+
+
+### Bug Fixes
+
+* add runtime shape validation for child stdout JSON ([0065c00](https://github.com/KamilMarzynski/sci-fi/commit/0065c006184633c955bb599ce79a0f796786d660))
+* address code review findings for upgrade command ([c93f819](https://github.com/KamilMarzynski/sci-fi/commit/c93f81903c80024339aaa2f610b16888e5da5f0f))
+* align upgrade command with spec wording and skip npm when already at latest ([f2d894a](https://github.com/KamilMarzynski/sci-fi/commit/f2d894a5a0c0e2d762bce160895e3c6356a48233))
+* always run npm install and use correct scoped package name ([2b52c82](https://github.com/KamilMarzynski/sci-fi/commit/2b52c82c46b548d4ed83318f439b4bf1c4751d1b))
+* assert npm install runs even when already at latest ([5795730](https://github.com/KamilMarzynski/sci-fi/commit/57957304be83d24385dd3409cfc91c29b08c4d55))
+* derive installed-upgrade e2e version from package.json ([a08c38a](https://github.com/KamilMarzynski/sci-fi/commit/a08c38a205fc478c7b6cbe5f478d80715b342d24))
+* derive installed-upgrade e2e version from package.json ([0c0378f](https://github.com/KamilMarzynski/sci-fi/commit/0c0378fe06c4e966f2ac20ed6d40a09470e8d6e9))
+* require explicit --harness when --yes is used and update CONTEXT.md glossary ([0403278](https://github.com/KamilMarzynski/sci-fi/commit/0403278ab5814f90ef9a58373a0a06966eeedfe2))
+
 ## [0.1.2](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.1...v0.1.2) (2026-06-12)
 
 
