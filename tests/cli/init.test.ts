@@ -226,8 +226,10 @@ describe('scifi init', () => {
     const normalized = normalizeInitError(new CheckboxCancelledError());
 
     expect(normalized).toBeInstanceOf(ScifiError);
-    expect((normalized as ScifiError).code).toBe('CANCELLED');
-    expect((normalized as ScifiError).message).toBe('Harness selection cancelled.');
+    expect(normalized).toMatchObject({
+      code: 'CANCELLED',
+      message: 'Harness selection cancelled.',
+    });
   });
 
   it('creates the baseline project structure in the current working directory', async () => {
