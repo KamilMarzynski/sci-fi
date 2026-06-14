@@ -3,12 +3,18 @@ import { access, mkdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { normalizeInitError } from '../../src/cli/commands/init.js';
 import { buildProgram } from '../../src/cli/index.js';
+import { CheckboxCancelledError } from '../../src/cli/prompts/checkbox.js';
+import { ScifiError } from '../../src/core/output/errors.js';
 import { runCli } from './helpers.js';
 
 describe('scifi init — multi-harness', () => {
   const temporaryDirectories: string[] = [];
   const originalWorkingDirectory = process.cwd();
+  const originalStdinIsTTY = process.stdin.isTTY;
+  const originalStdoutIsTTY = process.stdout.isTTY;
+  const originalStdinSetRawMode = process.stdin.setRawMode;
 
   afterEach(async () => {
     process.chdir(originalWorkingDirectory);
@@ -19,6 +25,10 @@ describe('scifi init — multi-harness', () => {
       }),
     );
     temporaryDirectories.length = 0;
+
+    process.stdin.isTTY = originalStdinIsTTY;
+    process.stdout.isTTY = originalStdoutIsTTY;
+    process.stdin.setRawMode = originalStdinSetRawMode;
   });
 
   it('installs both harnesses when --harness is repeated', async () => {
@@ -60,6 +70,26 @@ describe('scifi init — multi-harness', () => {
 
     expect(run.exitCode).not.toBe(0);
     expect(run.stderr).toContain('INVALID_ARGUMENT');
+  });
+
+  it('exits non-zero with INVALID_ARGUMENT when interactive but raw mode is unavailable', async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-init-raw-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    process.stdin.isTTY = true;
+    process.stdout.isTTY = true;
+    // @ts-expect-error — simulate a TTY stream whose setRawMode method is unavailable
+    process.stdin.setRawMode = undefined;
+
+    const run = await runCli(['init']);
+
+    expect(run.exitCode).not.toBe(0);
+    expect(run.stderr).toContain('INVALID_ARGUMENT');
+    expect(run.stderr).toContain('--harness');
+    await expect(access(join(projectRoot, 'docs', 'scifi'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 
   it('deduplicates repeated --harness flags and installs each once', async () => {
@@ -191,6 +221,16 @@ describe('scifi init', () => {
       }),
     );
     temporaryDirectories.length = 0;
+  });
+
+  it('maps a cancelled checkbox picker to a CANCELLED ScifiError', () => {
+    const normalized = normalizeInitError(new CheckboxCancelledError());
+
+    expect(normalized).toBeInstanceOf(ScifiError);
+    expect(normalized).toMatchObject({
+      code: 'CANCELLED',
+      message: 'Harness selection cancelled.',
+    });
   });
 
   it('creates the baseline project structure in the current working directory', async () => {

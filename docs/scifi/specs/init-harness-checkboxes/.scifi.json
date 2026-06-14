@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "slug": "init-harness-checkboxes",
+  "title": "Checkbox harness picker in scifi init",
+  "status": "done",
+  "createdAt": "2026-06-13T14:17:13.610Z",
+  "updatedAt": "2026-06-13T15:51:00.040Z",
+  "branch": "feat/init-harness-checkboxes",
+  "worktreePath": ".worktrees/feat-init-harness-checkboxes"
+}
