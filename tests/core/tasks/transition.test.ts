@@ -71,6 +71,18 @@ describe('updateTaskStatus', () => {
     expect(file.body).toBe('# Setup Database\n\nDetailed description.\n');
   });
 
+  it('rejects updating a task that does not exist with a NOT_FOUND error', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
+    temporaryDirectories.push(projectRoot);
+
+    await expect(
+      updateTaskStatus(projectRoot, 'user-auth', 'missing-task', 'in-progress'),
+    ).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+      message: expect.stringContaining('missing-task'),
+    });
+  });
+
   it('rejects marking a pending task as done', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-task-transition-'));
     temporaryDirectories.push(projectRoot);

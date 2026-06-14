@@ -116,6 +116,19 @@ describe('readNewVersion', () => {
     });
   });
 
+  it('throws ScifiError when stdout is empty after trimming', async () => {
+    mockExecFile.mockImplementation((_file, _args, _options, callback) => {
+      (callback as (err: null, stdout: string, stderr: string) => void)(null, '   \n', '');
+      return {} as ReturnType<typeof execFile>;
+    });
+
+    await expect(readNewVersion('/usr/local/bin/scifi')).rejects.toMatchObject({
+      name: 'ScifiError',
+      code: 'INTERNAL',
+      message: expect.stringContaining('Could not parse version') as unknown,
+    });
+  });
+
   it('throws ScifiError when stdout cannot be parsed as a version', async () => {
     mockExecFile.mockImplementation((_file, _args, _options, callback) => {
       (callback as (err: null, stdout: string, stderr: string) => void)(
