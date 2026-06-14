@@ -192,4 +192,31 @@ describe('canEnterRawMode', () => {
   it('returns false when the stream is not a TTY', () => {
     expect(canEnterRawMode(fakeReadStream({ isTTY: false, setRawMode: () => {} }))).toBe(false);
   });
+
+  it('returns false when probing setRawMode(true) throws', () => {
+    expect(
+      canEnterRawMode(
+        fakeReadStream({
+          isTTY: true,
+          setRawMode: (_mode: boolean) => {
+            throw new Error('Raw mode unsupported');
+          },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('returns false when probing setRawMode(false) throws', () => {
+    expect(
+      canEnterRawMode(
+        fakeReadStream({
+          isTTY: true,
+          setRawMode: (mode: boolean) => {
+            if (mode) return;
+            throw new Error('Cannot restore cooked mode');
+          },
+        }),
+      ),
+    ).toBe(false);
+  });
 });

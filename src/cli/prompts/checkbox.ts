@@ -27,7 +27,17 @@ export class CheckboxCancelledError extends Error {
 }
 
 export function canEnterRawMode(input: NodeJS.ReadStream): boolean {
-  return Boolean(input.isTTY) && typeof input.setRawMode === 'function';
+  if (!input.isTTY || typeof input.setRawMode !== 'function') {
+    return false;
+  }
+
+  try {
+    input.setRawMode(true);
+    input.setRawMode(false);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 interface FrameOptions {
