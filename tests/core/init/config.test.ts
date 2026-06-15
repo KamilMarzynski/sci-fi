@@ -66,6 +66,21 @@ describe('readConfig', () => {
     expect(config).toEqual({ version: 1, harnesses: ['claude-code', 'cursor'] });
   });
 
+  it('defaults version to 1 when the stored version is not a number', async () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-config-'));
+    temporaryDirectories.push(projectRoot);
+    await mkdir(join(projectRoot, 'docs', 'scifi', '.scifi'), { recursive: true });
+    await writeFile(
+      join(projectRoot, 'docs', 'scifi', '.scifi', 'config.json'),
+      JSON.stringify({ version: 'oops', harnesses: ['claude-code'] }),
+      'utf8',
+    );
+
+    const config = await readConfig(projectRoot);
+
+    expect(config).toEqual({ version: 1, harnesses: ['claude-code'] });
+  });
+
   it('throws NOT_FOUND when config file is missing', async () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'scifi-config-'));
     temporaryDirectories.push(projectRoot);

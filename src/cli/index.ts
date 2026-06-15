@@ -78,7 +78,7 @@ function normalizeExecutionPath(path: string): string {
   return realpathSync(resolvedPath);
 }
 
-function handleCliError(error: unknown, argv: readonly string[]): void {
+export function handleCliError(error: unknown, argv: readonly string[]): void {
   const json = argv.includes('--json');
 
   if (error instanceof CommanderError) {
@@ -102,7 +102,7 @@ function handleCliError(error: unknown, argv: readonly string[]): void {
   emitError(error, json);
 }
 
-async function runCli(argv: readonly string[]): Promise<void> {
+export async function runCli(argv: readonly string[]): Promise<void> {
   try {
     await buildProgram().parseAsync(argv as string[]);
   } catch (error) {

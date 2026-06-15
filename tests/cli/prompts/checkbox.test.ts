@@ -1,11 +1,15 @@
+import { EventEmitter } from 'node:events';
 import { Writable } from 'node:stream';
+import type { ReadStream } from 'node:tty';
 import { describe, expect, it } from 'vitest';
 import {
   CheckboxCancelledError,
   type CheckboxItem,
   canEnterRawMode,
+  createStdinKeyReader,
   type Key,
   type KeyReader,
+  promptHarnesses,
   runCheckbox,
 } from '../../../src/cli/prompts/checkbox.js';
 
@@ -124,6 +128,17 @@ describe('runCheckbox', () => {
     expect(upResult).toEqual(['github-copilot']);
   });
 
+  it('toggles a checked row back off when space is pressed again', async () => {
+    const result = await runCheckbox({
+      items: HARNESS_ITEMS,
+      message: MESSAGE,
+      reader: new ScriptedKeyReader(['space', 'space', 'down', 'space', 'enter']),
+      output: new CapturingStream(),
+    });
+
+    expect(result).toEqual(['opencode']);
+  });
+
   it('returns multi-selected ids in top-to-bottom display order', async () => {
     const result = await runCheckbox({
       items: HARNESS_ITEMS,
@@ -218,5 +233,139 @@ describe('canEnterRawMode', () => {
         }),
       ),
     ).toBe(false);
+  });
+});
+
+// A fake TTY ReadStream: emitKeypressEvents attaches to it, and tests drive it
+// by emitting 'keypress' events directly. The cast is isolated to this helper.
+class FakeTtyStream extends EventEmitter {
+  rawMode = false;
+  paused = false;
+  setRawMode(mode: boolean): this {
+    this.rawMode = mode;
+    return this;
+  }
+  pause(): this {
+    this.paused = true;
+    return this;
+  }
+  resume(): this {
+    this.paused = false;
+    return this;
+  }
+}
+
+function fakeTty(): FakeTtyStream {
+  return new FakeTtyStream();
+}
+
+function asReadStream(stream: FakeTtyStream): ReadStream {
+  return stream as unknown as ReadStream;
+}
+
+const tick = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
+
+describe('createStdinKeyReader', () => {
+  it('enters raw mode on creation', () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+    expect(input.rawMode).toBe(true);
+    reader.close();
+  });
+
+  it('queues keypresses that arrive before a read and drains them in order', async () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+
+    input.emit('keypress', '', { name: 'up' });
+    input.emit('keypress', '', { name: 'down' });
+
+    expect(await reader.read()).toBe('up');
+    expect(await reader.read()).toBe('down');
+    reader.close();
+  });
+
+  it('resolves a pending read when the next keypress arrives', async () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+
+    const pending = reader.read();
+    input.emit('keypress', ' ', { name: 'space' });
+
+    expect(await pending).toBe('space');
+    reader.close();
+  });
+
+  it('maps every recognized key sequence and ignores unknown keys', async () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+
+    input.emit('keypress', '', { name: 'x' }); // unknown — ignored, not queued
+    input.emit('keypress', '', { name: 'up' });
+    input.emit('keypress', '', { name: 'down' });
+    input.emit('keypress', ' ', { name: 'space' });
+    input.emit('keypress', ' ', { sequence: ' ' });
+    input.emit('keypress', '\r', { name: 'return' });
+    input.emit('keypress', '\n', { name: 'enter' });
+    input.emit('keypress', '', { name: 'escape' });
+    input.emit('keypress', '', { ctrl: true, name: 'c' });
+
+    const collected: Key[] = [];
+    for (let i = 0; i < 8; i += 1) {
+      collected.push(await reader.read());
+    }
+
+    expect(collected).toEqual([
+      'up',
+      'down',
+      'space',
+      'space',
+      'enter',
+      'enter',
+      'cancel',
+      'cancel',
+    ]);
+    reader.close();
+  });
+
+  it('detaches and restores cooked mode on close', () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+
+    reader.close();
+
+    expect(input.rawMode).toBe(false);
+    expect(input.paused).toBe(true);
+    expect(input.listenerCount('keypress')).toBe(0);
+  });
+
+  it('closes safely when the stream no longer exposes setRawMode', () => {
+    const input = fakeTty();
+    const reader = createStdinKeyReader(asReadStream(input));
+
+    // Simulate a stream that loses setRawMode before close runs.
+    (input as { setRawMode?: unknown }).setRawMode = undefined;
+
+    expect(() => reader.close()).not.toThrow();
+    expect(input.paused).toBe(true);
+  });
+});
+
+describe('promptHarnesses', () => {
+  it('drives the checkbox via the injected stdin and resolves selected ids', async () => {
+    const input = fakeTty();
+    const output = new CapturingStream();
+
+    const pending = promptHarnesses(['claude-code', 'opencode'], asReadStream(input), output);
+
+    await tick();
+    input.emit('keypress', '', { name: 'down' });
+    await tick();
+    input.emit('keypress', ' ', { name: 'space' });
+    await tick();
+    input.emit('keypress', '\r', { name: 'return' });
+
+    expect(await pending).toEqual(['opencode']);
+    expect(input.rawMode).toBe(false); // reader.close() restored cooked mode
   });
 });

@@ -203,15 +203,19 @@ export function createStdinKeyReader(input: ReadStream): KeyReader & { close(): 
   };
 }
 
-export async function promptHarnesses(choices: readonly HarnessId[]): Promise<readonly string[]> {
+export async function promptHarnesses(
+  choices: readonly HarnessId[],
+  input: ReadStream = stdin,
+  output: Writable = stdout,
+): Promise<readonly string[]> {
   const items: CheckboxItem[] = choices.map((id) => ({ id, label: id }));
-  const reader = createStdinKeyReader(stdin);
+  const reader = createStdinKeyReader(input);
   try {
     return await runCheckbox({
       items,
       message: 'Select harnesses to install (space to toggle, enter to confirm):',
       reader,
-      output: stdout,
+      output,
     });
   } finally {
     reader.close();
