@@ -80,8 +80,14 @@ So `/goal` decides *when to stop*; `ci-goal.md` decides *how to behave*.
   `allowManagedHooksOnly`. The `anthropics/claude-code-action` provides the
   trusted headless runtime that `/goal` needs; a hand-rolled `npm -g` +
   `claude -p` would additionally have to solve the folder-trust dialog, which is
-  why this example uses the action. The action's pinned engine must be a build
-  that ships `/goal` (≥ 2.1.139).
+  why this example uses the action.
+- **Engine version ≥ 2.1.172.** Two features gate on the engine the action runs:
+  `/goal` (≥ 2.1.139) and, more importantly here, **nested subagents** — the
+  `sf-implement` implementer spawns its own code-review subagent. Subagents can
+  spawn subagents only as of v2.1.172 (foreground, any depth). On an older
+  engine the reviewer falls back to `REVIEW_UNAVAILABLE` and the orchestrator
+  runs the gate instead — still correct, just not the designed path. Pin the
+  action to a version whose engine is ≥ 2.1.172.
 
 **Secrets** (repo → Settings → Secrets and variables → Actions)
 
@@ -119,8 +125,9 @@ custom App) and pass its token as `github_token` instead of the default
 - Assumes the project's verification harness installs and runs on a stock
   `ubuntu-latest` Node 20 runner — add system deps as your project needs.
 - **Unverified end to end.** The pieces are individually sound (the detect
-  script is tested), but the full action + `/goal` + nested-subagent
-  `sf-implement` run has not been executed on a live runner. Validate on a
-  throwaway repo before trusting it. The likeliest first failure is `/goal`
-  evaluation or the per-task reviewer falling back to `REVIEW_UNAVAILABLE`
-  because a subagent cannot spawn another subagent.
+  script is tested) and the building blocks are supported — headless runs,
+  `/goal`, and nested subagents (≥ 2.1.172) are all documented, first-class
+  features — but this specific combination has not been executed on a live
+  runner. Validate on a throwaway repo before trusting it: confirm the action's
+  engine version, that `/goal` evaluates, and that the implementer's reviewer
+  subagent spawns rather than falling back to `REVIEW_UNAVAILABLE`.
