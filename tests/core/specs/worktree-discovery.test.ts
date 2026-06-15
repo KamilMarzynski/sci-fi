@@ -83,6 +83,33 @@ describe('parseGitWorktreeList', () => {
     expect(worktrees).toEqual([]);
   });
 
+  it('marks no worktree as current when cwd is outside every worktree', () => {
+    const output = `worktree /project\nHEAD abcdef\nbranch refs/heads/main\n\nworktree /project/.worktrees/feat-other\nHEAD fedcba\nbranch refs/heads/feat/other\n\n`;
+
+    const worktrees = parseGitWorktreeList(output, '/project', '/somewhere-else');
+
+    expect(worktrees).toEqual([
+      { path: '/project', isCurrent: false },
+      { path: '/project/.worktrees/feat-other', isCurrent: false },
+    ]);
+  });
+
+  it('selects the deepest worktree when cwd is inside multiple nested worktrees', () => {
+    const output = `worktree /project\nHEAD abcdef\nbranch refs/heads/main\n\nworktree /project/.worktrees/outer\nHEAD 111111\nbranch refs/heads/feat/outer\n\nworktree /project/.worktrees/outer/nested\nHEAD 222222\nbranch refs/heads/feat/nested\n\n`;
+
+    const worktrees = parseGitWorktreeList(
+      output,
+      '/project',
+      '/project/.worktrees/outer/nested/src',
+    );
+
+    expect(worktrees).toEqual([
+      { path: '/project', isCurrent: false },
+      { path: '/project/.worktrees/outer', isCurrent: false },
+      { path: '/project/.worktrees/outer/nested', isCurrent: true },
+    ]);
+  });
+
   it('skips worktree lines with empty paths', () => {
     const output = `worktree /project\nHEAD abcdef\nbranch refs/heads/main\n\nworktree \nHEAD fedcba\n\n`;
     const worktrees = parseGitWorktreeList(output, '/project', '/project');

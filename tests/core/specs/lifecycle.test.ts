@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -87,6 +87,21 @@ describe('inspectFeatureLifecycle', () => {
     await expect(inspectFeatureLifecycle(projectRoot, 'user-auth')).rejects.toThrow(
       'Invalid metadata file at',
     );
+  });
+
+  it('rethrows unexpected read errors from metadata file', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    temporaryDirectories.push(projectRoot);
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
+
+    await mkdir(featureRoot, { recursive: true });
+    await chmod(featureRoot, 0o000);
+
+    await expect(inspectFeatureLifecycle(projectRoot, 'user-auth')).rejects.toThrow(
+      /EACCES|EPERM|permission/i,
+    );
+
+    await chmod(featureRoot, 0o755);
   });
 });
 
@@ -336,6 +351,45 @@ describe('resolveFeatureLifecycle', () => {
 
     expect(resolved.lifecycle.metadata.status).toBe('created');
     expect(resolved.location).toBe('local');
+  });
+
+  it('rethrows non-NOT_FOUND errors without consulting the provider', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    temporaryDirectories.push(projectRoot);
+
+    const localFeatureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
+    await mkdir(localFeatureRoot, { recursive: true });
+    await chmod(localFeatureRoot, 0o000);
+
+    const fakeProvider = {
+      discover: async () => [{ path: '/unused', isCurrent: false }],
+    };
+
+    await expect(resolveFeatureLifecycle(projectRoot, 'user-auth', fakeProvider)).rejects.toThrow(
+      /EACCES|EPERM|permission/i,
+    );
+
+    await chmod(localFeatureRoot, 0o755);
+  });
+
+  it('rethrows non-NOT_FOUND errors encountered during worktree fallback', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const worktreePath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-worktree-'));
+    temporaryDirectories.push(projectRoot, worktreePath);
+
+    const worktreeFeatureRoot = join(worktreePath, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(worktreeFeatureRoot, { recursive: true });
+    await chmod(worktreeFeatureRoot, 0o000);
+
+    const fakeProvider = {
+      discover: async () => [{ path: worktreePath, isCurrent: false }],
+    };
+
+    await expect(
+      resolveFeatureLifecycle(projectRoot, 'payment-flow', fakeProvider),
+    ).rejects.toThrow(/EACCES|EPERM|permission/i);
+
+    await chmod(worktreeFeatureRoot, 0o755);
   });
 });
 
