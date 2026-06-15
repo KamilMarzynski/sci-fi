@@ -40,8 +40,7 @@ The change must attach to one feature. Resolve it before anything else.
   matching worktree exists **and** `scifi status <slug>` returns `NOT_FOUND` from
   a checkout that would contain it is the feature truly absent — then stop: for
   genuinely new work point the user at `sf-feature`; for a defect rather than a
-  scope change, `sf-fix`. A `NOT_FOUND` while a worktree exists just means you
-  are in the wrong checkout, not that the feature is gone.
+  scope change, `sf-fix`. Run `scifi status <slug> --json`. If `location` is `worktree:<path>`, enter that worktree before continuing.
 
 ### 2. Assess current state
 
