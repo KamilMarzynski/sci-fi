@@ -1,8 +1,10 @@
 ---
 id: TASK-005
 slug: edge-cases
-status: pending
-depends-on: [TASK-003, TASK-004]
+status: done
+depends-on:
+  - TASK-003
+  - TASK-004
 ---
 
 # Edge cases and fallback behavior

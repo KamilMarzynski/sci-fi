@@ -1,8 +1,10 @@
 ---
 id: TASK-007
 slug: installed-build-verification
-status: pending
-depends-on: [TASK-003, TASK-004]
+status: done
+depends-on:
+  - TASK-003
+  - TASK-004
 ---
 
 # Installed-build verification for worktree-aware commands

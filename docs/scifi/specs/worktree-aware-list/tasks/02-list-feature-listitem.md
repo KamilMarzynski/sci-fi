@@ -1,7 +1,7 @@
 ---
 id: TASK-002
 slug: list-feature-listitem
-status: pending
+status: done
 depends-on: []
 ---
 

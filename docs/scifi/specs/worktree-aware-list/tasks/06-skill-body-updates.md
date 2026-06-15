@@ -1,8 +1,9 @@
 ---
 id: TASK-006
 slug: skill-body-updates
-status: pending
-depends-on: [TASK-004]
+status: done
+depends-on:
+  - TASK-004
 ---
 
 # Update skill bodies to drop wrong-checkout caveat

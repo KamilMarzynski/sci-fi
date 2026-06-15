@@ -1,7 +1,7 @@
 ---
 id: TASK-001
 slug: worktree-provider-seam
-status: pending
+status: done
 depends-on: []
 ---
 

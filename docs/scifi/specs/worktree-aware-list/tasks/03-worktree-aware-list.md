@@ -1,8 +1,10 @@
 ---
 id: TASK-003
 slug: worktree-aware-list
-status: pending
-depends-on: [TASK-001, TASK-002]
+status: done
+depends-on:
+  - TASK-001
+  - TASK-002
 ---
 
 # Make scifi list worktree-aware
