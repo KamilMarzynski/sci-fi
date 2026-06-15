@@ -34,11 +34,15 @@ function isValidFeatureMetadata(value: unknown): value is FeatureMetadata {
   );
 }
 
-async function loadFeatureMetadata(projectRoot: string): Promise<FeatureMetadata[]> {
+async function loadFeatureMetadata(
+  projectRoot: string,
+  options?: { ignoreErrors?: boolean },
+): Promise<FeatureMetadata[]> {
+  const ignoreErrors = options?.ignoreErrors ?? false;
   const specsRoot = buildFeaturesRootPath(projectRoot);
 
   const entries = await readdir(specsRoot, { withFileTypes: true }).catch((error: unknown) => {
-    if (isMissingPathError(error)) return [];
+    if (ignoreErrors || isMissingPathError(error)) return [];
     throw error;
   });
 
@@ -46,26 +50,24 @@ async function loadFeatureMetadata(projectRoot: string): Promise<FeatureMetadata
 
   const allResults = await Promise.all(
     featureDirs.map(async (dir) => {
-      const metadataPath = buildFeatureMetadataPath(projectRoot, dir.name);
-      const raw = JSON.parse(await readFile(metadataPath, 'utf8')) as unknown;
-      if (!isValidFeatureMetadata(raw)) return null;
-      return raw;
+      try {
+        const metadataPath = buildFeatureMetadataPath(projectRoot, dir.name);
+        const raw = JSON.parse(await readFile(metadataPath, 'utf8')) as unknown;
+        if (!isValidFeatureMetadata(raw)) return null;
+        return raw;
+      } catch (error) {
+        if (ignoreErrors) return null;
+        throw error;
+      }
     }),
   );
 
   return allResults.filter((m): m is FeatureMetadata => m !== null);
 }
 
-async function loadFeaturesFromWorktree(
-  _projectRoot: string,
-  worktreePath: string,
-): Promise<FeatureListItem[]> {
-  try {
-    const metadata = await loadFeatureMetadata(worktreePath);
-    return metadata.map((item) => ({ metadata: item, location: `worktree:${worktreePath}` }));
-  } catch {
-    return [];
-  }
+async function loadFeaturesFromWorktree(worktreePath: string): Promise<FeatureListItem[]> {
+  const metadata = await loadFeatureMetadata(worktreePath, { ignoreErrors: true });
+  return metadata.map((item) => ({ metadata: item, location: `worktree:${worktreePath}` }));
 }
 
 export interface ListFeaturesOptions {
@@ -87,7 +89,7 @@ export async function listFeatures(options: ListFeaturesOptions): Promise<Featur
     const worktrees = await worktreeProvider.discover(projectRoot);
     for (const worktree of worktrees) {
       if (worktree.isCurrent) continue;
-      const features = await loadFeaturesFromWorktree(projectRoot, worktree.path);
+      const features = await loadFeaturesFromWorktree(worktree.path);
       for (const feature of features) {
         const existing = merged.get(feature.metadata.slug);
         if (existing === undefined) {

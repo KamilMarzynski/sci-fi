@@ -2,6 +2,7 @@ import { cwd } from 'node:process';
 import type { Command } from 'commander';
 import { listOpenFixes } from '../../core/fixes/list.js';
 import { emitError, emitList, jsonMode } from '../../core/output/index.js';
+import type { ListFeaturesOptions } from '../../core/specs/list.js';
 import { listFeatures } from '../../core/specs/list.js';
 import type { FeatureStatus } from '../../core/specs/types.js';
 import { FEATURE_STATUS_VALUES } from '../../core/specs/types.js';
@@ -10,7 +11,7 @@ import { createGitWorktreeProvider } from '../../core/specs/worktree-discovery.j
 export function registerListCommand(program: Command): void {
   program
     .command('list')
-    .description('List all features')
+    .description('List all features across the current checkout and linked worktrees')
     .option('--status <status>', 'filter by lifecycle status')
     .option('--json', 'output as structured JSON (NDJSON)')
     .action(async (options: { status?: string; json?: boolean }, command: Command) => {
@@ -23,9 +24,12 @@ export function registerListCommand(program: Command): void {
             ? (options.status as FeatureStatus)
             : undefined;
 
-        const listOptions = { projectRoot, worktreeProvider: createGitWorktreeProvider() };
+        const listOptions: ListFeaturesOptions = {
+          projectRoot,
+          worktreeProvider: createGitWorktreeProvider(),
+        };
         if (statusFilter !== undefined) {
-          (listOptions as { status?: FeatureStatus }).status = statusFilter;
+          listOptions.status = statusFilter;
         }
         const features = await listFeatures(listOptions);
 

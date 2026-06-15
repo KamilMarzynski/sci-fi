@@ -232,4 +232,41 @@ describe('listFeatures', () => {
     const slugs = features.map((f) => f.metadata.slug);
     expect(slugs).toEqual(['payment-flow', 'user-auth']);
   });
+
+  it('skips a worktree whose specs directory is missing', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
+    const emptyWorktreePath = await mkdtemp(join(tmpdir(), 'scifi-list-empty-'));
+    temporaryDirectories.push(projectRoot, emptyWorktreePath);
+
+    const fakeProvider = {
+      discover: async () => [{ path: emptyWorktreePath, isCurrent: false }],
+    };
+
+    const features = await listFeatures({ projectRoot, worktreeProvider: fakeProvider });
+    expect(features).toEqual([]);
+  });
+
+  it('skips invalid metadata in a worktree while keeping valid entries', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
+    const worktreePath = await mkdtemp(join(tmpdir(), 'scifi-list-worktree-'));
+    temporaryDirectories.push(projectRoot, worktreePath);
+
+    const worktreeSpecsDir = join(worktreePath, 'docs', 'scifi', 'specs');
+    await mkdir(join(worktreeSpecsDir, 'payment-flow'), { recursive: true });
+    await writeFile(
+      join(worktreeSpecsDir, 'payment-flow', '.scifi.json'),
+      makeMetadata('payment-flow', 'spec-ready'),
+      'utf8',
+    );
+    await mkdir(join(worktreeSpecsDir, 'corrupt'), { recursive: true });
+    await writeFile(join(worktreeSpecsDir, 'corrupt', '.scifi.json'), 'not-json', 'utf8');
+
+    const fakeProvider = {
+      discover: async () => [{ path: worktreePath, isCurrent: false }],
+    };
+
+    const features = await listFeatures({ projectRoot, worktreeProvider: fakeProvider });
+    expect(features).toHaveLength(1);
+    expect(features[0]?.metadata.slug).toBe('payment-flow');
+  });
 });

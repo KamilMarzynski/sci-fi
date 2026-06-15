@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { realpath } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
@@ -15,9 +15,30 @@ export interface WorktreeProvider {
 }
 
 function isAncestorOrSame(parent: string, child: string): boolean {
-  if (parent === child) return true;
-  const separator = parent.endsWith('/') ? '' : '/';
-  return child.startsWith(`${parent}${separator}`);
+  const rel = relative(parent, child);
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
+function selectCurrentWorktree(
+  worktrees: readonly LinkedWorktree[],
+  currentWorkingDirectory: string,
+): LinkedWorktree[] {
+  const currentCandidates = worktrees.filter((worktree) =>
+    isAncestorOrSame(worktree.path, currentWorkingDirectory),
+  );
+
+  if (currentCandidates.length === 0) {
+    return worktrees.map((worktree) => ({ ...worktree, isCurrent: false }));
+  }
+
+  const deepest = currentCandidates.reduce((longest, worktree) =>
+    worktree.path.length > longest.path.length ? worktree : longest,
+  );
+
+  return worktrees.map((worktree) => ({
+    ...worktree,
+    isCurrent: worktree.path === deepest.path,
+  }));
 }
 
 export function parseGitWorktreeList(
@@ -78,11 +99,14 @@ export function createGitWorktreeProvider(): WorktreeProvider {
             if (normalizedPath === undefined) return undefined;
             return {
               path: normalizedPath,
-              isCurrent: worktree.isCurrent,
+              isCurrent: false,
             };
           }),
         );
-        return normalized.filter((worktree): worktree is LinkedWorktree => worktree !== undefined);
+        const validWorktrees = normalized.filter(
+          (worktree): worktree is LinkedWorktree => worktree !== undefined,
+        );
+        return selectCurrentWorktree(validWorktrees, currentWorkingDirectory);
       } catch {
         return [];
       }
