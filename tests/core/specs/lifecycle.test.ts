@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   inspectFeatureLifecycle,
+  resolveFeatureLifecycle,
   validateStatusTransition,
 } from '../../../src/core/specs/lifecycle.js';
 
@@ -86,6 +87,184 @@ describe('inspectFeatureLifecycle', () => {
     await expect(inspectFeatureLifecycle(projectRoot, 'user-auth')).rejects.toThrow(
       'Invalid metadata file at',
     );
+  });
+});
+
+describe('resolveFeatureLifecycle', () => {
+  it('returns local lifecycle with location local when metadata exists locally', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    temporaryDirectories.push(projectRoot);
+    const featureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'user-auth');
+
+    await mkdir(featureRoot, { recursive: true });
+    await writeFile(
+      join(featureRoot, '.scifi.json'),
+      `${JSON.stringify({
+        version: 1,
+        slug: 'user-auth',
+        status: 'created',
+        createdAt: '2026-05-20T06:29:55Z',
+        updatedAt: '2026-05-20T06:29:55Z',
+      })}\n`,
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [],
+    };
+
+    const resolved = await resolveFeatureLifecycle(projectRoot, 'user-auth', fakeProvider);
+
+    expect(resolved.lifecycle.metadata.status).toBe('created');
+    expect(resolved.location).toBe('local');
+  });
+
+  it('falls back to a linked worktree when the feature is absent locally', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const worktreePath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-worktree-'));
+    temporaryDirectories.push(projectRoot, worktreePath);
+
+    const worktreeFeatureRoot = join(worktreePath, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(worktreeFeatureRoot, { recursive: true });
+    await writeFile(
+      join(worktreeFeatureRoot, '.scifi.json'),
+      `${JSON.stringify({
+        version: 1,
+        slug: 'payment-flow',
+        status: 'spec-ready',
+        createdAt: '2026-05-20T06:29:55Z',
+        updatedAt: '2026-05-20T06:29:55Z',
+      })}\n`,
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [{ path: worktreePath, isCurrent: false }],
+    };
+
+    const resolved = await resolveFeatureLifecycle(projectRoot, 'payment-flow', fakeProvider);
+
+    expect(resolved.lifecycle.metadata.status).toBe('spec-ready');
+    expect(resolved.location).toBe(`worktree:${worktreePath}`);
+  });
+
+  it('prefers the local copy when the same slug also exists in a worktree', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const worktreePath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-worktree-'));
+    temporaryDirectories.push(projectRoot, worktreePath);
+
+    const localFeatureRoot = join(projectRoot, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(localFeatureRoot, { recursive: true });
+    await writeFile(
+      join(localFeatureRoot, '.scifi.json'),
+      `${JSON.stringify({
+        version: 1,
+        slug: 'payment-flow',
+        status: 'created',
+        createdAt: '2026-05-20T06:29:55Z',
+        updatedAt: '2026-05-20T06:29:55Z',
+      })}\n`,
+      'utf8',
+    );
+
+    const worktreeFeatureRoot = join(worktreePath, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(worktreeFeatureRoot, { recursive: true });
+    await writeFile(
+      join(worktreeFeatureRoot, '.scifi.json'),
+      `${JSON.stringify({
+        version: 1,
+        slug: 'payment-flow',
+        status: 'spec-ready',
+        createdAt: '2026-05-20T06:29:55Z',
+        updatedAt: '2026-05-20T06:29:55Z',
+      })}\n`,
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [{ path: worktreePath, isCurrent: false }],
+    };
+
+    const resolved = await resolveFeatureLifecycle(projectRoot, 'payment-flow', fakeProvider);
+
+    expect(resolved.lifecycle.metadata.status).toBe('created');
+    expect(resolved.location).toBe('local');
+  });
+
+  it('throws the original NOT_FOUND error when the feature is absent everywhere', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const worktreePath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-worktree-'));
+    temporaryDirectories.push(projectRoot, worktreePath);
+
+    const fakeProvider = {
+      discover: async () => [{ path: worktreePath, isCurrent: false }],
+    };
+
+    await expect(
+      resolveFeatureLifecycle(projectRoot, 'missing-feature', fakeProvider),
+    ).rejects.toThrow('Feature "missing-feature" does not exist.');
+  });
+
+  it('selects the lexicographically smallest worktree path for duplicate worktree slugs', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const alphaPath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-alpha-'));
+    const betaPath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-beta-'));
+    temporaryDirectories.push(projectRoot, alphaPath, betaPath);
+
+    for (const worktreePath of [betaPath, alphaPath]) {
+      const featureRoot = join(worktreePath, 'docs', 'scifi', 'specs', 'payment-flow');
+      await mkdir(featureRoot, { recursive: true });
+      await writeFile(
+        join(featureRoot, '.scifi.json'),
+        `${JSON.stringify({
+          version: 1,
+          slug: 'payment-flow',
+          status: 'spec-ready',
+          createdAt: '2026-05-20T06:29:55Z',
+          updatedAt: '2026-05-20T06:29:55Z',
+        })}\n`,
+        'utf8',
+      );
+    }
+
+    const fakeProvider = {
+      discover: async () => [
+        { path: betaPath, isCurrent: false },
+        { path: alphaPath, isCurrent: false },
+      ],
+    };
+
+    const resolved = await resolveFeatureLifecycle(projectRoot, 'payment-flow', fakeProvider);
+
+    expect(resolved.location).toBe(`worktree:${alphaPath}`);
+  });
+
+  it('ignores the current worktree entry in the provider results', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-'));
+    const currentWorktreePath = await mkdtemp(join(tmpdir(), 'scifi-lifecycle-current-'));
+    temporaryDirectories.push(projectRoot, currentWorktreePath);
+
+    const featureRoot = join(currentWorktreePath, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(featureRoot, { recursive: true });
+    await writeFile(
+      join(featureRoot, '.scifi.json'),
+      `${JSON.stringify({
+        version: 1,
+        slug: 'payment-flow',
+        status: 'spec-ready',
+        createdAt: '2026-05-20T06:29:55Z',
+        updatedAt: '2026-05-20T06:29:55Z',
+      })}\n`,
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [{ path: currentWorktreePath, isCurrent: true }],
+    };
+
+    await expect(
+      resolveFeatureLifecycle(projectRoot, 'payment-flow', fakeProvider),
+    ).rejects.toThrow('Feature "payment-flow" does not exist.');
   });
 });
 
