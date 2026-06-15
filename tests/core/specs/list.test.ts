@@ -233,6 +233,64 @@ describe('listFeatures', () => {
     expect(slugs).toEqual(['payment-flow', 'user-auth']);
   });
 
+  it('does not duplicate a local feature as a worktree entry when the current checkout is reported', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
+    temporaryDirectories.push(projectRoot);
+
+    const localSpecsDir = join(projectRoot, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(localSpecsDir, { recursive: true });
+    await writeFile(
+      join(localSpecsDir, '.scifi.json'),
+      makeMetadata('payment-flow', 'created'),
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [{ path: projectRoot, isCurrent: true }],
+    };
+
+    const features = await listFeatures({ projectRoot, worktreeProvider: fakeProvider });
+    expect(features).toHaveLength(1);
+    expect(features[0]?.metadata.slug).toBe('payment-flow');
+    expect(features[0]?.location).toBe('local');
+  });
+
+  it('skips a worktree path that no longer exists on disk', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
+    const removedWorktreePath = await mkdtemp(join(tmpdir(), 'scifi-list-removed-'));
+    await rm(removedWorktreePath, { recursive: true, force: true });
+    temporaryDirectories.push(projectRoot);
+
+    const fakeProvider = {
+      discover: async () => [{ path: removedWorktreePath, isCurrent: false }],
+    };
+
+    const features = await listFeatures({ projectRoot, worktreeProvider: fakeProvider });
+    expect(features).toEqual([]);
+  });
+
+  it('falls back to local-only output when the provider returns an empty array', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
+    temporaryDirectories.push(projectRoot);
+
+    const localSpecsDir = join(projectRoot, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(localSpecsDir, { recursive: true });
+    await writeFile(
+      join(localSpecsDir, '.scifi.json'),
+      makeMetadata('payment-flow', 'spec-ready'),
+      'utf8',
+    );
+
+    const fakeProvider = {
+      discover: async () => [],
+    };
+
+    const features = await listFeatures({ projectRoot, worktreeProvider: fakeProvider });
+    expect(features).toHaveLength(1);
+    expect(features[0]?.metadata.slug).toBe('payment-flow');
+    expect(features[0]?.location).toBe('local');
+  });
+
   it('skips a worktree whose specs directory is missing', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-'));
     const emptyWorktreePath = await mkdtemp(join(tmpdir(), 'scifi-list-empty-'));

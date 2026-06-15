@@ -361,4 +361,31 @@ describe('status command', () => {
     expect(parsed.data).toBeUndefined();
     expect(exitCode).toBe(3);
   });
+
+  it('reports a local feature outside a git repository without a worktree location', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const featureDir = join(projectRoot, 'docs', 'scifi', 'specs', 'local-feature');
+    await mkdir(featureDir, { recursive: true });
+    await writeFile(
+      join(featureDir, '.scifi.json'),
+      JSON.stringify({
+        version: 1,
+        slug: 'local-feature',
+        status: 'created',
+        createdAt: '2026-06-11T00:00:00Z',
+        updatedAt: '2026-06-11T00:00:00Z',
+      }),
+      'utf8',
+    );
+
+    const { stdout } = await runStatus(['local-feature', '--json']);
+
+    const parsed = JSON.parse(stdout);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.data.slug).toBe('local-feature');
+    expect(parsed.data.location).toBe('local');
+  });
 });

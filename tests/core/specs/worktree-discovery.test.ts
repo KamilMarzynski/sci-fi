@@ -60,6 +60,15 @@ describe('parseGitWorktreeList', () => {
     ]);
   });
 
+  it('marks the project root worktree as current when cwd is a subdirectory', () => {
+    const projectRoot = '/project';
+    const output = `worktree /project\nHEAD abcdef\nbranch refs/heads/main\n\n`;
+
+    const worktrees = parseGitWorktreeList(output, projectRoot, '/project/src/nested');
+
+    expect(worktrees).toEqual([{ path: '/project', isCurrent: true }]);
+  });
+
   it('returns an empty array for empty output', () => {
     const worktrees = parseGitWorktreeList('', '/project', '/project');
     expect(worktrees).toEqual([]);

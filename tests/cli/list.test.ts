@@ -17,6 +17,47 @@ afterEach(async () => {
   temporaryDirectories.length = 0;
 });
 
+async function writeFeatureMetadata(
+  projectRoot: string,
+  slug: string,
+  status: string,
+): Promise<void> {
+  const specsDir = join(projectRoot, 'docs', 'scifi', 'specs');
+  await mkdir(join(specsDir, slug), { recursive: true });
+  await writeFile(
+    join(specsDir, slug, '.scifi.json'),
+    `${JSON.stringify(
+      {
+        version: 1,
+        slug,
+        status,
+        createdAt: '2026-05-20T00:00:00Z',
+        updatedAt: '2026-05-20T00:00:00Z',
+      },
+      null,
+      2,
+    )}\n`,
+    'utf8',
+  );
+}
+
+async function captureStdout(args: string[]): Promise<string> {
+  const output: string[] = [];
+  const originalWrite = process.stdout.write.bind(process.stdout);
+  process.stdout.write = (chunk: string | Uint8Array): boolean => {
+    if (typeof chunk === 'string') output.push(chunk);
+    return true;
+  };
+
+  try {
+    await buildProgram().parseAsync(['node', 'scifi', ...args]);
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+
+  return output.join('');
+}
+
 describe('list command', () => {
   it('prints all features when no filter applied', async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
@@ -303,5 +344,88 @@ describe('list command', () => {
     expect(userAuthLine?.split('\t')).toContain('local');
     expect(paymentFlowLine?.split('\t')).toContain(`worktree:${await realpath(worktreeRoot)}`);
     expect(paymentFlowLine?.split('\t')[2]).toBe('-');
+  });
+
+  it('succeeds outside a git repository and shows only local features', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    await writeFeatureMetadata(projectRoot, 'user-auth', 'created');
+
+    const combined = await captureStdout(['list']);
+    expect(combined).toContain('user-auth');
+    expect(combined).toContain('local');
+    expect(combined).not.toContain('worktree:');
+  });
+
+  it('falls back to local-only output when git worktree list fails', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
+    const fakeBinDir = await mkdtemp(join(tmpdir(), 'scifi-list-fake-bin-'));
+    temporaryDirectories.push(projectRoot, fakeBinDir);
+    process.chdir(projectRoot);
+
+    await writeFile(
+      join(fakeBinDir, 'git'),
+      '#!/bin/sh\necho "fake git failure" >&2\nexit 1\n',
+      'utf8',
+    );
+    await execFileAsync('chmod', ['+x', join(fakeBinDir, 'git')]);
+    await writeFeatureMetadata(projectRoot, 'user-auth', 'created');
+
+    const previousPath = process.env.PATH;
+    process.env.PATH = `${fakeBinDir}:${process.env.PATH ?? ''}`;
+
+    let combined: string;
+    try {
+      combined = await captureStdout(['list']);
+    } finally {
+      process.env.PATH = previousPath;
+    }
+
+    expect(combined).toContain('user-auth');
+    expect(combined).toContain('local');
+    expect(combined).not.toContain('worktree:');
+  });
+
+  it('does not duplicate a local feature when the current checkout is included in git worktree list', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
+    const worktreeRoot = join(projectRoot, '.worktrees', 'feat-other');
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    await execFileAsync('git', ['init'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.email', 'test@example.com'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.name', 'Test User'], { cwd: projectRoot });
+
+    const mainSpecsDir = join(projectRoot, 'docs', 'scifi', 'specs');
+    await mkdir(join(mainSpecsDir, 'user-auth'), { recursive: true });
+    await writeFile(
+      join(mainSpecsDir, 'user-auth', '.scifi.json'),
+      `${JSON.stringify(
+        {
+          version: 1,
+          slug: 'user-auth',
+          status: 'created',
+          createdAt: '2026-05-20T00:00:00Z',
+          updatedAt: '2026-05-20T00:00:00Z',
+        },
+        null,
+        2,
+      )}\n`,
+      'utf8',
+    );
+    await execFileAsync('git', ['add', '.'], { cwd: projectRoot });
+    await execFileAsync('git', ['commit', '-m', 'initial'], { cwd: projectRoot });
+
+    await execFileAsync('git', ['worktree', 'add', '-b', 'feat/other', worktreeRoot], {
+      cwd: projectRoot,
+    });
+
+    const combined = await captureStdout(['list']);
+    const lines = combined.split('\n').filter((l) => l.includes('user-auth'));
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.split('\t')).toContain('local');
+    expect(lines[0]?.split('\t')).not.toContain(`worktree:${await realpath(projectRoot)}`);
   });
 });
