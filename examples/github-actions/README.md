@@ -137,7 +137,8 @@ custom App) and pass its token as `github_token` instead of the default
   adjust both for other conventions.
 - No retry/backoff on API errors beyond the turn cap.
 - Assumes the project's verification harness installs and runs on a stock
-  `ubuntu-latest` Node 20 runner — add system deps as your project needs.
+  `ubuntu-latest` Node 22 runner — add system deps as your project needs.
+  (scifi declares `node >=22`; the workflow pins Node 22 for that reason.)
 - **Unverified end to end.** The pieces are individually sound (the detect
   script is tested) and the building blocks are supported — headless runs,
   `/goal`, and nested subagents (≥ 2.1.172) are all documented, first-class

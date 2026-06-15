@@ -49,10 +49,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install scifi
-        run: npm install -g scifi
+        run: npm install -g @kamilmarzynski/scifi
 
       - name: Find plan-ready slugs
         id: find
@@ -87,12 +87,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       # scifi must be on PATH for the skill's CLI calls (scifi start/status/...);
       # the Claude runtime itself is provided by the action below.
       - name: Install scifi
-        run: npm install -g scifi
+        run: npm install -g @kamilmarzynski/scifi
 
       - name: Configure git identity
         run: |

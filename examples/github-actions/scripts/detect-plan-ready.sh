@@ -26,9 +26,11 @@ changed_slugs="$(
 
 while IFS= read -r slug; do
   [ -z "$slug" ] && continue
-  # `scifi status` exits non-zero for unknown slugs (e.g. a dir deleted in the
-  # range). The `|| true` keeps `set -e -o pipefail` from killing the loop on it.
-  status="$(scifi status "$slug" --json 2>/dev/null | jq -r '.status // empty' || true)"
+  # `scifi status --json` wraps its payload in a `{ ok, data }` envelope, so the
+  # lifecycle status is at `.data.status`. `scifi status` also exits non-zero for
+  # unknown slugs (e.g. a dir deleted in the range); the `|| true` keeps
+  # `set -e -o pipefail` from killing the loop on it.
+  status="$(scifi status "$slug" --json 2>/dev/null | jq -r '.data.status // empty' || true)"
   if [ "$status" = "plan-ready" ]; then
     printf '%s\n' "$slug"
   fi
