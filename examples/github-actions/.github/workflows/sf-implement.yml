@@ -117,9 +117,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLUG: ${{ matrix.slug }}
         run: |
-          # The goal directive overrides sf-implement's interactive "ask the human"
-          # path with CI-safe behaviour (draft PR on blocker). See ci-goal.md.
-          claude -p "/sf-implement $SLUG" \
+          # Two complementary mechanisms:
+          #  * /goal sets the completion condition and keeps Claude working
+          #    across turns until a fast model confirms it holds — a single
+          #    `-p` run would otherwise return after the first turn. The
+          #    evaluator only reads the transcript, so the condition is phrased
+          #    around what the agent surfaces (the `scifi status` output).
+          #  * ci-goal.md (appended system prompt) carries the *behaviour*:
+          #    branch rules, never ask a human, draft-PR-on-blocker.
+          condition="Drive the scifi feature \"$SLUG\" to completion by running /sf-implement $SLUG. \
+          Done when the transcript shows \`scifi status $SLUG --json\` reporting status \"done\" with a ready PR open, \
+          OR a critical blocker forced a [blocked] draft PR that documents it. Stop after 400 turns."
+          claude -p "/goal $condition" \
             --append-system-prompt "$(cat examples/github-actions/ci-goal.md)" \
             --permission-mode bypassPermissions \
             --max-turns 400

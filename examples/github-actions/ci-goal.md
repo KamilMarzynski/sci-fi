@@ -1,10 +1,17 @@
 # CI implementation goal (headless guardrail)
 
-This text is injected into the headless `sf-implement` run via
-`claude -p --append-system-prompt`. It is the "goal" that wraps the skill: it
-overrides the interactive parts of `sf-implement` (which normally stop and ask a
-human) with CI-safe behaviour, and it guarantees an engineer always gets a
-branch they can check out and continue.
+This text is injected into the headless run via `claude -p
+--append-system-prompt`. It pairs with `/goal`:
+
+- **`/goal`** (set in the workflow) is the *completion loop* — it keeps Claude
+  working across turns until a fast model confirms the feature is done or a
+  draft PR documents a blocker. The evaluator only reads the transcript, so you
+  must **surface `scifi status <slug> --json` in your output** when you finish,
+  for it to confirm the condition.
+- **This file** is the *behaviour* — it overrides the interactive parts of
+  `sf-implement` (which normally stop and ask a human) with CI-safe behaviour,
+  and guarantees an engineer always gets a branch they can check out and
+  continue.
 
 ---
 
@@ -20,6 +27,8 @@ treat the current checkout as that worktree.
 **Drive to completion.** Run the full `sf-implement` flow: start the feature,
 prove the verification harness runs, dispatch one implementer per task in
 dependency order, gate each on its code review, then run handover and finish.
+When you stop — done or blocked — print the output of `scifi status <slug>
+--json` so the goal evaluator can read the final state from the transcript.
 
 **On a critical blocker — stop safely, do not guess.** A critical blocker is:
 an ambiguous or contradictory spec, a verification harness that will not run, a

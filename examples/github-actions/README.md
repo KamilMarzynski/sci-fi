@@ -37,13 +37,24 @@ the result behind a normal PR review.
 Copy them into the target repo (keep `ci-goal.md` and `scripts/` next to the
 workflow, or adjust the paths the workflow references).
 
-## The goal directive (`ci-goal.md`)
+## `/goal` + the behaviour directive (`ci-goal.md`)
 
-`sf-implement` is built to **stop and ask a human** on an ambiguous spec, a
-broken harness, or a wrong plan. Headless in CI there is no human, so the run
-would otherwise either hang or guess.
+Two complementary mechanisms wrap the skill. Both run in the single headless
+`claude -p` invocation in the workflow's *Run sf-implement headlessly* step.
 
-`ci-goal.md` is injected as an appended system prompt and overrides that path:
+**`/goal` — the completion loop.** A plain `claude -p "/sf-implement <slug>"`
+returns after the first turn. `/goal` sets a completion condition and a fast
+model re-checks it after every turn; until it holds, Claude keeps working. The
+workflow sets the condition to "feature reports `done` with a ready PR, or a
+`[blocked]` draft PR documents the blocker; stop after N turns." Because the
+evaluator **only reads the transcript** (it does not run commands), the agent
+must surface `scifi status <slug> --json` in its output — `ci-goal.md` tells it
+to.
+
+**`ci-goal.md` — the behaviour.** `sf-implement` is built to **stop and ask a
+human** on an ambiguous spec, a broken harness, or a wrong plan. Headless there
+is no human. Injected as an appended system prompt, this file overrides that
+path:
 
 - never pause for input; you are already on the right branch (don't make a
   worktree);
@@ -51,10 +62,7 @@ would otherwise either hang or guess.
   PR** that documents the blocker and how to continue;
 - on clean completion, finish and open a ready PR.
 
-This is the robust form of "wrap `sf-implement` with a goal" — a standing
-instruction the agent carries for the whole run, not a one-off message. (There
-is no built-in `/goal` command in Claude Code; `--append-system-prompt` is the
-supported mechanism.)
+So `/goal` decides *when to stop*; `ci-goal.md` decides *how to behave*.
 
 ## Setup
 
@@ -65,6 +73,10 @@ supported mechanism.)
   the skill cannot load.
 - A `docs/scifi/HANDOVER.md` whose finishing actions push the branch and open
   the PR (the workflow's *Ensure a PR exists* step is only a safety net).
+- **`/goal` requires Claude Code ≥ 2.1.139, a trusted workspace, and hooks
+  enabled** (it is implemented as a session-scoped Stop hook). It is unavailable
+  under `disableAllHooks` or `allowManagedHooksOnly` — ensure neither is set in
+  the runner's settings, and that the checkout is trusted.
 
 **Secrets** (repo → Settings → Secrets and variables → Actions)
 
