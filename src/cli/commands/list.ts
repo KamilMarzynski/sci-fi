@@ -5,6 +5,7 @@ import { emitError, emitList, jsonMode } from '../../core/output/index.js';
 import { listFeatures } from '../../core/specs/list.js';
 import type { FeatureStatus } from '../../core/specs/types.js';
 import { FEATURE_STATUS_VALUES } from '../../core/specs/types.js';
+import { createGitWorktreeProvider } from '../../core/specs/worktree-discovery.js';
 
 export function registerListCommand(program: Command): void {
   program
@@ -22,7 +23,7 @@ export function registerListCommand(program: Command): void {
             ? (options.status as FeatureStatus)
             : undefined;
 
-        const listOptions = { projectRoot };
+        const listOptions = { projectRoot, worktreeProvider: createGitWorktreeProvider() };
         if (statusFilter !== undefined) {
           (listOptions as { status?: FeatureStatus }).status = statusFilter;
         }
@@ -30,18 +31,22 @@ export function registerListCommand(program: Command): void {
 
         const rows = await Promise.all(
           features.map(async (feature) => {
-            const openFixes = await listOpenFixes(projectRoot, feature.slug);
+            const openFixes =
+              feature.location === 'local'
+                ? await listOpenFixes(projectRoot, feature.metadata.slug)
+                : [];
             return {
-              slug: feature.slug,
-              status: feature.status,
+              slug: feature.metadata.slug,
+              status: feature.metadata.status,
               openFixes: openFixes.length,
-              title: feature.title ?? '',
+              title: feature.metadata.title ?? '',
+              location: feature.location,
             };
           }),
         );
 
         const humanLines = [
-          ['SLUG', 'STATUS', 'OPEN FIXES', 'TITLE'].join('\t'),
+          ['SLUG', 'STATUS', 'OPEN FIXES', 'LOCATION', 'TITLE'].join('\t'),
           ...rows.map((row) =>
             [
               row.slug,
@@ -49,6 +54,7 @@ export function registerListCommand(program: Command): void {
               row.openFixes > 0
                 ? `${row.openFixes} open fix${row.openFixes === 1 ? '' : 'es'}`
                 : '-',
+              row.location,
               row.title,
             ].join('\t'),
           ),

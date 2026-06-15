@@ -1,8 +1,12 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildProgram } from '../../src/cli/index.js';
+
+const execFileAsync = promisify(execFile);
 
 const temporaryDirectories: string[] = [];
 const originalWorkingDirectory = process.cwd();
@@ -220,5 +224,84 @@ describe('list command', () => {
     expect(lineNoFixes).toBeDefined();
     const noFixColumns = lineNoFixes?.split('\t');
     expect(noFixColumns[2]).toBe('-');
+  });
+
+  it('discovers features from linked git worktrees', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-list-cmd-'));
+    const worktreeRoot = join(projectRoot, '.worktrees', 'feat-other');
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    await execFileAsync('git', ['init'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.email', 'test@example.com'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.name', 'Test User'], { cwd: projectRoot });
+
+    const mainSpecsDir = join(projectRoot, 'docs', 'scifi', 'specs');
+    await mkdir(join(mainSpecsDir, 'user-auth'), { recursive: true });
+    await writeFile(
+      join(mainSpecsDir, 'user-auth', '.scifi.json'),
+      `${JSON.stringify(
+        {
+          version: 1,
+          slug: 'user-auth',
+          status: 'created',
+          createdAt: '2026-05-20T00:00:00Z',
+          updatedAt: '2026-05-20T00:00:00Z',
+        },
+        null,
+        2,
+      )}\n`,
+      'utf8',
+    );
+    await execFileAsync('git', ['add', '.'], { cwd: projectRoot });
+    await execFileAsync('git', ['commit', '-m', 'initial'], { cwd: projectRoot });
+
+    await execFileAsync('git', ['worktree', 'add', '-b', 'feat/other', worktreeRoot], {
+      cwd: projectRoot,
+    });
+
+    const worktreeSpecsDir = join(worktreeRoot, 'docs', 'scifi', 'specs', 'payment-flow');
+    await mkdir(worktreeSpecsDir, { recursive: true });
+    await writeFile(
+      join(worktreeSpecsDir, '.scifi.json'),
+      `${JSON.stringify(
+        {
+          version: 1,
+          slug: 'payment-flow',
+          status: 'spec-ready',
+          createdAt: '2026-05-20T00:00:00Z',
+          updatedAt: '2026-05-20T00:00:00Z',
+        },
+        null,
+        2,
+      )}\n`,
+      'utf8',
+    );
+
+    const output: string[] = [];
+    const originalWrite = process.stdout.write.bind(process.stdout);
+    process.stdout.write = (chunk: string | Uint8Array): boolean => {
+      if (typeof chunk === 'string') output.push(chunk);
+      return true;
+    };
+
+    try {
+      await buildProgram().parseAsync(['node', 'scifi', 'list']);
+    } finally {
+      process.stdout.write = originalWrite;
+    }
+
+    const combined = output.join('');
+    expect(combined).toContain('user-auth');
+    expect(combined).toContain('payment-flow');
+
+    const lines = combined.split('\n');
+    const userAuthLine = lines.find((l) => l.includes('user-auth'));
+    const paymentFlowLine = lines.find((l) => l.includes('payment-flow'));
+    expect(userAuthLine).toBeDefined();
+    expect(paymentFlowLine).toBeDefined();
+    expect(userAuthLine?.split('\t')).toContain('local');
+    expect(paymentFlowLine?.split('\t')).toContain(`worktree:${await realpath(worktreeRoot)}`);
+    expect(paymentFlowLine?.split('\t')[2]).toBe('-');
   });
 });

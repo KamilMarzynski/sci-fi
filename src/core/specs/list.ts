@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { buildFeatureMetadataPath, buildFeaturesRootPath } from './paths.js';
-import type { FeatureMetadata, FeatureStatus } from './types.js';
+import type { FeatureListItem, FeatureMetadata, FeatureStatus } from './types.js';
+import type { WorktreeProvider } from './worktree-discovery.js';
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
@@ -23,13 +24,7 @@ function isValidFeatureMetadata(value: unknown): value is FeatureMetadata {
   );
 }
 
-export interface ListFeaturesOptions {
-  projectRoot: string;
-  status?: FeatureStatus;
-}
-
-export async function listFeatures(options: ListFeaturesOptions): Promise<FeatureMetadata[]> {
-  const { projectRoot, status } = options;
+async function loadFeatureMetadata(projectRoot: string): Promise<FeatureMetadata[]> {
   const specsRoot = buildFeaturesRootPath(projectRoot);
 
   const entries = await readdir(specsRoot, { withFileTypes: true }).catch((error: unknown) => {
@@ -48,10 +43,60 @@ export async function listFeatures(options: ListFeaturesOptions): Promise<Featur
     }),
   );
 
-  const features = allResults.filter((m): m is FeatureMetadata => m !== null);
+  return allResults.filter((m): m is FeatureMetadata => m !== null);
+}
+
+async function loadFeaturesFromWorktree(
+  _projectRoot: string,
+  worktreePath: string,
+): Promise<FeatureListItem[]> {
+  const metadata = await loadFeatureMetadata(worktreePath);
+  return metadata.map((item) => ({ metadata: item, location: `worktree:${worktreePath}` }));
+}
+
+export interface ListFeaturesOptions {
+  projectRoot: string;
+  status?: FeatureStatus;
+  worktreeProvider?: WorktreeProvider;
+}
+
+export async function listFeatures(options: ListFeaturesOptions): Promise<FeatureListItem[]> {
+  const { projectRoot, status, worktreeProvider } = options;
+
+  const localMetadata = await loadFeatureMetadata(projectRoot);
+  const merged = new Map<string, FeatureListItem>();
+  for (const metadata of localMetadata) {
+    merged.set(metadata.slug, { metadata, location: 'local' });
+  }
+
+  if (worktreeProvider !== undefined) {
+    const worktrees = await worktreeProvider.discover(projectRoot);
+    for (const worktree of worktrees) {
+      if (worktree.isCurrent) continue;
+      const features = await loadFeaturesFromWorktree(projectRoot, worktree.path);
+      for (const feature of features) {
+        const existing = merged.get(feature.metadata.slug);
+        if (existing === undefined) {
+          merged.set(feature.metadata.slug, feature);
+          continue;
+        }
+        if (existing.location !== 'local') {
+          const existingPath = existing.location.slice('worktree:'.length);
+          const candidatePath = feature.location.slice('worktree:'.length);
+          if (candidatePath < existingPath) {
+            merged.set(feature.metadata.slug, feature);
+          }
+        }
+      }
+    }
+  }
+
+  let features = [...merged.values()].sort((a, b) =>
+    a.metadata.slug.localeCompare(b.metadata.slug),
+  );
 
   if (status !== undefined) {
-    return features.filter((f) => f.status === status);
+    features = features.filter((f) => f.metadata.status === status);
   }
 
   return features;
