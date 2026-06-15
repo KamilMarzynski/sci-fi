@@ -1,8 +1,9 @@
 # Autonomous implementation of plan-ready scifi features.
 #
 # When a spec is merged to the default branch at lifecycle status `plan-ready`,
-# this workflow opens a branch, runs `sf-implement` headlessly via Claude Code,
-# and leaves a pull request (draft if the run hit a blocker, ready if clean).
+# this workflow opens a branch, runs `sf-implement` headlessly via the official
+# anthropics/claude-code-action, and leaves a pull request (draft if the run hit
+# a blocker, ready if clean).
 #
 # This is a REFERENCE example, not a hardened pipeline. Read the README before
 # enabling it on a real repository — in particular the permission-bypass and
@@ -88,8 +89,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install scifi and Claude Code
-        run: npm install -g scifi @anthropic-ai/claude-code
+      # scifi must be on PATH for the skill's CLI calls (scifi start/status/...);
+      # the Claude runtime itself is provided by the action below.
+      - name: Install scifi
+        run: npm install -g scifi
 
       - name: Configure git identity
         run: |
@@ -109,28 +112,37 @@ jobs:
           git checkout -b "$branch"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
-      - name: Run sf-implement headlessly
+      # Run sf-implement headlessly via the official action. It runs the real
+      # Claude Code engine — so project skills (.claude/skills) and hooks both
+      # load, which is what /goal (a Stop hook) and /sf-implement need — and it
+      # handles the headless trust/permission environment that a hand-rolled
+      # `claude -p` does not.
+      #
+      # Two complementary mechanisms:
+      #  * /goal (the prompt) is the completion loop: a fast model re-checks the
+      #    condition after every turn and keeps Claude working until it holds.
+      #    The evaluator only reads the transcript, so the condition is phrased
+      #    around what the agent surfaces (the `scifi status` output).
+      #  * ci-goal.md (appended system prompt) carries the behaviour: branch
+      #    rules, never ask a human, draft-PR-on-blocker.
+      - name: Run sf-implement (Claude Code Action)
         if: steps.branch.outputs.skip != 'true'
+        uses: anthropics/claude-code-action@v1
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # gh (used by HANDOVER.md / the goal directive) reads this for PR creation.
+          # The skill's `gh pr create` (HANDOVER.md) reads this from the env.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLUG: ${{ matrix.slug }}
-        run: |
-          # Two complementary mechanisms:
-          #  * /goal sets the completion condition and keeps Claude working
-          #    across turns until a fast model confirms it holds — a single
-          #    `-p` run would otherwise return after the first turn. The
-          #    evaluator only reads the transcript, so the condition is phrased
-          #    around what the agent surfaces (the `scifi status` output).
-          #  * ci-goal.md (appended system prompt) carries the *behaviour*:
-          #    branch rules, never ask a human, draft-PR-on-blocker.
-          condition="Drive the scifi feature \"$SLUG\" to completion by running /sf-implement $SLUG. \
-          Done when the transcript shows \`scifi status $SLUG --json\` reporting status \"done\" with a ready PR open, \
-          OR a critical blocker forced a [blocked] draft PR that documents it. Stop after 400 turns."
-          claude -p "/goal $condition" \
-            --append-system-prompt "$(cat examples/github-actions/ci-goal.md)" \
-            --permission-mode bypassPermissions \
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: >-
+            /goal Drive the scifi feature "${{ matrix.slug }}" to completion by
+            running /sf-implement ${{ matrix.slug }}. Done when the transcript
+            shows `scifi status ${{ matrix.slug }} --json` reporting status
+            "done" with a ready PR open, OR a critical blocker forced a [blocked]
+            draft PR that documents it. Stop after 400 turns.
+          claude_args: |
+            --append-system-prompt-file examples/github-actions/ci-goal.md
+            --permission-mode bypassPermissions
             --max-turns 400
 
       # Safety net: if the agent committed work but never opened a PR (crash,

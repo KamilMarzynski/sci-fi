@@ -18,8 +18,8 @@ the result behind a normal PR review.
 2. On push to `main`, `detect-plan-ready.sh` diffs the merged range, finds
    feature slugs whose files changed, and keeps the ones `scifi status` reports
    as `plan-ready`.
-3. For each, the workflow cuts a `sf-impl/<slug>` branch and runs
-   `claude -p "/sf-implement <slug>"` headlessly.
+3. For each, the workflow cuts a `sf-impl/<slug>` branch and runs `sf-implement`
+   headlessly via the official `anthropics/claude-code-action`.
 4. The run drives the full TDD + per-task code-review + handover pipeline and
    opens a PR back to `main`:
    - **clean run →** ready (non-draft) PR per `docs/scifi/HANDOVER.md`;
@@ -32,24 +32,26 @@ the result behind a normal PR review.
 | --- | --- |
 | `.github/workflows/sf-implement.yml` | The workflow: detect → branch → run → ensure PR. |
 | `scripts/detect-plan-ready.sh` | Diffs the merged range, prints `plan-ready` slugs. |
-| `ci-goal.md` | The headless guardrail injected via `--append-system-prompt`. |
+| `ci-goal.md` | The headless guardrail injected via `--append-system-prompt-file`. |
 
 Copy them into the target repo (keep `ci-goal.md` and `scripts/` next to the
 workflow, or adjust the paths the workflow references).
 
 ## `/goal` + the behaviour directive (`ci-goal.md`)
 
-Two complementary mechanisms wrap the skill. Both run in the single headless
-`claude -p` invocation in the workflow's *Run sf-implement headlessly* step.
+Two complementary mechanisms wrap the skill. Both are passed to the
+`anthropics/claude-code-action` step — `/goal …` as the `prompt`, `ci-goal.md`
+via `claude_args: --append-system-prompt-file`. The action runs the real Claude
+Code engine, so project skills *and* hooks load (both are required: `/goal` is a
+hook and `/sf-implement` is a skill).
 
-**`/goal` — the completion loop.** A plain `claude -p "/sf-implement <slug>"`
-returns after the first turn. `/goal` sets a completion condition and a fast
-model re-checks it after every turn; until it holds, Claude keeps working. The
-workflow sets the condition to "feature reports `done` with a ready PR, or a
-`[blocked]` draft PR documents the blocker; stop after N turns." Because the
-evaluator **only reads the transcript** (it does not run commands), the agent
-must surface `scifi status <slug> --json` in its output — `ci-goal.md` tells it
-to.
+**`/goal` — the completion loop.** A plain one-shot run returns after the first
+turn. `/goal` sets a completion condition and a fast model re-checks it after
+every turn; until it holds, Claude keeps working. The workflow sets the
+condition to "feature reports `done` with a ready PR, or a `[blocked]` draft PR
+documents the blocker; stop after N turns." Because the evaluator **only reads
+the transcript** (it does not run commands), the agent must surface
+`scifi status <slug> --json` in its output — `ci-goal.md` tells it to.
 
 **`ci-goal.md` — the behaviour.** `sf-implement` is built to **stop and ask a
 human** on an ambiguous spec, a broken harness, or a wrong plan. Headless there
@@ -73,21 +75,24 @@ So `/goal` decides *when to stop*; `ci-goal.md` decides *how to behave*.
   the skill cannot load.
 - A `docs/scifi/HANDOVER.md` whose finishing actions push the branch and open
   the PR (the workflow's *Ensure a PR exists* step is only a safety net).
-- **`/goal` requires Claude Code ≥ 2.1.139, a trusted workspace, and hooks
-  enabled** (it is implemented as a session-scoped Stop hook). It is unavailable
-  under `disableAllHooks` or `allowManagedHooksOnly` — ensure neither is set in
-  the runner's settings, and that the checkout is trusted.
+- **`/goal` requires hooks enabled** (it is a session-scoped Stop hook) — do not
+  set `disableAllHooks`, and in managed settings do not set
+  `allowManagedHooksOnly`. The `anthropics/claude-code-action` provides the
+  trusted headless runtime that `/goal` needs; a hand-rolled `npm -g` +
+  `claude -p` would additionally have to solve the folder-trust dialog, which is
+  why this example uses the action. The action's pinned engine must be a build
+  that ships `/goal` (≥ 2.1.139).
 
 **Secrets** (repo → Settings → Secrets and variables → Actions)
 
 | Secret | Purpose |
 | --- | --- |
-| `ANTHROPIC_API_KEY` | Authenticates the headless Claude Code run. |
+| `ANTHROPIC_API_KEY` | Authenticates the action's Claude run (passed as the `anthropic_api_key` input). |
 | `GITHUB_TOKEN` | Provided automatically; the workflow grants it `contents: write` + `pull-requests: write` for branch push and PR creation. |
 
-To let the bot's PRs trigger your normal CI, use a PAT / GitHub App token
-instead of the default `GITHUB_TOKEN` (default-token pushes don't trigger
-further workflow runs).
+To let the bot's PRs trigger your normal CI, install the Claude GitHub App (or a
+custom App) and pass its token as `github_token` instead of the default
+`GITHUB_TOKEN` — default-token pushes don't trigger further workflow runs.
 
 ## Blast radius — read before enabling
 
@@ -113,3 +118,9 @@ further workflow runs).
 - No retry/backoff on API errors beyond the turn cap.
 - Assumes the project's verification harness installs and runs on a stock
   `ubuntu-latest` Node 20 runner — add system deps as your project needs.
+- **Unverified end to end.** The pieces are individually sound (the detect
+  script is tested), but the full action + `/goal` + nested-subagent
+  `sf-implement` run has not been executed on a live runner. Validate on a
+  throwaway repo before trusting it. The likeliest first failure is `/goal`
+  evaluation or the per-task reviewer falling back to `REVIEW_UNAVAILABLE`
+  because a subagent cannot spawn another subagent.

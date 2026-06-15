@@ -1,19 +1,11 @@
-# CI implementation goal (headless guardrail)
-
-This text is injected into the headless run via `claude -p
---append-system-prompt`. It pairs with `/goal`:
-
-- **`/goal`** (set in the workflow) is the *completion loop* — it keeps Claude
-  working across turns until a fast model confirms the feature is done or a
-  draft PR documents a blocker. The evaluator only reads the transcript, so you
-  must **surface `scifi status <slug> --json` in your output** when you finish,
-  for it to confirm the condition.
-- **This file** is the *behaviour* — it overrides the interactive parts of
-  `sf-implement` (which normally stop and ask a human) with CI-safe behaviour,
-  and guarantees an engineer always gets a branch they can check out and
-  continue.
-
----
+<!--
+  CI implementation guardrail. Injected verbatim as the appended system prompt
+  via `claude_args: --append-system-prompt-file` (see the workflow). It pairs
+  with `/goal`: /goal is the completion loop (keep working until done or a draft
+  PR documents a blocker); this file is the behaviour. Keep it directive-only —
+  everything below the comment is sent to the model. The README explains the
+  design.
+-->
 
 You are running **headless in CI**. There is no human available to answer
 questions. Never pause to ask "should I continue?" and never wait for input.
