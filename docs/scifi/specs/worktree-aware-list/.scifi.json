@@ -2,9 +2,9 @@
   "version": 1,
   "slug": "worktree-aware-list",
   "title": "Global in-flight feature list via worktree discovery",
-  "status": "spec-ready",
+  "status": "plan-ready",
   "createdAt": "2026-06-14T16:35:15.200Z",
-  "updatedAt": "2026-06-15T06:15:19.005Z",
+  "updatedAt": "2026-06-15T08:03:24.138Z",
   "branch": "feat/worktree-aware-list",
   "worktreePath": ".worktrees/feat-worktree-aware-list"
 }
