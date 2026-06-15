@@ -109,11 +109,25 @@ harness that will not run — the skill already hard-stops on itself. But three 
 its assumptions need the prompt's help, which is why `LOCAL_IMPL_LOOP.md` is more
 than "run `/sf-implement`":
 
-- **It expects to start inside the feature's worktree.** The skill confirms it is
-  inside the worktree `sf-feature` created (via the `worktree` path from
-  `scifi status`); it does **not** create one. The loop session sits on `main`, so
-  the dispatched subagent is told to read that path and `cd` into it first (and
-  recreate it if it is gone) before running `/sf-implement`.
+- **It expects to start inside the feature's worktree, and the recorded path may
+  not be local.** The skill confirms it is inside the worktree `sf-feature`
+  created, reading the `worktree` path from `scifi status`; it does **not** create
+  one. That path is recorded with `scifi worktree set` at authoring time and
+  **committed into the spec**, so it points at the machine where the spec was
+  written — it only exists here if this is that machine. The dispatched subagent
+  is therefore told to `cd` into the recorded worktree when it exists, and
+  otherwise create one for the feature branch on this machine
+  (`git worktree add` + `scifi worktree set`) before running `/sf-implement` —
+  never to work in the `main` checkout.
+
+  > **This is a current limitation worth stating plainly.** scifi records an
+  > absolute worktree path so the *local* author gets seamless resume
+  > (`sf-continue` lands back in the same worktree). The cost is that any *other*
+  > machine — this loop on a teammate's merge, or the CI runner in the sibling
+  > example — must not trust that path and has to re-establish a worktree itself.
+  > Until scifi resolves the worktree relative to the current checkout, every
+  > autonomous, off-author-machine setup has to account for this explicitly, as
+  > this prompt does.
 - **Handover has a second ask-the-human gate.** When handover finds untracked
   workflow artifacts (the spec dir, new ADRs, `CONTEXT.md` edits) it asks the user
   how to handle each. Unattended there is no user, so the prompt sets a default:

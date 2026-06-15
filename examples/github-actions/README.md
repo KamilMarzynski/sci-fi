@@ -60,11 +60,25 @@ path:
 
 - never pause for input; you are already on the right branch (don't make a
   worktree);
+- **ignore the recorded worktree path** (see the note below) and treat the
+  checkout as the feature's worktree;
 - on a critical blocker, **stop, commit what is safely done, and open a draft
   PR** that documents the blocker and how to continue;
 - on clean completion, finish and open a ready PR.
 
 So `/goal` decides *when to stop*; `ci-goal.md` decides *how to behave*.
+
+> **Worktree note — a current limitation worth stating plainly.** `sf-implement`
+> expects to start inside the worktree `sf-feature` created, reading its path
+> from `scifi status <slug> --json`. scifi records that path with
+> `scifi worktree set` at authoring time and **commits it into the spec**, so on
+> the merged branch it points at the *author's machine* and does not exist on the
+> runner. `ci-goal.md` tells the agent to ignore it and use the checkout the
+> workflow already prepared on the `sf-impl/<slug>` branch. The recorded path
+> exists to give the local author a seamless `sf-continue`; the cost is that any
+> off-author machine — this runner, or the local `/loop` example on a teammate's
+> merge — must not trust it. Until scifi resolves the worktree relative to the
+> current checkout, autonomous setups have to handle this explicitly.
 
 ## Setup
 

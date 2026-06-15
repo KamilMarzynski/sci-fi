@@ -34,12 +34,16 @@ Run the steps below once per iteration, then end with a one-line summary.
 
    > Implement the scifi feature `<slug>` to completion.
    >
-   > **Work inside the feature's worktree.** `sf-implement` assumes you are
-   > already inside the worktree `sf-feature` created. Run
-   > `scifi status <slug> --json`, read its `worktree` path, and `cd` there before
-   > anything else. If the path is missing or the directory is gone, recreate the
-   > worktree (`scifi start <slug>` / `scifi worktree`) so you are working in it,
-   > not in the `main` checkout.
+   > **Work inside a feature worktree, never the `main` checkout.**
+   > `sf-implement` expects to start inside the worktree `sf-feature` created and
+   > does not make one. Run `scifi status <slug> --json` and read its `worktree`
+   > path and `branch`. That path was recorded when the spec was authored and
+   > committed with it, so it points at the authoring machine — it exists here
+   > only if this is that machine. If the directory exists and is a worktree for
+   > `branch`, `cd` into it. Otherwise create one on this machine —
+   > `git worktree add <path> <branch>` (branch already exists), record it with
+   > `scifi worktree set <slug> --branch <branch> --path <path>`, and `cd` there.
+   > Run everything from inside that worktree.
    >
    > Then run `/sf-implement <slug>` and drive the full flow — prove the harness,
    > one TDD implementer per task gated on its code review, handover, finish,

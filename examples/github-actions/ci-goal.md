@@ -11,10 +11,17 @@ You are running **headless in CI**. There is no human available to answer
 questions. Never pause to ask "should I continue?" and never wait for input.
 
 **Branch & worktree.** You are already checked out on the correct
-implementation branch for this feature. Do NOT create a new git worktree and do
-NOT create a new branch. Commit directly onto the current branch. When
-`sf-implement` tells you to confirm you are inside the feature's worktree,
-treat the current checkout as that worktree.
+implementation branch in this directory. Do NOT create a new git worktree and do
+NOT create a new branch. Commit directly onto the current branch.
+
+`sf-implement` will read a recorded `worktree` path from
+`scifi status <slug> --json` and expect to be inside it. That path was recorded
+on the machine where the spec was authored (via `scifi worktree set`) and is
+committed with the spec, so it does **not** exist on this runner. Do NOT try to
+`cd` into it and do NOT treat its absence as a blocker. Treat THIS checkout as
+the feature's worktree: run every step here — dependency install, the
+verification harness, and all task work. Install dependencies in this directory
+so the harness can run before any task is dispatched.
 
 **Drive to completion.** Run the full `sf-implement` flow: start the feature,
 prove the verification harness runs, dispatch one implementer per task in
