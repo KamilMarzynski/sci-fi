@@ -7,6 +7,16 @@ function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
+function worktreePathFromLocation(location: `worktree:${string}`): string {
+  return location.slice('worktree:'.length);
+}
+
+function isWorktreeLocation(
+  location: FeatureListItem['location'],
+): location is `worktree:${string}` {
+  return location !== 'local';
+}
+
 function isValidFeatureMetadata(value: unknown): value is FeatureMetadata {
   if (typeof value !== 'object' || value === null) return false;
   const obj = value as Record<string, unknown>;
@@ -50,8 +60,12 @@ async function loadFeaturesFromWorktree(
   _projectRoot: string,
   worktreePath: string,
 ): Promise<FeatureListItem[]> {
-  const metadata = await loadFeatureMetadata(worktreePath);
-  return metadata.map((item) => ({ metadata: item, location: `worktree:${worktreePath}` }));
+  try {
+    const metadata = await loadFeatureMetadata(worktreePath);
+    return metadata.map((item) => ({ metadata: item, location: `worktree:${worktreePath}` }));
+  } catch {
+    return [];
+  }
 }
 
 export interface ListFeaturesOptions {
@@ -80,9 +94,9 @@ export async function listFeatures(options: ListFeaturesOptions): Promise<Featur
           merged.set(feature.metadata.slug, feature);
           continue;
         }
-        if (existing.location !== 'local') {
-          const existingPath = existing.location.slice('worktree:'.length);
-          const candidatePath = feature.location.slice('worktree:'.length);
+        if (isWorktreeLocation(existing.location) && isWorktreeLocation(feature.location)) {
+          const existingPath = worktreePathFromLocation(existing.location);
+          const candidatePath = worktreePathFromLocation(feature.location);
           if (candidatePath < existingPath) {
             merged.set(feature.metadata.slug, feature);
           }

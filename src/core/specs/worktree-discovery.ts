@@ -26,7 +26,7 @@ export function parseGitWorktreeList(
   currentWorkingDirectory: string,
 ): LinkedWorktree[] {
   const lines = output.split('\n');
-  const worktrees: LinkedWorktree[] = [];
+  const candidates: LinkedWorktree[] = [];
 
   for (const line of lines) {
     if (!line.startsWith('worktree ')) continue;
@@ -35,13 +35,31 @@ export function parseGitWorktreeList(
     if (rawPath.length === 0) continue;
 
     const absolutePath = resolve(projectRoot, rawPath);
-    worktrees.push({
+    candidates.push({
       path: absolutePath,
       isCurrent: isAncestorOrSame(absolutePath, currentWorkingDirectory),
     });
   }
 
-  return worktrees;
+  const currentCandidates = candidates.filter((worktree) => worktree.isCurrent);
+  if (currentCandidates.length > 1) {
+    const deepest = currentCandidates.reduce((longest, worktree) =>
+      worktree.path.length > longest.path.length ? worktree : longest,
+    );
+    for (const worktree of candidates) {
+      worktree.isCurrent = worktree.path === deepest.path;
+    }
+  }
+
+  return candidates;
+}
+
+async function safeRealpath(inputPath: string): Promise<string | undefined> {
+  try {
+    return await realpath(inputPath);
+  } catch {
+    return undefined;
+  }
 }
 
 export function createGitWorktreeProvider(): WorktreeProvider {
@@ -54,12 +72,17 @@ export function createGitWorktreeProvider(): WorktreeProvider {
           cwd: resolvedRoot,
         });
         const parsed = parseGitWorktreeList(stdout, resolvedRoot, currentWorkingDirectory);
-        return await Promise.all(
-          parsed.map(async (worktree) => ({
-            path: await realpath(worktree.path),
-            isCurrent: worktree.isCurrent,
-          })),
+        const normalized = await Promise.all(
+          parsed.map(async (worktree) => {
+            const normalizedPath = await safeRealpath(worktree.path);
+            if (normalizedPath === undefined) return undefined;
+            return {
+              path: normalizedPath,
+              isCurrent: worktree.isCurrent,
+            };
+          }),
         );
+        return normalized.filter((worktree): worktree is LinkedWorktree => worktree !== undefined);
       } catch {
         return [];
       }
