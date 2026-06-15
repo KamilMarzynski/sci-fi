@@ -132,7 +132,7 @@ The other skills handle the situations that come up around the spine:
 **Inspect state any time** with the CLI directly:
 
 ```bash
-scifi list                 # all features, status, open-fix counts
+scifi list                 # all features, status, open-fix counts, location
 scifi status <slug>        # full inventory: artifacts, tasks, fixes
 scifi task list <slug>     # the task graph and each task's status
 ```
@@ -218,7 +218,7 @@ own context.
 | `scifi task list\|start\|done <slug> ...`  | Manage task status within a feature                 |
 | `scifi fix create\|resolve\|wont-fix ...`  | Manage tracked fixes (open fixes block `finish`)    |
 | `scifi finish <slug>`                      | `in-progress → done` (all tasks done, no open fixes)|
-| `scifi list [--status <s>]`                | List features                                       |
+| `scifi list [--status <s>]`                | List features across the current checkout and linked worktrees |
 | `scifi status <slug>`                      | Show a feature's full state                         |
 | `scifi worktree set <slug> --branch <b> --path <p>` | Record the branch + worktree backing a feature |
 

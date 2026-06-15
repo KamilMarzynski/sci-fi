@@ -20,18 +20,14 @@ should pick up.
   and will *not* appear in `scifi list` run from the default checkout). Match by
   slug and title. If one obviously fits, name it; if several could, present them
   and **confirm the pick with the user**. Never guess silently.
-- **Enter the feature's worktree before reading its state.** An in-flight
-  feature's `docs/scifi/specs/<slug>/.scifi.json` exists only on its `feat/<slug>`
-  branch — not in the default checkout. Run `git worktree list`; if
-  `.worktrees/feat-<slug>` (branch `feat/<slug>`) exists, enter it and read state
-  from there. Running `scifi status <slug>` from the default checkout would
-  otherwise report `NOT_FOUND` for a feature that is merely on another branch.
+- **Run `scifi status <slug>` anywhere.** The `location` field in the JSON output
+  tells you where to work: if `location` is `worktree:<path>`, enter that worktree,
+  then re-read state from there. An in-flight feature's `docs/scifi/specs/<slug>/.scifi.json`
+  exists only on its `feat/<slug>` branch — not in the default checkout.
 - Conclude the feature does **not** exist only when *both* hold: no `feat/<slug>`
   worktree exists **and** `scifi status <slug>` returns `NOT_FOUND` from a
   checkout that would contain it (e.g. the default branch for a merged feature).
-  Then say so and point the user at `sf-feature`. A `NOT_FOUND` while a matching
-  worktree exists just means you are in the wrong checkout — enter the worktree
-  and re-read; never route the user to start a new feature in that case.
+  Then say so and point the user at `sf-feature`.
 
 ### 2. Read the state
 

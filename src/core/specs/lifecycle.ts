@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { ScifiError } from '../output/errors.js';
 import { buildFeatureDirectoryPath, buildFeatureMetadataPath } from './paths.js';
 import type { FeatureMetadata, FeatureStatus } from './types.js';
+import type { WorktreeProvider } from './worktree-discovery.js';
 
 export interface FeatureArtifacts {
   specExists: boolean;
@@ -97,6 +98,49 @@ export async function inspectFeatureLifecycle(
       taskFileCount,
     },
   };
+}
+
+export interface ResolvedFeatureLifecycle {
+  lifecycle: FeatureLifecycle;
+  location: 'local' | `worktree:${string}`;
+}
+
+export async function resolveFeatureLifecycle(
+  projectRoot: string,
+  slug: string,
+  worktreeProvider?: WorktreeProvider,
+): Promise<ResolvedFeatureLifecycle> {
+  try {
+    const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
+    return { lifecycle, location: 'local' };
+  } catch (error) {
+    if (
+      !(error instanceof ScifiError) ||
+      error.code !== 'NOT_FOUND' ||
+      worktreeProvider === undefined
+    ) {
+      throw error;
+    }
+
+    const worktrees = await worktreeProvider.discover(projectRoot);
+    const fallbackWorktrees = worktrees
+      .filter((worktree) => !worktree.isCurrent)
+      .sort((a, b) => a.path.localeCompare(b.path));
+
+    for (const worktree of fallbackWorktrees) {
+      try {
+        const lifecycle = await inspectFeatureLifecycle(worktree.path, slug);
+        return { lifecycle, location: `worktree:${worktree.path}` };
+      } catch (fallbackError) {
+        if (fallbackError instanceof ScifiError && fallbackError.code === 'NOT_FOUND') {
+          continue;
+        }
+        throw fallbackError;
+      }
+    }
+
+    throw error;
+  }
 }
 
 interface ValidationContext {

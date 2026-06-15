@@ -24,3 +24,8 @@ export interface CreateFeatureMetadataInput {
   title?: string;
   createdAt: string;
 }
+
+export interface FeatureListItem {
+  metadata: FeatureMetadata;
+  location: 'local' | `worktree:${string}`;
+}

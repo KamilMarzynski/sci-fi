@@ -2,7 +2,11 @@ import { cwd } from 'node:process';
 import type { Command } from 'commander';
 import { listFixes } from '../../core/fixes/list.js';
 import { emitError, emitSuccess, jsonMode } from '../../core/output/index.js';
-import { inspectFeatureLifecycle } from '../../core/specs/lifecycle.js';
+import { resolveFeatureLifecycle } from '../../core/specs/lifecycle.js';
+import {
+  createGitWorktreeProvider,
+  worktreePathFromLocation,
+} from '../../core/specs/worktree-discovery.js';
 import { listTasks } from '../../core/tasks/list.js';
 
 export function registerStatusCommand(program: Command): void {
@@ -15,11 +19,17 @@ export function registerStatusCommand(program: Command): void {
       const json = jsonMode(command);
       try {
         const projectRoot = cwd();
-        const lifecycle = await inspectFeatureLifecycle(projectRoot, slug);
-        const tasks = await listTasks(projectRoot, slug);
-        const fixes = await listFixes(projectRoot, slug);
-
+        const resolved = await resolveFeatureLifecycle(
+          projectRoot,
+          slug,
+          createGitWorktreeProvider(),
+        );
+        const { lifecycle, location } = resolved;
         const { metadata, artifacts } = lifecycle;
+
+        const sourceRoot = location === 'local' ? projectRoot : worktreePathFromLocation(location);
+        const tasks = await listTasks(sourceRoot, slug);
+        const fixes = await listFixes(sourceRoot, slug);
 
         const data = {
           slug: metadata.slug,
@@ -27,6 +37,7 @@ export function registerStatusCommand(program: Command): void {
           status: metadata.status,
           ...(metadata.branch !== undefined && { branch: metadata.branch }),
           ...(metadata.worktreePath !== undefined && { worktree: metadata.worktreePath }),
+          location,
           artifacts: {
             spec: artifacts.specExists,
             design: artifacts.designExists,
@@ -46,6 +57,7 @@ export function registerStatusCommand(program: Command): void {
           `status:  ${metadata.status}`,
           ...(metadata.branch !== undefined ? [`branch:  ${metadata.branch}`] : []),
           ...(metadata.worktreePath !== undefined ? [`worktree: ${metadata.worktreePath}`] : []),
+          `location: ${location}`,
           ``,
           `spec.md:    ${artifacts.specExists ? 'present' : 'missing'}`,
           `design.md:  ${artifacts.designExists ? 'present' : 'missing'}`,

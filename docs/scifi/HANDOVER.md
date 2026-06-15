@@ -1,42 +1,25 @@
-# Handover: init-harness-checkboxes
+# Handover: worktree-aware-list
 
-## Installed-build verification
+## Final verification
 
-Verified against a freshly packed and installed build in `.testing/` per
-`TESTING.md`:
+Run the full automated suite and the installed-build e2e test for this feature:
 
-- `scifi init --harness claude-code --yes` succeeded and installed the
-  `claude-code` harness into `.claude/skills/`.
-- `scifi init --harness claude-code --harness cursor --yes` succeeded and installed
-  both harnesses into `.claude/skills/` and `.cursor/skills/`.
-- The e2e installed-init suite (`tests/e2e/installed-init.test.ts`) passes
-  unmodified (6/6 tests green).
+```bash
+npm run build
+npm test
+npm run check
+npm test tests/e2e/installed-worktree-discovery.test.ts
+```
 
-## Interactive `scifi init` verification
+All must pass.
 
-Ran `scifi init` with no flags against the installed build under an
-`expect`-driven pseudo-terminal. The picker rendered with all harnesses unchecked
-and the cursor on the first row, and the following sequences completed with the
-expected result:
+## Manual smoke test
 
-- **Select first harness:** `space` toggled `claude-code`, `enter` confirmed,
-  exit code 0, config recorded `claude-code`.
-- **Arrow wrap-around:** `up` from the first row moved the cursor to the last row
-  (`github-copilot`), `space` toggled it, `enter` confirmed, exit code 0, config
-  recorded `github-copilot` only.
-- **Multi-select:** `space` on `claude-code`, `down`, `space` on `opencode`,
-  `enter` confirmed, exit code 0, config recorded both `claude-code` and
-  `opencode`.
-- **Empty confirm re-prompts:** `enter` with no selection showed
-  `Please select at least one harness.`, then `space` + `enter` confirmed
-  `claude-code`, exit code 0.
-- **Abort with `Ctrl-C`:** `Ctrl-C` aborted, exit code non-zero, no config or
-  `.claude` directory was written, and the terminal emitted the cursor-show
-  sequence (`\x1b[?25h`).
-- **Abort with `Esc`:** `Esc` aborted, exit code non-zero, no config or
-  `.claude` directory was written, and the terminal emitted the cursor-show
-  sequence (`\x1b[?25h`).
+From a temporary git repository with the installed build:
 
-The terminal was restored after every run: the final output contained the
-`SHOW_CURSOR` ANSI sequence (`\x1b[?25h`) and no raw-mode residue was left in the
-output stream.
+1. On the default branch, create a scifi feature: `scifi spec local-feature --title "Local feature"`.
+2. Add a linked worktree on a feature branch: `git worktree add -b feat/other .worktrees/feat-other main`.
+3. Inside the worktree, create another feature: `scifi spec other-feature --title "Other feature"`.
+4. Return to the default branch and run `scifi list --json`. Both features must appear; `local-feature` with `location: local`, `other-feature` with `location: worktree:<absolute-path>`.
+5. Run `scifi status other-feature --json`. It must succeed and include `location: worktree:<absolute-path>` plus the real metadata from the worktree.
+6. Run `scifi status local-feature --json`. It must report `location: local`.
