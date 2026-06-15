@@ -50,10 +50,11 @@ keep going." Here:
 
 1. A reviewed spec reaches `plan-ready` locally and is merged to `main`.
 2. In a checkout of the repo, you start one long-lived Claude Code session and run
-   `/loop 10m` (with `.claude/loop.md` in place — see below).
+   `/loop 10m @LOCAL_IMPL_LOOP.md`.
 3. Each iteration the session pulls `main`, runs
    `scifi list --status plan-ready --json`, and for every plan-ready slug not
-   already in progress dispatches a subagent running `/sf-implement <slug>`.
+   already in progress dispatches a subagent. The subagent `cd`s into the
+   feature's worktree and runs `/sf-implement <slug>`.
 4. The subagent drives TDD + per-task review + handover and opens a PR — a ready
    PR on clean completion, a `[blocked]` draft PR documenting the blocker
    otherwise.
@@ -64,35 +65,68 @@ keep going." Here:
 
 | File | Role |
 | --- | --- |
-| `loop.md` | The loop prompt. Copy to **`.claude/loop.md`** in the target repo. |
+| `LOCAL_IMPL_LOOP.md` | The loop prompt. Pass it to `/loop` with an `@`-mention. |
 
-Only one file to copy. Detection is a single CLI call, so there is no script to
-ship — `scifi list --status plan-ready --json` already filters by status across
-the checkout and any linked worktrees.
+Only one file. Detection is a single CLI call, so there is no script to ship —
+`scifi list --status plan-ready --json` already filters by status across the
+checkout and any linked worktrees.
 
 ## How to run
 
-From a clean checkout of the target repo, on `main`:
+From a clean checkout of the target repo, on `main`, with `LOCAL_IMPL_LOOP.md` at
+the repo root:
 
 ```bash
-# 1. Put the loop prompt where /loop reads it.
-mkdir -p .claude && cp path/to/examples/local-loop/loop.md .claude/loop.md
-
-# 2. Start a session that may act without per-tool prompts, then start the loop.
+# Start a session that may act without per-tool prompts.
 claude --permission-mode acceptEdits
 ```
 
 ```text
-> /loop 10m
+> /loop 10m @LOCAL_IMPL_LOOP.md
 ```
 
-`/loop` inherits the session's permission mode, so for hands-off operation start
-`claude` with `--permission-mode acceptEdits` (or `--dangerously-skip-permissions`
-if you accept the *Blast radius* below). Leave the terminal open: the loop only
-fires while the session is running and idle.
+The `@`-mention passes the file's contents as the loop prompt. `/loop` inherits
+the session's permission mode, so for hands-off operation start `claude` with
+`--permission-mode acceptEdits` (or `--dangerously-skip-permissions` if you accept
+the *Blast radius* below). Leave the terminal open: the loop only fires while the
+session is running and idle.
+
+> The `@`-mention is expanded when you issue the command, so the prompt is
+> snapshotted once — re-issue `/loop` after editing the file. If you want a prompt
+> that reloads every iteration instead, put the same body at `.claude/loop.md` and
+> run a bare `/loop 10m`; that path is auto-read and re-read each iteration.
 
 **Stop it** with `Esc` while it is waiting for the next iteration. It also stops
 on its own after the 7-day cron expiry; re-run `/loop 10m` to continue past that.
+
+## Fitting the `sf-implement` skill (what the prompt has to handle)
+
+`sf-implement` is built to run autonomously — *"Run continuously, do not stop to
+ask between tasks. Stop only for a BLOCKED you cannot resolve, a genuine
+ambiguity, or all tasks done."* So the loop's "never pause" instruction reinforces
+the skill rather than fighting it, and the most dangerous path — a verification
+harness that will not run — the skill already hard-stops on itself. But three of
+its assumptions need the prompt's help, which is why `LOCAL_IMPL_LOOP.md` is more
+than "run `/sf-implement`":
+
+- **It expects to start inside the feature's worktree.** The skill confirms it is
+  inside the worktree `sf-feature` created (via the `worktree` path from
+  `scifi status`); it does **not** create one. The loop session sits on `main`, so
+  the dispatched subagent is told to read that path and `cd` into it first (and
+  recreate it if it is gone) before running `/sf-implement`.
+- **Handover has a second ask-the-human gate.** When handover finds untracked
+  workflow artifacts (the spec dir, new ADRs, `CONTEXT.md` edits) it asks the user
+  how to handle each. Unattended there is no user, so the prompt sets a default:
+  commit them with the feature so the branch is self-contained.
+- **Blocker escalation is redirected, not removed.** Where the skill would escalate
+  a genuine blocker to the user, the prompt sends it to a `[blocked]` draft PR
+  instead — same "stop, do not guess" intent, different destination.
+
+This is also where the example is most likely to need tuning on a real run: an
+agent told to "drive to completion" can lean on the skill's *re-dispatch* and
+*split-the-task* recovery steps longer than it should before concluding a slug is
+genuinely blocked. The turn budget and your review of the resulting PRs are the
+backstop.
 
 ## Requirements
 
@@ -136,8 +170,8 @@ on its own after the 7-day cron expiry; re-run `/loop 10m` to continue past that
   interval, not by parallel dispatch (parallel subagents on one machine multiply
   the resource and token cost).
 - **Unverified end to end.** The pieces are individually supported — `/loop` on a
-  fixed interval, `.claude/loop.md`, `scifi list --status`, subagents running
-  skills, nested subagents (≥ 2.1.172) — but this specific combination has not
+  fixed interval, an `@`-mentioned prompt file, `scifi list --status`, subagents
+  running skills, nested subagents (≥ 2.1.172) — but this combination has not
   been run for real. Validate on a throwaway repo first: confirm a plan-ready slug
   is detected, the subagent spawns and runs `/sf-implement`, and its reviewer
   subagent spawns rather than falling back to `REVIEW_UNAVAILABLE`.
