@@ -14,6 +14,10 @@ export interface WorktreeProvider {
   discover(projectRoot: string): Promise<LinkedWorktree[]>;
 }
 
+export function worktreePathFromLocation(location: `worktree:${string}`): string {
+  return location.slice('worktree:'.length);
+}
+
 function isAncestorOrSame(parent: string, child: string): boolean {
   const rel = relative(parent, child);
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));

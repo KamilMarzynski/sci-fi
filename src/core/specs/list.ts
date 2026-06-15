@@ -1,14 +1,10 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { buildFeatureMetadataPath, buildFeaturesRootPath } from './paths.js';
 import type { FeatureListItem, FeatureMetadata, FeatureStatus } from './types.js';
-import type { WorktreeProvider } from './worktree-discovery.js';
+import { type WorktreeProvider, worktreePathFromLocation } from './worktree-discovery.js';
 
 function isMissingPathError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
-}
-
-function worktreePathFromLocation(location: `worktree:${string}`): string {
-  return location.slice('worktree:'.length);
 }
 
 function isWorktreeLocation(

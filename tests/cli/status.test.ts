@@ -17,21 +17,38 @@ afterEach(async () => {
   temporaryDirectories.length = 0;
 });
 
-async function runStatus(args: string[]): Promise<{ stdout: string; exitCode?: number }> {
-  const output: string[] = [];
-  const originalWrite = process.stdout.write.bind(process.stdout);
+async function runStatus(
+  args: string[],
+): Promise<{ stdout: string; stderr: string; exitCode?: number }> {
+  const stdoutOutput: string[] = [];
+  const stderrOutput: string[] = [];
+  const originalStdoutWrite = process.stdout.write.bind(process.stdout);
+  const originalStderrWrite = process.stderr.write.bind(process.stderr);
+  const previousExitCode = process.exitCode;
+  process.exitCode = undefined;
   process.stdout.write = (chunk: string | Uint8Array): boolean => {
-    if (typeof chunk === 'string') output.push(chunk);
+    if (typeof chunk === 'string') stdoutOutput.push(chunk);
+    return true;
+  };
+  process.stderr.write = (chunk: string | Uint8Array): boolean => {
+    if (typeof chunk === 'string') stderrOutput.push(chunk);
     return true;
   };
 
   try {
     await buildProgram().parseAsync(['node', 'scifi', 'status', ...args]);
   } finally {
-    process.stdout.write = originalWrite;
+    process.stdout.write = originalStdoutWrite;
+    process.stderr.write = originalStderrWrite;
   }
 
-  return { stdout: output.join(''), exitCode: process.exitCode };
+  const exitCode = process.exitCode;
+  process.exitCode = previousExitCode;
+  return {
+    stdout: stdoutOutput.join(''),
+    stderr: stderrOutput.join(''),
+    exitCode,
+  };
 }
 
 describe('status command', () => {
@@ -67,26 +84,14 @@ describe('status command', () => {
       'utf8',
     );
 
-    const output: string[] = [];
-    const originalWrite = process.stdout.write.bind(process.stdout);
-    process.stdout.write = (chunk: string | Uint8Array): boolean => {
-      if (typeof chunk === 'string') output.push(chunk);
-      return true;
-    };
+    const { stdout } = await runStatus(['user-auth']);
 
-    try {
-      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
-    } finally {
-      process.stdout.write = originalWrite;
-    }
-
-    const combined = output.join('');
-    expect(combined).toContain('user-auth');
-    expect(combined).toContain('in-progress');
-    expect(combined).toContain('spec.md');
-    expect(combined).toContain('design.md');
-    expect(combined).toContain('setup-db');
-    expect(combined).toContain('done');
+    expect(stdout).toContain('user-auth');
+    expect(stdout).toContain('in-progress');
+    expect(stdout).toContain('spec.md');
+    expect(stdout).toContain('design.md');
+    expect(stdout).toContain('setup-db');
+    expect(stdout).toContain('done');
   });
 
   it('prints fixes block when feature has open fixes', async () => {
@@ -119,25 +124,13 @@ describe('status command', () => {
       'utf8',
     );
 
-    const output: string[] = [];
-    const originalWrite = process.stdout.write.bind(process.stdout);
-    process.stdout.write = (chunk: string | Uint8Array): boolean => {
-      if (typeof chunk === 'string') output.push(chunk);
-      return true;
-    };
+    const { stdout } = await runStatus(['user-auth']);
 
-    try {
-      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
-    } finally {
-      process.stdout.write = originalWrite;
-    }
-
-    const combined = output.join('');
-    expect(combined).toContain('fixes:');
-    expect(combined).toContain('FIX-0001');
-    expect(combined).toContain('token-expiry');
-    expect(combined).toContain('FIX-0002');
-    expect(combined).toContain('null-ptr');
+    expect(stdout).toContain('fixes:');
+    expect(stdout).toContain('FIX-0001');
+    expect(stdout).toContain('token-expiry');
+    expect(stdout).toContain('FIX-0002');
+    expect(stdout).toContain('null-ptr');
   });
 
   it('omits fixes block when feature has no fixes', async () => {
@@ -159,21 +152,9 @@ describe('status command', () => {
       'utf8',
     );
 
-    const output: string[] = [];
-    const originalWrite = process.stdout.write.bind(process.stdout);
-    process.stdout.write = (chunk: string | Uint8Array): boolean => {
-      if (typeof chunk === 'string') output.push(chunk);
-      return true;
-    };
+    const { stdout } = await runStatus(['user-auth']);
 
-    try {
-      await buildProgram().parseAsync(['node', 'scifi', 'status', 'user-auth']);
-    } finally {
-      process.stdout.write = originalWrite;
-    }
-
-    const combined = output.join('');
-    expect(combined).not.toContain('fixes:');
+    expect(stdout).not.toContain('fixes:');
   });
 
   it('prints the recorded branch and worktree when present', async () => {
@@ -197,22 +178,10 @@ describe('status command', () => {
       'utf8',
     );
 
-    const output: string[] = [];
-    const originalWrite = process.stdout.write.bind(process.stdout);
-    process.stdout.write = (chunk: string | Uint8Array): boolean => {
-      if (typeof chunk === 'string') output.push(chunk);
-      return true;
-    };
+    const { stdout } = await runStatus(['google-auth']);
 
-    try {
-      await buildProgram().parseAsync(['node', 'scifi', 'status', 'google-auth']);
-    } finally {
-      process.stdout.write = originalWrite;
-    }
-
-    const combined = output.join('');
-    expect(combined).toContain('feat/google-auth');
-    expect(combined).toContain('.worktrees/feat-google-auth');
+    expect(stdout).toContain('feat/google-auth');
+    expect(stdout).toContain('.worktrees/feat-google-auth');
   });
 
   it('resolves a worktree-only feature and prints its location', async () => {
@@ -250,7 +219,11 @@ describe('status command', () => {
     });
 
     const worktreeFeatureDir = join(worktreeRoot, 'docs', 'scifi', 'specs', 'payment-flow');
+    const worktreeTasksDir = join(worktreeFeatureDir, 'tasks');
+    const worktreeFixesDir = join(worktreeFeatureDir, 'fixes');
     await mkdir(worktreeFeatureDir, { recursive: true });
+    await mkdir(worktreeTasksDir, { recursive: true });
+    await mkdir(worktreeFixesDir, { recursive: true });
     await writeFile(
       join(worktreeFeatureDir, '.scifi.json'),
       `${JSON.stringify(
@@ -268,6 +241,16 @@ describe('status command', () => {
       'utf8',
     );
     await writeFile(join(worktreeFeatureDir, 'spec.md'), '# Payment Flow\n', 'utf8');
+    await writeFile(
+      join(worktreeTasksDir, 'setup-gateway.md'),
+      '---\nid: TASK-001\nslug: setup-gateway\nstatus: in-progress\ndepends-on: []\n---\n# Setup Gateway\n',
+      'utf8',
+    );
+    await writeFile(
+      join(worktreeFixesDir, 'FIX-0001-timeout.md'),
+      '---\nid: FIX-0001\nslug: timeout\nstatus: open\nfeature: payment-flow\ncreated: 2026-05-21T00:00:00.000Z\n---\n# timeout\n',
+      'utf8',
+    );
 
     const { stdout } = await runStatus(['payment-flow']);
 
@@ -275,6 +258,9 @@ describe('status command', () => {
     expect(stdout).toContain('spec-ready');
     expect(stdout).toContain(`worktree:${await realpath(worktreeRoot)}`);
     expect(stdout).toContain('location:');
+    expect(stdout).toContain('setup-gateway');
+    expect(stdout).toContain('FIX-0001');
+    expect(stdout).toContain('timeout');
   });
 
   it('includes location in json output for a local feature', async () => {
@@ -360,5 +346,19 @@ describe('status command', () => {
     const parsed = JSON.parse(stdout);
     expect(parsed.ok).toBe(true);
     expect(parsed.data.location).toBe(`worktree:${await realpath(worktreeRoot)}`);
+  });
+
+  it('preserves NOT_FOUND and omits location for a missing feature', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-status-cmd-'));
+    temporaryDirectories.push(projectRoot);
+    process.chdir(projectRoot);
+
+    const { stderr, exitCode } = await runStatus(['missing-feature', '--json']);
+
+    const parsed = JSON.parse(stderr);
+    expect(parsed.ok).toBe(false);
+    expect(parsed.error.code).toBe('NOT_FOUND');
+    expect(parsed.data).toBeUndefined();
+    expect(exitCode).toBe(3);
   });
 });

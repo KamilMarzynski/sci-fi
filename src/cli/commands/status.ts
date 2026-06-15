@@ -3,7 +3,10 @@ import type { Command } from 'commander';
 import { listFixes } from '../../core/fixes/list.js';
 import { emitError, emitSuccess, jsonMode } from '../../core/output/index.js';
 import { resolveFeatureLifecycle } from '../../core/specs/lifecycle.js';
-import { createGitWorktreeProvider } from '../../core/specs/worktree-discovery.js';
+import {
+  createGitWorktreeProvider,
+  worktreePathFromLocation,
+} from '../../core/specs/worktree-discovery.js';
 import { listTasks } from '../../core/tasks/list.js';
 
 export function registerStatusCommand(program: Command): void {
@@ -24,7 +27,7 @@ export function registerStatusCommand(program: Command): void {
         const { lifecycle, location } = resolved;
         const { metadata, artifacts } = lifecycle;
 
-        const sourceRoot = location === 'local' ? projectRoot : location.slice('worktree:'.length);
+        const sourceRoot = location === 'local' ? projectRoot : worktreePathFromLocation(location);
         const tasks = await listTasks(sourceRoot, slug);
         const fixes = await listFixes(sourceRoot, slug);
 
