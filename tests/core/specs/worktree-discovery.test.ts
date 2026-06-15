@@ -125,4 +125,36 @@ describe('createGitWorktreeProvider', () => {
     expect(worktrees.find((w) => w.path === realProjectRoot)?.isCurrent).toBe(true);
     expect(worktrees.find((w) => w.path === realLinkedPath)?.isCurrent).toBe(false);
   });
+
+  it('skips a linked worktree whose directory has been removed', async () => {
+    const projectRoot = await mkdtemp(join(tmpdir(), 'scifi-git-'));
+    const linkedPath = join(projectRoot, '.worktrees', 'linked');
+    temporaryDirectories.push(projectRoot);
+
+    await writeFile(join(projectRoot, 'initial.txt'), 'initial\n', 'utf8');
+
+    const { execFile } = await import('node:child_process');
+    const { promisify } = await import('node:util');
+    const execFileAsync = promisify(execFile);
+
+    await execFileAsync('git', ['init'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.email', 'test@example.com'], { cwd: projectRoot });
+    await execFileAsync('git', ['config', 'user.name', 'Test User'], { cwd: projectRoot });
+    await execFileAsync('git', ['add', '.'], { cwd: projectRoot });
+    await execFileAsync('git', ['commit', '-m', 'initial'], { cwd: projectRoot });
+    await execFileAsync('git', ['worktree', 'add', '-b', 'feat/linked', linkedPath], {
+      cwd: projectRoot,
+    });
+
+    await rm(linkedPath, { recursive: true, force: true });
+
+    process.chdir(projectRoot);
+
+    const provider = createGitWorktreeProvider();
+    const worktrees = await provider.discover(projectRoot);
+
+    const realProjectRoot = await realpath(projectRoot);
+    const paths = worktrees.map((w) => w.path);
+    expect(paths).toEqual([realProjectRoot]);
+  });
 });

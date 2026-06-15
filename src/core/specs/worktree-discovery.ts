@@ -108,6 +108,8 @@ export function createGitWorktreeProvider(): WorktreeProvider {
         );
         return selectCurrentWorktree(validWorktrees, currentWorkingDirectory);
       } catch {
+        // Swallow git failures (not a repo, git missing, command errors) so callers
+        // fall back to local-only behavior without surfacing an error.
         return [];
       }
     },
