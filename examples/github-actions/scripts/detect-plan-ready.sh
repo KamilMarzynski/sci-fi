@@ -26,8 +26,9 @@ changed_slugs="$(
 
 while IFS= read -r slug; do
   [ -z "$slug" ] && continue
-  # `scifi status` exits non-zero for unknown slugs; skip those quietly.
-  status="$(scifi status "$slug" --json 2>/dev/null | jq -r '.status // empty')"
+  # `scifi status` exits non-zero for unknown slugs (e.g. a dir deleted in the
+  # range). The `|| true` keeps `set -e -o pipefail` from killing the loop on it.
+  status="$(scifi status "$slug" --json 2>/dev/null | jq -r '.status // empty' || true)"
   if [ "$status" = "plan-ready" ]; then
     printf '%s\n' "$slug"
   fi
