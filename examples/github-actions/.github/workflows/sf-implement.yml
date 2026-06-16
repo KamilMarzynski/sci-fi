@@ -1,0 +1,164 @@
+# Autonomous implementation of plan-ready scifi features.
+#
+# When a spec is merged to the default branch at lifecycle status `plan-ready`,
+# this workflow opens a branch, runs `sf-implement` headlessly via the official
+# anthropics/claude-code-action, and leaves a pull request (draft if the run hit
+# a blocker, ready if clean).
+#
+# This is a REFERENCE example, not a hardened pipeline. Read the README before
+# enabling it on a real repository — in particular the permission-bypass and
+# cost notes.
+#
+# Copy `.github/workflows/sf-implement.yml`, `scripts/detect-plan-ready.sh`, and
+# `ci-goal.md` into the target repo (adjusting paths) and set the secrets listed
+# in the README.
+
+name: sf-implement
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/scifi/specs/**"
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "Feature slug to implement (skips detection)"
+        required: true
+        type: string
+
+# The run pushes a branch and opens a PR.
+permissions:
+  contents: write
+  pull-requests: write
+
+# Never run two autonomous implementations of the same commit concurrently.
+concurrency:
+  group: sf-implement-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      slugs: ${{ steps.find.outputs.slugs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need history to diff the merged range
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install scifi
+        run: npm install -g @kamilmarzynski/scifi
+
+      - name: Find plan-ready slugs
+        id: find
+        run: |
+          if [ -n "${{ inputs.slug }}" ]; then
+            slugs="${{ inputs.slug }}"
+          else
+            base="${{ github.event.before }}"
+            # First push to a fresh branch reports an all-zero base; fall back to HEAD^.
+            if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+              base="$(git rev-parse HEAD^)"
+            fi
+            slugs="$(bash examples/github-actions/scripts/detect-plan-ready.sh "$base" "${{ github.sha }}")"
+          fi
+          # Emit a JSON array for the matrix (empty array => downstream job skipped).
+          json="$(printf '%s\n' "$slugs" | jq -R . | jq -cs 'map(select(length > 0))')"
+          echo "slugs=$json" >> "$GITHUB_OUTPUT"
+          echo "Detected: $json"
+
+  implement:
+    needs: detect
+    if: needs.detect.outputs.slugs != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # one feature blocking must not cancel the others
+      matrix:
+        slug: ${{ fromJSON(needs.detect.outputs.slugs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # scifi must be on PATH for the skill's CLI calls (scifi start/status/...);
+      # the Claude runtime itself is provided by the action below.
+      - name: Install scifi
+        run: npm install -g @kamilmarzynski/scifi
+
+      - name: Configure git identity
+        run: |
+          git config user.name "scifi-bot"
+          git config user.email "scifi-bot@users.noreply.github.com"
+
+      - name: Create implementation branch
+        id: branch
+        run: |
+          branch="sf-impl/${{ matrix.slug }}"
+          # Idempotency: if a branch/PR already exists for this slug, do not start a second run.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "Branch $branch already exists upstream — skipping." >&2
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git checkout -b "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      # Run sf-implement headlessly via the official action. It runs the real
+      # Claude Code engine — so project skills (.claude/skills) and hooks both
+      # load, which is what /goal (a Stop hook) and /sf-implement need — and it
+      # handles the headless trust/permission environment that a hand-rolled
+      # `claude -p` does not.
+      #
+      # Two complementary mechanisms:
+      #  * /goal (the prompt) is the completion loop: a fast model re-checks the
+      #    condition after every turn and keeps Claude working until it holds.
+      #    The evaluator only reads the transcript, so the condition is phrased
+      #    around what the agent surfaces (the `scifi status` output).
+      #  * ci-goal.md (appended system prompt) carries the behaviour: branch
+      #    rules, never ask a human, draft-PR-on-blocker.
+      - name: Run sf-implement (Claude Code Action)
+        if: steps.branch.outputs.skip != 'true'
+        uses: anthropics/claude-code-action@v1
+        env:
+          # The skill's `gh pr create` (HANDOVER.md) reads this from the env.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: >-
+            /goal Drive the scifi feature "${{ matrix.slug }}" to completion by
+            running /sf-implement ${{ matrix.slug }}. Done when the transcript
+            shows `scifi status ${{ matrix.slug }} --json` reporting status
+            "done" with a ready PR open, OR a critical blocker forced a [blocked]
+            draft PR that documents it. Stop after 400 turns.
+          claude_args: |
+            --append-system-prompt-file examples/github-actions/ci-goal.md
+            --permission-mode bypassPermissions
+            --max-turns 400
+
+      # Safety net: if the agent committed work but never opened a PR (crash,
+      # turn limit), still surface a draft PR so nothing is silently lost.
+      - name: Ensure a PR exists
+        if: always() && steps.branch.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLUG: ${{ matrix.slug }}
+        run: |
+          branch="${{ steps.branch.outputs.branch }}"
+          git push -u origin "$branch" || true
+          if [ -z "$(gh pr list --head "$branch" --json number --jq '.[].number')" ] \
+             && [ -n "$(git log "origin/main..$branch" --oneline 2>/dev/null)" ]; then
+            gh pr create --draft \
+              --base main --head "$branch" \
+              --title "[blocked] sf-implement: $SLUG" \
+              --body "Autonomous \`sf-implement $SLUG\` did not open its own PR (crash or turn limit). Branch pushed with whatever was committed; check the run logs and continue with \`sf-continue\`."
+          fi

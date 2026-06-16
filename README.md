@@ -226,6 +226,27 @@ Every command accepts `--json` for structured output, and reports failures with
 a stable error code (`NOT_FOUND`, `PRECONDITION_FAILED`, `CONFLICT`,
 `INVALID_ARGUMENT`).
 
+## Examples
+
+[`examples/`](examples/) holds reference setups for running the implementation
+stage autonomously once a reviewed spec reaches `plan-ready` — the human-judgement
+stages stay local, and every result lands behind a normal PR review.
+
+- [`examples/github-actions/`](examples/github-actions/) — unattended CI: a push
+  of a `plan-ready` spec to `main` triggers a headless `sf-implement` run (via the
+  official `anthropics/claude-code-action` and `/goal`) that opens an implemented
+  PR.
+- [`examples/local-loop/`](examples/local-loop/) — attended local: a `/loop`
+  session polls `main` and dispatches a subagent to implement each new
+  `plan-ready` feature.
+- [`examples/local-pr-loop/`](examples/local-pr-loop/) — attended local: one
+  `/loop` session babysits your open spec PRs — answering review comments with
+  `sf-receiving-review` and, once a PR is clean and 👍-approved, dispatching a
+  background `sf-implement` subagent per PR in its own worktree.
+
+Both are references, not hardened pipelines — read each directory's README before
+enabling it.
+
 ## Development
 
 ```bash
