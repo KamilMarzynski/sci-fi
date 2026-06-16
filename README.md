@@ -239,6 +239,10 @@ stages stay local, and every result lands behind a normal PR review.
 - [`examples/local-loop/`](examples/local-loop/) — attended local: a `/loop`
   session polls `main` and dispatches a subagent to implement each new
   `plan-ready` feature.
+- [`examples/local-pr-loop/`](examples/local-pr-loop/) — attended local: one
+  `/loop` session babysits your open spec PRs — answering review comments with
+  `sf-receiving-review` and, once a PR is clean and 👍-approved, dispatching a
+  background `sf-implement` subagent per PR in its own worktree.
 
 Both are references, not hardened pipelines — read each directory's README before
 enabling it.
