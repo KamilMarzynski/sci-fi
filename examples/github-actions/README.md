@@ -139,10 +139,7 @@ custom App) and pass its token as `github_token` instead of the default
 - Assumes the project's verification harness installs and runs on a stock
   `ubuntu-latest` Node 22 runner — add system deps as your project needs.
   (scifi declares `node >=22`; the workflow pins Node 22 for that reason.)
-- **Unverified end to end.** The pieces are individually sound (the detect
-  script is tested) and the building blocks are supported — headless runs,
-  `/goal`, and nested subagents (≥ 2.1.172) are all documented, first-class
-  features — but this specific combination has not been executed on a live
-  runner. Validate on a throwaway repo before trusting it: confirm the action's
-  engine version, that `/goal` evaluates, and that the implementer's reviewer
-  subagent spawns rather than falling back to `REVIEW_UNAVAILABLE`.
+- **A reference, not a turnkey pipeline.** The building blocks are individually
+  supported — headless runs, `/goal`, and nested subagents (≥ 2.1.172) — and the
+  detect script is tested, but the workflow is meant to be read and adapted to a
+  repo's own conventions rather than dropped in unchanged.

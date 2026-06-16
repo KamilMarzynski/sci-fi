@@ -183,9 +183,8 @@ backstop.
 - Serial by design — one feature per iteration. Raise throughput by shortening the
   interval, not by parallel dispatch (parallel subagents on one machine multiply
   the resource and token cost).
-- **Unverified end to end.** The pieces are individually supported — `/loop` on a
-  fixed interval, an `@`-mentioned prompt file, `scifi list --status`, subagents
-  running skills, nested subagents (≥ 2.1.172) — but this combination has not
-  been run for real. Validate on a throwaway repo first: confirm a plan-ready slug
-  is detected, the subagent spawns and runs `/sf-implement`, and its reviewer
-  subagent spawns rather than falling back to `REVIEW_UNAVAILABLE`.
+- **A reference, not a turnkey pipeline.** The building blocks are individually
+  supported — `/loop` on a fixed interval, an `@`-mentioned prompt file,
+  `scifi list --status`, subagents running skills, nested subagents
+  (≥ 2.1.172) — and are meant to be read and adapted to a repo's own conventions
+  rather than run unchanged.

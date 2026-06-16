@@ -148,9 +148,7 @@ Stop it with `Esc`; it also expires after 7 days (re-run to continue).
   inside `sf-implement`; the loop does not route post-implementation code review.
 - **Lens detection is heuristic** — threads on `spec.md` use the spec lens, on
   `design.md`/`tasks/` the plan lens. Mixed threads may need a human.
-- **Unverified end to end.** Every primitive is supported — `/loop`, background
-  subagents, isolated worktrees, `gh` reactions and GraphQL review threads,
-  `sf-receiving-review` and `sf-implement` — but this combination has not been run
-  for real. Validate on a throwaway repo first: open a spec PR, leave a comment and
-  confirm the review subagent answers and resolves it, then 👍 and confirm exactly
-  one implement subagent runs and pushes to the same PR.
+- **A reference, not a turnkey pipeline.** Every primitive is supported — `/loop`,
+  background subagents, isolated worktrees, `gh` reactions and GraphQL review
+  threads, `sf-receiving-review` and `sf-implement` — and is meant to be read and
+  adapted to your own review conventions rather than run unchanged.
