@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.1.4](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.3...v0.1.4) (2026-06-16)
+
+
+### Features
+
+* add CANCELLED error code with exit code 130 ([b0297ec](https://github.com/KamilMarzynski/sci-fi/commit/b0297ec22bd4f5919278b86ca4a3eae690a395da))
+* checkbox harness picker in scifi init ([1c967f7](https://github.com/KamilMarzynski/sci-fi/commit/1c967f770d68cd36971e190a2908f45cf6f50253))
+* **cli:** add checkbox harness picker module ([be3686b](https://github.com/KamilMarzynski/sci-fi/commit/be3686b69865eeeccd6925b0be1090911006f004))
+* **list:** make scifi list worktree-aware ([ac20c7c](https://github.com/KamilMarzynski/sci-fi/commit/ac20c7ced505f9ea2da67cc5b01e44d95d3fdd45))
+* **status:** resolve features across linked worktrees with location ([9397ac9](https://github.com/KamilMarzynski/sci-fi/commit/9397ac94665b48e08f0852d0fdebcc5e74c274c2))
+* wire checkbox picker into init and delete number parser ([a02327a](https://github.com/KamilMarzynski/sci-fi/commit/a02327a96eaddabf5335a9a63f5c7f0fe9768482))
+* worktree-aware discovery for scifi list and status ([84a0d66](https://github.com/KamilMarzynski/sci-fi/commit/84a0d66a65a81c927bb5c1063acb609640ea00d9))
+
+
+### Bug Fixes
+
+* document setRawMode override with ts-expect-error ([fe5b334](https://github.com/KamilMarzynski/sci-fi/commit/fe5b33436fc3aab3b7570cb4e41b3f2ad06706f3))
+* **examples:** address Codex review (package, status envelope, node) ([fd6653d](https://github.com/KamilMarzynski/sci-fi/commit/fd6653da2d2d3b9afd66203a4b15cadfbb7fde6f))
+* **examples:** keep detect loop alive when scifi status exits non-zero ([2a85083](https://github.com/KamilMarzynski/sci-fi/commit/2a85083508a0728ff13edf83099f2c09ec9fd75c))
+* **list:** address review findings for worktree-aware discovery ([579fcb3](https://github.com/KamilMarzynski/sci-fi/commit/579fcb31b541dd3592bb581c261dd116fddf7975))
+* **list:** address second code-review round ([af8acc1](https://github.com/KamilMarzynski/sci-fi/commit/af8acc110fd6575a8ee737010e30670d0d17558a))
+* probe setRawMode before launching harness picker ([d164006](https://github.com/KamilMarzynski/sci-fi/commit/d164006f817f4e426fcdd1778ecd1bc5b1f179b7))
+* remove type assertions in cancel-mapping test ([24bc360](https://github.com/KamilMarzynski/sci-fi/commit/24bc360c02cbc655dc32f892adeaa2aca0d5d38f))
+
 ## [0.1.3](https://github.com/KamilMarzynski/sci-fi/compare/v0.1.2...v0.1.3) (2026-06-13)
 
 
