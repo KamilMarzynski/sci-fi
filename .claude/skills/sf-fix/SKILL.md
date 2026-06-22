@@ -43,8 +43,7 @@ The fix must attach to one feature. Resolve it before anything else.
   when *no* matching worktree exists **and** `scifi status <slug>` returns
   `NOT_FOUND` from a checkout that would contain it is the feature truly absent —
   then stop: a defect with no owning feature goes to `sf-bug` (untracked), real
-  new work to `sf-feature`. A `NOT_FOUND` while a `feat/<slug>` worktree exists
-  just means you are in the wrong checkout, not that the feature is gone.
+  new work to `sf-feature`. Run `scifi status <slug> --json`. If `location` is `worktree:<path>`, enter that worktree before continuing.
 
 Once identified, read the feature's `spec.md` and `design.md`, and grep
 `docs/scifi/adr/` for decisions touching the area. Diagnosis is grounded in the
